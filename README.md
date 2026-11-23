@@ -1,11 +1,54 @@
-# NexaTerm
+<p align="center">
+  <img src="public/nexaterm-wordmark-dark.svg#gh-dark-mode-only" alt="NexaTerm - Remote Administration Workstation" width="560">
+  <img src="public/nexaterm-wordmark-light.svg#gh-light-mode-only" alt="NexaTerm - Remote Administration Workstation" width="560">
+</p>
 
-**One Workspace. Every Remote Connection.**
+<p align="center"><strong>One Workspace. Every Remote Connection.</strong></p>
+
+<p align="center">
+  <a href="https://github.com/bom-sudo/NexaTerm/releases/latest"><b>Download</b></a> &nbsp;|&nbsp;
+  <a href="docs/USER_GUIDE.md">User guide</a> &nbsp;|&nbsp;
+  <a href="docs/INSTALL.md">Installation</a> &nbsp;|&nbsp;
+  <a href="docs/DEVELOPER.md">Build from source</a> &nbsp;|&nbsp;
+  <a href="SECURITY.md">Security</a>
+</p>
+
+<p align="center">
+  <img alt="Platform: Windows 10/11 x64" src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011%20x64-0b1930">
+  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-35bdf2">
+  <img alt="Version 1.0.0" src="https://img.shields.io/badge/version-1.0.0-477bff">
+  <img alt="Built with Tauri 2 and Rust" src="https://img.shields.io/badge/built%20with-Tauri%202%20%2B%20Rust-142a49">
+</p>
 
 NexaTerm is a free, open-source (MIT) remote administration workstation for Windows 10/11:
 a tabbed terminal with split panes, an SSH client with real host-key verification, an SFTP file
-manager, SSH tunnels, multi-execution, an SSH key manager, command snippets and network diagnostics —
+manager, SSH tunnels, multi-execution, an SSH key manager, command snippets and network diagnostics,
 in one offline-first desktop app. No account, no telemetry, no paid tier, no usage limits.
+
+![NexaTerm workspace: local PowerShell and an SSH session side by side, with saved sessions organised in folders](docs/images/workspace.png)
+
+## Screenshots
+
+All screenshots show the real application. SSH and SFTP views are connected to the small test
+server that ships with the source (`cargo run --example mock_sshd`), which is why hosts read `127.0.0.1`.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/images/sftp.png" alt="SFTP file browser"><br><b>SFTP file manager</b><br>Browse, upload by drag and drop, download, rename, delete and edit remote files, with a transfer queue.</td>
+    <td width="50%"><img src="docs/images/multiexec.png" alt="Multi-execution across three SSH sessions"><br><b>Multi-execution</b><br>Send one command to several servers, with a confirmation that lists every target and warns about destructive commands.</td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/hostkey.png" alt="Host key verification dialog"><br><b>Host key verification</b><br>Every new server shows its SHA-256 fingerprint first. Changed keys are blocked until you decide.</td>
+    <td><img src="docs/images/tunnels.png" alt="SSH tunnel manager"><br><b>SSH tunnels</b><br>Local (-L), remote (-R) and SOCKS5 (-D) forwards with live status and port-conflict detection.</td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/keys.png" alt="SSH key manager"><br><b>SSH key manager</b><br>Generate Ed25519 or RSA keys, import existing ones, export public keys and change passphrases.</td>
+    <td><img src="docs/images/snippets.png" alt="Command snippets"><br><b>Command snippets</b><br>Reusable commands with <code>{{variables}}</code>, shown in full before anything is sent.</td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="docs/images/network-tools-light.png" alt="Network tools in the light theme" width="70%"><br><b>Network toolbox, light theme</b><br>Ping, traceroute, DNS, reverse DNS, TCP port test, interfaces and public IP (only on request).</td>
+  </tr>
+</table>
 
 ## Features (v1.0.0)
 

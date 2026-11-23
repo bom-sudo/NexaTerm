@@ -191,6 +191,7 @@ export interface AppInfo {
   dataDir: string;
   portable: boolean;
   dataNotice: string | null;
+  showcase: string | null;
   schemaVersion: number;
   os: string;
 }

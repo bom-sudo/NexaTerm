@@ -64,3 +64,7 @@ debug = false
 [[example]]
 name = "mock_sshd"
 path = "examples/mock_sshd.rs"
+
+[[example]]
+name = "seed_showcase"
+path = "examples/seed_showcase.rs"

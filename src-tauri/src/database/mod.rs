@@ -115,6 +115,10 @@ pub const PORTABLE_DIR: &str = "portable-data";
 /// Portable mode is active when `portable-data\` (or the legacy `portable.flag`) sits next to the
 /// executable. Installed mode uses `%APPDATA%\NexaTerm`.
 pub fn resolve_data_location() -> DataLocation {
+    // Explicit override for automation, testing and screenshots: NEXATERM_DATA_DIR=<folder>.
+    if let Some(dir) = std::env::var_os("NEXATERM_DATA_DIR").filter(|d| !d.is_empty()) {
+        return DataLocation { dir: PathBuf::from(dir), portable: false, notice: None };
+    }
     let exe_dir = std::env::current_exe().ok().and_then(|e| e.parent().map(PathBuf::from));
     if let Some(exe_dir) = exe_dir {
         if let Some(loc) = portable_location(&exe_dir) {

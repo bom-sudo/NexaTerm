@@ -1,6 +1,6 @@
 # Development Status — NexaTerm 1.0.0 (2026-11-23)
 
-Legend: ✅ built and tested · 🟡 implemented, tested by automated tests only (not clicked through) · ⬜ not implemented
+Legend: **Done** = built and tested · **Partial** = implemented and covered by automated tests, UI not clicked through · **Not started** = not implemented
 
 ## Release artifacts (`dist/release/v1.0.0/`, git-ignored — publish as a GitHub Release)
 
@@ -16,13 +16,13 @@ Signing: **unsigned** (no certificate). Checksums are in `SHA256SUMS.txt`.
 
 | Suite | Result | Notes |
 |---|---|---|
-| Frontend type check + Vitest | ✅ 18/18 | |
-| Rust unit tests | ✅ 34/34 | |
-| SSH/SFTP/tunnel integration (mock server) | ✅ 11/11 | |
-| `verify-release.ps1` | ✅ VERIFY PASSED | PE files, versions, ZIP layout/integrity, checksums, portable self-test |
-| Offline installer (`test-installer.ps1`) | ✅ 19/19 | Real wizard via UI Automation, Start-menu shortcut, registry, launch from shortcut, self-test ×2, uninstall, data retained, silent reinstall to path with spaces, uninstall. Run with `TEMP` on D: (see limitation 1). |
-| Web installer (`test-installer.ps1`) | ✅ 19/19 | Same suite with default `TEMP` on the nearly full C: drive |
-| Portable (`test-portable.ps1`) | ✅ 15/15 | Path with spaces, PATH without dev tools, GUI open + graceful close, persistence, logs, DB integrity, no secrets on disk, move folder, read-only fallback with in-app warning |
+| Frontend type check + Vitest | Passed 18/18 | |
+| Rust unit tests | Passed 34/34 | |
+| SSH/SFTP/tunnel integration (mock server) | Passed 11/11 | |
+| `verify-release.ps1` | Passed (VERIFY PASSED) | PE files, versions, ZIP layout/integrity, checksums, portable self-test |
+| Offline installer (`test-installer.ps1`) | Passed 19/19 | Real wizard via UI Automation, Start-menu shortcut, registry, launch from shortcut, self-test ×2, uninstall, data retained, silent reinstall to path with spaces, uninstall. Run with `TEMP` on D: (see limitation 1). |
+| Web installer (`test-installer.ps1`) | Passed 19/19 | Same suite with default `TEMP` on the nearly full C: drive |
+| Portable (`test-portable.ps1`) | Passed 15/15 | Path with spaces, PATH without dev tools, GUI open + graceful close, persistence, logs, DB integrity, no secrets on disk, move folder, read-only fallback with in-app warning |
 
 Environment: Windows 11 Pro (build 26300), x64, per-user without admin rights, WebView2 157 already installed.
 **Not tested:** a clean Windows VM, Windows 10, a machine *without* WebView2 (the runtime-install path of
@@ -33,31 +33,31 @@ and SSH against a real OpenSSH server (all SSH tests use the bundled mock server
 
 | Criterion | Status |
 |---|---|
-| Application starts on Windows | ✅ installed and portable release builds |
-| Local PowerShell / CMD terminals | ✅ GUI (dev build) + ConPTY self-test in release builds |
-| Multiple tabs, split terminal | ✅ GUI (dev build) |
-| SSH password / private-key login | ✅ integration tests; password login also via GUI against mock server |
-| Host fingerprint verification, known hosts persisted | ✅ integration + GUI |
-| Session profiles create/edit, persist after restart | ✅ unit tests + release persistence tests |
-| Multiple simultaneous SSH sessions | ✅ integration test |
-| SFTP browse / upload / download | ✅ integration; browse + edit via GUI |
-| Port forwarding | ✅ integration (local, SOCKS5); 🟡 tunnel UI |
-| Credentials securely stored | ✅ Credential Manager tests, no secrets on disk |
-| No mandatory internet, no paid services, no usage limits | ✅ |
-| Windows installer builds | ✅ offline + web |
-| Portable edition builds | ✅ |
-| Documentation | ✅ |
+| Application starts on Windows | Done: installed and portable release builds |
+| Local PowerShell / CMD terminals | Done: GUI (dev build) + ConPTY self-test in release builds |
+| Multiple tabs, split terminal | Done: GUI (dev build) |
+| SSH password / private-key login | Done: integration tests; password login also via GUI against mock server |
+| Host fingerprint verification, known hosts persisted | Done: integration + GUI |
+| Session profiles create/edit, persist after restart | Done: unit tests + release persistence tests |
+| Multiple simultaneous SSH sessions | Done: integration test |
+| SFTP browse / upload / download | Done: integration; browse + edit via GUI |
+| Port forwarding | Done: integration (local, SOCKS5); Partial: tunnel UI |
+| Credentials securely stored | Done: Credential Manager tests, no secrets on disk |
+| No mandatory internet, no paid services, no usage limits | Done |
+| Windows installer builds | Done: offline + web |
+| Portable edition builds | Done |
+| Documentation | Done |
 
 ## Feature status
 
 | Module | Status |
 |---|---|
-| Terminal emulator, local shells | ✅ |
-| SSH client, session manager | ✅ (import/export & folder drag-drop 🟡) |
-| SFTP + remote editor | ✅ (folder transfer ⬜) |
-| Tunnels, multi-execution, key manager, network tools, snippets, settings/backup | 🟡 backend tested, UI type-checked, not clicked through |
-| Portable mode, read-only fallback, app log, `--self-test` | ✅ |
-| Macros, RDP, VNC, X11, Telnet, Serial | ⬜ (hidden in the UI) |
+| Terminal emulator, local shells | Done |
+| SSH client, session manager | Done (import/export and folder drag-drop: Partial) |
+| SFTP + remote editor | Done (folder transfer: Not started) |
+| Tunnels, multi-execution, key manager, network tools, snippets, settings/backup | Partial (backend tested, UI type-checked, not clicked through) |
+| Portable mode, read-only fallback, app log, `--self-test` | Done |
+| Macros, RDP, VNC, X11, Telnet, Serial | Not started (hidden in the UI) |
 
 ## Known limitations
 
@@ -76,6 +76,6 @@ and SSH against a real OpenSSH server (all SSH tests use the bundled mock server
 ## Next tasks
 
 1. Test against real OpenSSH servers; test on a clean Windows 10 and 11 VM, including a PC without WebView2.
-2. Click-through QA of the 🟡 screens.
+2. Click-through QA of the screens marked Partial.
 3. Code signing and CI (GitHub Actions on `windows-latest` with MSVC, which also removes `WebView2Loader.dll`).
 4. Phase 5 protocols (Telnet/Serial first), macros, SFTP folder transfers.

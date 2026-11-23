@@ -33,6 +33,7 @@ npm run test:rust                # cargo test: unit + integration (mock SSH/SFTP
 npm run build:installer          # release build + NSIS installer
 npm run build:release            # full pipeline -> dist\release\v<version>\ (installers, portable zip, checksums)
 npm run verify:release           # verify that folder, incl. self-test of the portable exe
+powershell -File scripts\capture-screenshots.ps1   # regenerate docs\images (real app + mock server, throw-away data)
 node scripts/gen-licenses.mjs    # regenerate THIRD_PARTY_LICENSES.md
 cargo run --manifest-path src-tauri/Cargo.toml --example mock_sshd -- 2222   # local SSH/SFTP test server (tester/secret)
 ```

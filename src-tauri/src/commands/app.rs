@@ -13,6 +13,8 @@ pub struct AppInfo {
     data_notice: Option<String>,
     schema_version: i64,
     os: String,
+    /// Dev builds only: scene name for README screenshots (NEXATERM_SHOWCASE).
+    showcase: Option<String>,
 }
 
 #[tauri::command]
@@ -25,6 +27,7 @@ pub fn app_info(state: S) -> AppResult<AppInfo> {
         data_notice: state.data_notice.clone(),
         schema_version: database::schema_version(&db)?,
         os: format!("{} {}", std::env::consts::OS, std::env::consts::ARCH),
+        showcase: if cfg!(debug_assertions) { std::env::var("NEXATERM_SHOWCASE").ok() } else { None },
     })
 }
 

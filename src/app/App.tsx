@@ -23,7 +23,15 @@ export function App() {
   const [fatal, setFatal] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([useSettings.getState().load(), useSessions.getState().refresh(), useSessions.getState().loadShells()]).catch((e) => setFatal(toApiError(e).message));
+    Promise.all([useSettings.getState().load(), useSessions.getState().refresh(), useSessions.getState().loadShells()])
+      .then(async () => {
+        // Dev builds only: README screenshot scenes (tree-shaken from release bundles).
+        if (import.meta.env.DEV) {
+          const info = await api.appInfo();
+          if (info.showcase) (await import("./showcase")).runShowcase(info.showcase);
+        }
+      })
+      .catch((e) => setFatal(toApiError(e).message));
     // Tell the user when the portable data folder was not writable and a fallback is in use.
     api.appInfo().then((i) => i.dataNotice && toast("warn", i.dataNotice, 0)).catch(() => {});
     registerShortcutHandlers({ newSession: () => newSessionDialog(), newTerminal: () => newLocalTerminal() });
