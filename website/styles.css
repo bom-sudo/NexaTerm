@@ -77,7 +77,37 @@ kbd {
 .nav-links { display: flex; gap: 26px; list-style: none; margin-left: 8px; }
 .nav-links a { color: var(--text-dim); font-size: 15px; }
 .nav-links a:hover { color: var(--text); }
-.nav-actions { display: flex; gap: 10px; margin-left: auto; }
+.nav-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+
+/* Language Switcher */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+.lang-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font: 600 13px/1 var(--font);
+  padding: 6px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .15s ease;
+  user-select: none;
+}
+.lang-btn:hover {
+  color: var(--text);
+}
+.lang-btn.active {
+  background: var(--accent);
+  color: #04121f;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
 
 /* Hero */
 .hero { padding: 84px 0 40px; text-align: center; }

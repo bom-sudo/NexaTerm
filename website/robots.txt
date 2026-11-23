@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://bom-sudo.github.io/NexaTerm/sitemap.xml
+Sitemap: https://nexaterm.pages.dev/sitemap.xml
