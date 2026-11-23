@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+<title id="title">NexaTerm Monochrome Icon</title><desc id="desc">Monochrome geometric N terminal mark.</desc>
+<rect x="24" y="24" width="464" height="464" rx="112" fill="none" stroke="currentColor" stroke-width="18" opacity=".18"/>
+<path d="M156 354V158L356 354V158" fill="none" stroke="currentColor" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="374" y="350" width="34" height="34" rx="8" fill="currentColor"/>
+</svg>

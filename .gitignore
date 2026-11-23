@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build output (frontend bundle, portable staging) and release artifacts
+build/
+dist/
+release/
+src-tauri/target/
+src-tauri/gen/
+
+# Third-party proprietary software kept locally for reference — never commit
+MobaXterm/
+
+# Local data / logs / secrets
+*.log
+*.db
+*.db-wal
+*.db-shm
+portable-data/
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db

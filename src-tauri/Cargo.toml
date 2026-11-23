@@ -1,0 +1,66 @@
+[package]
+name = "nexaterm"
+version = "1.0.0"
+description = "NexaTerm Remote Administration Workstation"
+authors = ["NexaTerm Project"]
+license = "MIT"
+edition = "2021"
+rust-version = "1.85"
+
+[lib]
+name = "nexaterm_lib"
+# Desktop-only: cdylib/staticlib are only needed for Tauri mobile and exceed the MinGW export limit.
+crate-type = ["rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }
+embed-manifest = "1"
+
+[dependencies]
+tauri = { version = "2.12", features = [] }
+tauri-plugin-dialog = "2.8"
+tauri-plugin-clipboard-manager = "2.5"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tokio = { version = "1", features = ["full"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+rusqlite = { version = "0.43", features = ["bundled", "backup"] }
+portable-pty = "0.9"
+russh = { version = "0.65", default-features = false, features = ["ring", "flate2", "rsa"] }
+russh-sftp = "4"
+rand = { version = "0.10", features = ["thread_rng"] }
+log = { version = "0.4", features = ["std"] }
+dirs = "6"
+futures = "0.3"
+dns-lookup = "2"
+if-addrs = "0.13"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.61", features = [
+  "Win32_Foundation",
+  "Win32_Security_Credentials",
+  "Win32_System_Console",
+  "Win32_System_Registry",
+] }
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true
+
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
+
+[[example]]
+name = "mock_sshd"
+path = "examples/mock_sshd.rs"

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "NexaTerm",
+  "version": "1.0.0",
+  "identifier": "org.nexaterm.workstation",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../build/web"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "title": "NexaTerm",
+        "width": 1360,
+        "height": 780,
+        "minWidth": 900,
+        "minHeight": 520,
+        "center": true,
+        "dragDropEnabled": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "publisher": "NexaTerm Project",
+    "copyright": "Copyright (c) 2026 NexaTerm Project. MIT License.",
+    "category": "DeveloperTool",
+    "shortDescription": "NexaTerm Remote Administration Workstation",
+    "longDescription": "Free and open-source remote administration workstation: terminal, SSH, SFTP, tunnels and network tools.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "webviewInstallMode": {
+        "type": "offlineInstaller",
+        "silent": true
+      },
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": [
+          "English",
+          "Thai"
+        ],
+        "displayLanguageSelector": true,
+        "installerIcon": "icons/nexaterm.ico",
+        "startMenuFolder": "NexaTerm",
+        "installerHooks": "../packaging/nsis-hooks.nsh"
+      }
+    },
+    "useLocalToolsDir": true
+  }
+}

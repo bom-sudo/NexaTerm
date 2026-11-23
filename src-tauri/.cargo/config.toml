@@ -1,0 +1,4 @@
+# Limit parallel rustc jobs: the dependency graph is large and 16 parallel jobs exhaust
+# memory on 8 GB machines. Raise this on bigger build hosts.
+[build]
+jobs = 2
