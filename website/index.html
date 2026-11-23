@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexaTerm - โปรแกรมเทอร์มินัล SSH และ SFTP ฟรีสำหรับ Windows</title>
+  <meta name="description" content="NexaTerm รวมเทอร์มินัล SSH, SFTP, SSH tunnel, การสั่งงานหลายเซิร์ฟเวอร์พร้อมกัน และเครื่องมือเครือข่ายไว้ในโปรแกรมเดียวสำหรับ Windows 10/11 ฟรีและโอเพนซอร์ส (MIT) ไม่ต้องสมัครบัญชี ไม่ส่งข้อมูลการใช้งานออกจากเครื่อง">
+  <meta name="keywords" content="NexaTerm, SSH, SFTP, เทอร์มินัล, Windows, SSH tunnel, โปรแกรมฟรี, โอเพนซอร์ส, ผู้ดูแลระบบ, network tools">
+  <meta name="theme-color" content="#0a1020">
+  <meta name="color-scheme" content="dark">
+  <link rel="canonical" href="https://bom-sudo.github.io/NexaTerm/">
+
+  <link rel="icon" type="image/x-icon" href="nexaterm.ico">
+  <link rel="icon" type="image/svg+xml" href="images/nexaterm-icon.svg">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bom-sudo.github.io/NexaTerm/">
+  <meta property="og:site_name" content="NexaTerm">
+  <meta property="og:locale" content="th_TH">
+  <meta property="og:title" content="NexaTerm - หนึ่งพื้นที่ทำงาน ครบทุกการเชื่อมต่อระยะไกล">
+  <meta property="og:description" content="เทอร์มินัล SSH, SFTP, SSH tunnel และเครื่องมือเครือข่ายสำหรับ Windows ฟรีและโอเพนซอร์ส">
+  <meta property="og:image" content="https://bom-sudo.github.io/NexaTerm/images/workspace.png">
+  <meta property="og:image:width" content="1376">
+  <meta property="og:image:height" content="819">
+  <meta property="og:image:alt" content="หน้าจอ NexaTerm: PowerShell และ SSH แสดงคู่กันในแท็บเดียว">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "NexaTerm",
+    "operatingSystem": "Windows 10 (1809+), Windows 11 (x64)",
+    "applicationCategory": "DeveloperApplication",
+    "softwareVersion": "1.0.0",
+    "inLanguage": "th",
+    "license": "https://opensource.org/licenses/MIT",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "THB" },
+    "downloadUrl": "https://github.com/bom-sudo/NexaTerm/releases/latest",
+    "description": "โปรแกรมเทอร์มินัล SSH, SFTP, SSH tunnel และเครื่องมือเครือข่ายสำหรับ Windows ฟรีและโอเพนซอร์ส",
+    "screenshot": "https://bom-sudo.github.io/NexaTerm/images/workspace.png"
+  }
+  </script>
+</head>
+<body>
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a href="#top" class="brand" aria-label="NexaTerm หน้าแรก">
+        <img src="images/nexaterm-icon.svg" alt="" width="30" height="30">
+        <span>NexaTerm</span>
+      </a>
+      <nav aria-label="เมนูหลัก">
+        <ul class="nav-links">
+          <li><a href="#features">ความสามารถ</a></li>
+          <li><a href="#guide">วิธีใช้งาน</a></li>
+          <li><a href="#privacy">ความปลอดภัย</a></li>
+          <li><a href="#download">ดาวน์โหลด</a></li>
+          <li><a href="#faq">คำถามที่พบบ่อย</a></li>
+        </ul>
+      </nav>
+      <div class="nav-actions">
+        <a class="btn btn-ghost btn-sm" href="https://github.com/bom-sudo/NexaTerm" target="_blank" rel="noopener noreferrer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+          <span>GitHub</span>
+        </a>
+        <a class="btn btn-primary btn-sm" href="#download">ดาวน์โหลด</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="wrap">
+        <p class="eyebrow">NexaTerm 1.0.0 <span>·</span> ฟรีและโอเพนซอร์ส (MIT) <span>·</span> Windows 10 และ 11</p>
+        <h1>หนึ่งพื้นที่ทำงาน<br><span class="grad">ครบทุกการเชื่อมต่อระยะไกล</span></h1>
+        <p class="lead">
+          เทอร์มินัล, SSH, SFTP, SSH tunnel และเครื่องมือตรวจสอบเครือข่ายสำหรับผู้ดูแลระบบ รวมอยู่ในโปรแกรมเดียวบน Windows
+          ไม่ต้องสมัครบัญชี ไม่มีรุ่นเสียเงิน และไม่ส่งข้อมูลการใช้งานออกจากเครื่อง
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary btn-lg" href="#download">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            ดาวน์โหลดสำหรับ Windows
+          </a>
+          <a class="btn btn-ghost btn-lg" href="#guide">ดูวิธีใช้งาน</a>
+        </div>
+        <p class="hero-note">ติดตั้งแบบรายผู้ใช้ ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ หรือใช้รุ่นพกพาที่ไม่ต้องติดตั้งเลย</p>
+
+        <figure class="shot shot-hero">
+          <button class="shot-btn" type="button" data-full="images/workspace.png" data-caption="PowerShell บนเครื่อง (ซ้าย) และ SSH ไปยังเซิร์ฟเวอร์ (ขวา) ในแท็บเดียว พร้อมรายการ session ที่จัดเป็นโฟลเดอร์">
+            <img src="images/workspace.png" width="1376" height="819" alt="หน้าจอ NexaTerm แสดง PowerShell และ SSH คู่กันในแท็บเดียว" loading="eager">
+          </button>
+          <figcaption>PowerShell บนเครื่องและ SSH แสดงคู่กันในแท็บเดียว รูปทั้งหมดในหน้านี้ถ่ายจากโปรแกรมจริง ส่วน SSH และ SFTP เชื่อมต่อกับเซิร์ฟเวอร์ทดสอบที่มาพร้อมซอร์สโค้ด จึงเห็นที่อยู่เป็น 127.0.0.1</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Facts -->
+    <section class="facts" aria-label="จุดเด่น">
+      <div class="wrap facts-grid">
+        <div class="fact">
+          <h3>ใช้ได้ฟรีทุกฟังก์ชัน</h3>
+          <p>สัญญาอนุญาต MIT ไม่มีรุ่นเสียเงิน ไม่มีคีย์ลิขสิทธิ์ และไม่จำกัดจำนวน session หรือ tunnel</p>
+        </div>
+        <div class="fact">
+          <h3>ไม่เก็บข้อมูลการใช้งาน</h3>
+          <p>ไม่มี telemetry และไม่เชื่อมต่ออินเทอร์เน็ตเองตอนเปิดโปรแกรม ข้อมูลทุกอย่างอยู่ในเครื่องคุณ</p>
+        </div>
+        <div class="fact">
+          <h3>รหัสผ่านอยู่ใน Windows</h3>
+          <p>เก็บใน Windows Credential Manager ไม่อยู่ในฐานข้อมูลของโปรแกรม ไฟล์ log หรือไฟล์ที่ export ออกไป</p>
+        </div>
+        <div class="fact">
+          <h3>ตรวจ host key ทุกครั้ง</h3>
+          <p>เซิร์ฟเวอร์ใหม่ต้องยืนยัน fingerprint SHA-256 ก่อน ถ้า key เปลี่ยน โปรแกรมจะไม่เชื่อมต่อจนกว่าคุณตัดสินใจ</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section" id="features">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">ความสามารถ</p>
+          <h2>งานที่ผู้ดูแลระบบทำทุกวัน อยู่ในหน้าต่างเดียว</h2>
+        </header>
+
+        <article class="feature">
+          <div class="feature-text">
+            <h3>เปิดหลายเทอร์มินัลในแท็บเดียว</h3>
+            <p>แบ่งหน้าจอได้ 2 หรือ 4 ช่อง แล้วลากเส้นแบ่งเพื่อปรับขนาด ใช้ PowerShell, Command Prompt, Git Bash, WSL และ SSH ร่วมกันได้ในแท็บเดียว โปรแกรมตรวจหา shell ที่ติดตั้งไว้ในเครื่องให้เอง</p>
+            <ul class="ticks">
+              <li>รองรับสี 256 สี, truecolor และ Unicode</li>
+              <li>ค้นหาข้อความในเทอร์มินัล, export ผลลัพธ์ และบันทึก log ลงไฟล์</li>
+              <li>ปรับฟอนต์, เคอร์เซอร์ และชุดสีของเทอร์มินัลได้</li>
+            </ul>
+          </div>
+          <figure class="shot">
+            <button class="shot-btn" type="button" data-full="images/workspace.png" data-caption="แบ่งหน้าจอเป็น PowerShell และ SSH">
+              <img src="images/workspace.png" width="1376" height="819" alt="เทอร์มินัลแบ่งหน้าจอเป็นสองช่อง" loading="lazy">
+            </button>
+          </figure>
+        </article>
+
+        <article class="feature reverse">
+          <div class="feature-text">
+            <h3>จัดการไฟล์บนเซิร์ฟเวอร์ด้วย SFTP</h3>
+            <p>เปิด SFTP จาก SSH ที่เชื่อมต่ออยู่ได้ทันทีโดยไม่ต้องล็อกอินซ้ำ ลากไฟล์จาก File Explorer มาวางเพื่ออัปโหลด ดูความคืบหน้าและยกเลิกได้ ไฟล์ที่ส่งไม่ครบจะถูกลบทิ้ง ไม่ค้างอยู่บนเซิร์ฟเวอร์</p>
+            <ul class="ticks">
+              <li>สร้าง, เปลี่ยนชื่อ, ลบไฟล์และโฟลเดอร์ โดยถามยืนยันก่อนลบหรือเขียนทับ</li>
+              <li>แก้ไฟล์ข้อความบนเซิร์ฟเวอร์ในโปรแกรม: บันทึกลงไฟล์ชั่วคราวก่อนแล้วจึงแทนที่ไฟล์เดิม ถ้าบันทึกไม่สำเร็จ ไฟล์เดิมยังอยู่ครบ</li>
+              <li>ส่งไฟล์ใหญ่แบบทยอยอ่าน ไม่โหลดทั้งไฟล์เข้าหน่วยความจำ</li>
+            </ul>
+          </div>
+          <figure class="shot">
+            <button class="shot-btn" type="button" data-full="images/sftp.png" data-caption="หน้าจัดการไฟล์ SFTP">
+              <img src="images/sftp.png" width="1376" height="819" alt="หน้าจัดการไฟล์ SFTP แสดงโฟลเดอร์และไฟล์บนเซิร์ฟเวอร์" loading="lazy">
+            </button>
+          </figure>
+        </article>
+
+        <article class="feature">
+          <div class="feature-text">
+            <h3>สั่งงานหลายเซิร์ฟเวอร์พร้อมกัน</h3>
+            <p>เลือกเทอร์มินัลที่จะรับคำสั่ง แล้วพิมพ์ครั้งเดียว ก่อนส่งจะมีหน้าต่างยืนยันที่แสดงรายชื่อเครื่องปลายทางทั้งหมด ช่องที่ถูกเลือกมีกรอบสีเหลืองให้เห็นชัดตลอดเวลา</p>
+            <ul class="ticks">
+              <li>คำสั่งที่อาจทำความเสียหาย เช่น <code>rm -rf</code>, <code>mkfs</code>, <code>reboot</code> หรือ <code>DROP TABLE</code> จะมีคำเตือนสีแดง</li>
+              <li>โหมดพิมพ์พร้อมกัน: ทุกปุ่มที่กดในช่องหนึ่งถูกส่งไปยังช่องอื่นที่เลือกไว้ด้วย</li>
+            </ul>
+          </div>
+          <figure class="shot">
+            <button class="shot-btn" type="button" data-full="images/multiexec.png" data-caption="สั่งงาน 3 เซิร์ฟเวอร์พร้อมกัน">
+              <img src="images/multiexec.png" width="1376" height="819" alt="แถบสั่งงานหลายเครื่องพร้อมกันและเทอร์มินัล 4 ช่อง" loading="lazy">
+            </button>
+          </figure>
+        </article>
+
+        <div class="cards">
+          <article class="card">
+            <button class="shot-btn" type="button" data-full="images/hostkey.png" data-caption="หน้าต่างยืนยันตัวตนเซิร์ฟเวอร์">
+              <img src="images/hostkey.png" width="1376" height="819" alt="หน้าต่างยืนยัน host key" loading="lazy">
+            </button>
+            <h3>ยืนยันตัวตนเซิร์ฟเวอร์</h3>
+            <p>แสดง fingerprint SHA-256 ก่อนเชื่อมต่อเซิร์ฟเวอร์ใหม่ทุกครั้ง ไม่มีตัวเลือก "เชื่อทุกเครื่อง" ให้กดข้าม</p>
+          </article>
+          <article class="card">
+            <button class="shot-btn" type="button" data-full="images/tunnels.png" data-caption="จัดการ SSH tunnel">
+              <img src="images/tunnels.png" width="1376" height="819" alt="หน้าจัดการ SSH tunnel" loading="lazy">
+            </button>
+            <h3>SSH tunnel</h3>
+            <p>ส่งต่อพอร์ตแบบ local (-L), remote (-R) และ SOCKS5 (-D) เริ่ม หยุด หรือเริ่มใหม่ได้ แจ้งเตือนเมื่อพอร์ตถูกใช้อยู่แล้ว</p>
+          </article>
+          <article class="card">
+            <button class="shot-btn" type="button" data-full="images/keys.png" data-caption="จัดการ SSH key">
+              <img src="images/keys.png" width="1376" height="819" alt="หน้าจัดการ SSH key" loading="lazy">
+            </button>
+            <h3>จัดการ SSH key</h3>
+            <p>สร้าง key แบบ Ed25519 หรือ RSA พร้อมรหัสผ่าน นำเข้า key เดิม คัดลอกหรือ export public key และเปลี่ยนรหัสผ่านของ key ได้</p>
+          </article>
+          <article class="card">
+            <button class="shot-btn" type="button" data-full="images/snippets.png" data-caption="ชุดคำสั่งที่บันทึกไว้">
+              <img src="images/snippets.png" width="1376" height="819" alt="รายการชุดคำสั่ง" loading="lazy">
+            </button>
+            <h3>ชุดคำสั่งที่ใช้บ่อย</h3>
+            <p>บันทึกคำสั่งแยกหมวด ใส่ตัวแปรแบบ <code>{{service}}</code> ให้โปรแกรมถามค่าตอนใช้ และแสดงคำสั่งเต็มให้ดูก่อนส่งทุกครั้ง</p>
+          </article>
+          <article class="card">
+            <button class="shot-btn" type="button" data-full="images/network-tools-light.png" data-caption="เครื่องมือเครือข่าย (ธีมสว่าง)">
+              <img src="images/network-tools-light.png" width="1376" height="819" alt="เครื่องมือเครือข่ายในธีมสว่าง" loading="lazy">
+            </button>
+            <h3>เครื่องมือเครือข่าย</h3>
+            <p>Ping, Traceroute, DNS, Reverse DNS, ทดสอบพอร์ต TCP และดูข้อมูลการ์ดเครือข่าย ทุกอย่างทำงานเมื่อคุณกดเท่านั้น และยกเลิกกลางคันได้</p>
+          </article>
+          <article class="card card-list">
+            <h3>รายละเอียดอื่นๆ</h3>
+            <ul class="ticks">
+              <li>ล็อกอินด้วยรหัสผ่าน, private key, SSH agent ของ Windows หรือ keyboard-interactive</li>
+              <li>เชื่อมต่อผ่านเครื่องกลาง (ProxyJump)</li>
+              <li>จัด session เป็นโฟลเดอร์ ใส่แท็ก ค้นหา และนำเข้าจาก <code>~/.ssh/config</code></li>
+              <li>สำรองและกู้คืนข้อมูลได้จากหน้าตั้งค่า</li>
+              <li>ธีมมืดและธีมสว่าง</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Guide -->
+    <section class="section alt" id="guide">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">วิธีใช้งาน</p>
+          <h2>เริ่มต้นใช้งานใน 6 ขั้นตอน</h2>
+        </header>
+        <ol class="steps">
+          <li>
+            <h3>ติดตั้งหรือแตกไฟล์</h3>
+            <p>ดับเบิลคลิก <code>NexaTerm-Setup-x64.exe</code> แล้วทำตามตัวช่วยติดตั้ง หรือแตกไฟล์ <code>NexaTerm-Portable-x64.zip</code> แล้วเปิด <code>NexaTerm.exe</code> ได้เลย</p>
+          </li>
+          <li>
+            <h3>เปิดเทอร์มินัลบนเครื่อง</h3>
+            <p>กด <kbd>Ctrl</kbd> + <kbd>T</kbd> เพื่อเปิด shell เริ่มต้น หรือกดลูกศรข้างปุ่มเทอร์มินัลบนแถบเครื่องมือเพื่อเลือก PowerShell, Command Prompt, Git Bash หรือ WSL</p>
+          </li>
+          <li>
+            <h3>เพิ่ม session SSH</h3>
+            <p>กด <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> ใส่ชื่อเครื่อง พอร์ต ชื่อผู้ใช้ และวิธีล็อกอิน ถ้าใส่รหัสผ่านไว้ รหัสจะถูกเก็บใน Windows Credential Manager หรือเว้นว่างไว้ให้โปรแกรมถามตอนเชื่อมต่อก็ได้</p>
+          </li>
+          <li>
+            <h3>เชื่อมต่อครั้งแรก</h3>
+            <p>ดับเบิลคลิก session ในแถบด้านซ้าย โปรแกรมจะแสดง fingerprint ของเซิร์ฟเวอร์ ให้เทียบกับค่าที่ผู้ดูแลเซิร์ฟเวอร์ให้มา ถ้าตรงกันจึงกด "Trust and connect"</p>
+          </li>
+          <li>
+            <h3>เปิด SFTP</h3>
+            <p>ขณะอยู่ในเทอร์มินัล SSH ให้กดปุ่ม SFTP บนแถบเครื่องมือ หรือคลิกขวาที่ session แล้วเลือก "Open SFTP browser" ลากไฟล์มาวางเพื่ออัปโหลด ดับเบิลคลิกไฟล์ข้อความเพื่อแก้ไข</p>
+          </li>
+          <li>
+            <h3>แบ่งหน้าจอและสั่งงานหลายเครื่อง</h3>
+            <p>คลิกขวาที่ session แล้วเลือก "Connect in split pane" เพื่อเปิดในช่องใหม่ จากนั้นกดปุ่ม multi-execution บนแถบเครื่องมือ เลือกเครื่องปลายทาง พิมพ์คำสั่ง แล้วกด Broadcast</p>
+          </li>
+        </ol>
+        <p class="more">คู่มือฉบับเต็มอยู่ที่ <a href="https://github.com/bom-sudo/NexaTerm/blob/main/docs/USER_GUIDE.md" target="_blank" rel="noopener">docs/USER_GUIDE.md</a></p>
+      </div>
+    </section>
+
+    <!-- Shortcuts -->
+    <section class="section" id="shortcuts">
+      <div class="wrap narrow">
+        <header class="section-head">
+          <p class="kicker">คีย์ลัด</p>
+          <h2>คีย์ลัดที่ใช้บ่อย</h2>
+        </header>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">คีย์</th><th scope="col">การทำงาน</th></tr></thead>
+            <tbody>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd></td><td>สร้าง session ใหม่</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>T</kbd></td><td>เปิดเทอร์มินัลใหม่</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>W</kbd></td><td>ปิดแท็บปัจจุบัน</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>Tab</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Tab</kbd></td><td>ไปแท็บถัดไป / ก่อนหน้า</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>F</kbd></td><td>ค้นหาข้อความในเทอร์มินัล</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd></td><td>ค้นหา session</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>C</kbd> (เมื่อเลือกข้อความ) / <kbd>Ctrl</kbd> + <kbd>V</kbd></td><td>คัดลอก / วาง</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>+</kbd> / <kbd>Ctrl</kbd> + <kbd>-</kbd> / <kbd>Ctrl</kbd> + <kbd>0</kbd></td><td>ขยาย / ย่อ / คืนขนาดตัวอักษร</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">ขณะพิมพ์ในเทอร์มินัล <kbd>Ctrl</kbd> + <kbd>W</kbd> และ <kbd>Ctrl</kbd> + <kbd>T</kbd> จะถูกส่งให้ shell (bash ใช้ <kbd>Ctrl</kbd> + <kbd>W</kbd> ลบคำ) ให้ใช้ <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>W</kbd> และ <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>T</kbd> แทน หรือเปลี่ยนได้ในหน้าตั้งค่า</p>
+      </div>
+    </section>
+
+    <!-- Privacy -->
+    <section class="section alt" id="privacy">
+      <div class="wrap narrow">
+        <header class="section-head">
+          <p class="kicker">ความปลอดภัย</p>
+          <h2>ข้อมูลของคุณเก็บไว้ที่ไหน</h2>
+        </header>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">ข้อมูล</th><th scope="col">ที่เก็บ</th></tr></thead>
+            <tbody>
+              <tr><td>Session, โฟลเดอร์, การตั้งค่า, known hosts</td><td>ฐานข้อมูล SQLite ใน <code>%APPDATA%\NexaTerm</code> (รุ่นพกพาเก็บใน <code>portable-data\</code>)</td></tr>
+              <tr><td>รหัสผ่านและรหัสของ key</td><td>Windows Credential Manager ของผู้ใช้ Windows คนนั้น</td></tr>
+              <tr><td>Private key</td><td>อยู่ในไฟล์ที่คุณเลือกตามเดิม โปรแกรมจำไว้แค่ตำแหน่งไฟล์</td></tr>
+              <tr><td>Log ของโปรแกรม</td><td>โฟลเดอร์ <code>logs\</code> ข้อความที่เป็นรหัสผ่านจะถูกปิดบังก่อนเขียน</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">ไฟล์ session ที่ export ออกไปและไฟล์สำรองฐานข้อมูลไม่มีรหัสผ่านอยู่ข้างใน รายละเอียดเพิ่มเติมอยู่ใน <a href="https://github.com/bom-sudo/NexaTerm/blob/main/SECURITY.md" target="_blank" rel="noopener">SECURITY.md</a></p>
+      </div>
+    </section>
+
+    <!-- Download -->
+    <section class="section" id="download">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">รุ่นล่าสุด</p>
+          <h2>ดาวน์โหลด NexaTerm 1.0.0</h2>
+          <p>สำหรับ Windows 10 (1809 ขึ้นไป) และ Windows 11 แบบ 64 บิต ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ</p>
+        </header>
+        <div class="downloads">
+          <article class="dl featured">
+            <p class="dl-tag">แนะนำ</p>
+            <h3>ตัวติดตั้งแบบออฟไลน์</h3>
+            <p class="dl-file">NexaTerm-Setup-x64.exe <span>287 MB</span></p>
+            <p>มีตัวติดตั้ง WebView2 Runtime อยู่ในไฟล์ ติดตั้งได้โดยไม่ต้องต่ออินเทอร์เน็ต ระหว่างติดตั้งต้องมีพื้นที่ว่างในไดรฟ์ C: ประมาณ 300 MB</p>
+            <a class="btn btn-primary" href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Setup-x64.exe">ดาวน์โหลดตัวติดตั้ง</a>
+          </article>
+          <article class="dl">
+            <p class="dl-tag muted">ไฟล์เล็ก</p>
+            <h3>ตัวติดตั้งแบบออนไลน์</h3>
+            <p class="dl-file">NexaTerm-Setup-x64-web.exe <span>3 MB</span></p>
+            <p>ตัวติดตั้งเดียวกัน แต่จะดาวน์โหลด WebView2 จาก Microsoft เฉพาะเมื่อเครื่องยังไม่มี Windows 11 และ Windows 10 ที่อัปเดตแล้วมีอยู่แล้ว</p>
+            <a class="btn btn-ghost" href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Setup-x64-web.exe">ดาวน์โหลด</a>
+          </article>
+          <article class="dl">
+            <p class="dl-tag muted">ไม่ต้องติดตั้ง</p>
+            <h3>รุ่นพกพา</h3>
+            <p class="dl-file">NexaTerm-Portable-x64.zip <span>3.6 MB</span></p>
+            <p>แตกไฟล์ไว้ที่ไหนก็ได้ รวมถึงแฟลชไดรฟ์ ข้อมูลทั้งหมดอยู่ในโฟลเดอร์ <code>portable-data\</code> ข้างโปรแกรม ต้องมี WebView2 ในเครื่องอยู่แล้ว</p>
+            <a class="btn btn-ghost" href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Portable-x64.zip">ดาวน์โหลด</a>
+          </article>
+        </div>
+
+        <div class="verify">
+          <div>
+            <h3>ตรวจสอบไฟล์ก่อนติดตั้ง</h3>
+            <p>ไฟล์ในรุ่นนี้ยังไม่ได้ลงลายเซ็นดิจิทัล Windows SmartScreen อาจขึ้นคำเตือนตอนเปิดครั้งแรก ให้เทียบค่า SHA-256 กับไฟล์ <code>SHA256SUMS.txt</code> ในหน้า Release ก่อน แล้วจึงกด "More info" และ "Run anyway"</p>
+          </div>
+          <div class="cmd">
+            <code id="cmd-hash">Get-FileHash .\NexaTerm-Setup-x64.exe -Algorithm SHA256</code>
+            <button class="copy" type="button" data-copy="cmd-hash" aria-label="คัดลอกคำสั่ง">คัดลอก</button>
+          </div>
+        </div>
+        <p class="more">ไฟล์ทุกรุ่นและบันทึกการเปลี่ยนแปลงอยู่ที่ <a href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener">หน้า Releases บน GitHub</a></p>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section alt" id="faq">
+      <div class="wrap narrow">
+        <header class="section-head">
+          <h2>คำถามที่พบบ่อย</h2>
+        </header>
+        <div class="faq">
+          <details open>
+            <summary>ใช้ฟรีจริงไหม มีเงื่อนไขอะไรบ้าง</summary>
+            <p>ฟรีทุกฟังก์ชัน เผยแพร่ภายใต้สัญญาอนุญาต MIT ใช้งานส่วนตัวหรือในองค์กรได้ แก้ไขและนำไปแจกจ่ายต่อได้ ไม่มีรุ่นเสียเงินและไม่มีระยะทดลองใช้</p>
+          </details>
+          <details>
+            <summary>โปรแกรมส่งข้อมูลอะไรออกไปบ้าง</summary>
+            <p>ไม่ส่งข้อมูลการใช้งานใดๆ ไม่มี telemetry และไม่ตรวจหาอัปเดตเอง การเชื่อมต่อออกไปข้างนอกเกิดขึ้นเฉพาะเมื่อคุณเชื่อมต่อเซิร์ฟเวอร์ หรือกดปุ่ม "Public IP" ในหน้าเครื่องมือเครือข่าย</p>
+          </details>
+          <details>
+            <summary>ต้องใช้สิทธิ์ผู้ดูแลระบบไหม</summary>
+            <p>ไม่ต้อง ตัวติดตั้งติดตั้งให้เฉพาะผู้ใช้ปัจจุบัน (ค่าเริ่มต้นคือ <code>%LOCALAPPDATA%\NexaTerm</code>) ส่วนรุ่นพกพาไม่ต้องติดตั้งเลย</p>
+          </details>
+          <details>
+            <summary>WebView2 คืออะไร ต้องติดตั้งเพิ่มไหม</summary>
+            <p>WebView2 เป็นส่วนประกอบของ Microsoft ที่ NexaTerm ใช้แสดงหน้าจอ Windows 11 และ Windows 10 ที่อัปเดตแล้วมีอยู่แล้ว ถ้าเครื่องยังไม่มี ตัวติดตั้งจะติดตั้งให้ ส่วนรุ่นพกพาต้องติดตั้ง WebView2 เองก่อน</p>
+          </details>
+          <details>
+            <summary>ย้ายรุ่นพกพาไปเครื่องอื่น รหัสผ่านไปด้วยไหม</summary>
+            <p>ไม่ไป เพราะรหัสผ่านเก็บใน Windows Credential Manager ของผู้ใช้แต่ละคน Session, โฟลเดอร์, การตั้งค่าและ known hosts ย้ายไปพร้อมโฟลเดอร์ <code>portable-data\</code> แต่โปรแกรมจะถามรหัสผ่านใหม่บนเครื่องใหม่</p>
+          </details>
+          <details>
+            <summary>รองรับ RDP, VNC, X11, Telnet หรือ Serial ไหม</summary>
+            <p>ยังไม่รองรับในรุ่น 1.0.0 และโปรแกรมจะไม่แสดงตัวเลือกเหล่านี้จนกว่าจะใช้งานได้จริง แผนงานอยู่ใน <a href="https://github.com/bom-sudo/NexaTerm/blob/main/DEVELOPMENT_STATUS.md" target="_blank" rel="noopener">DEVELOPMENT_STATUS.md</a></p>
+          </details>
+          <details>
+            <summary>เกี่ยวข้องกับโปรแกรมเชิงพาณิชย์ตัวอื่นไหม</summary>
+            <p>ไม่เกี่ยวข้อง NexaTerm เป็นโปรเจกต์อิสระที่เขียนขึ้นใหม่ทั้งหมดด้วย Rust และ TypeScript ไม่มีโค้ดหรือไฟล์ภาพจากโปรแกรมอื่น</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tech -->
+    <section class="section" id="tech">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="kicker">สำหรับนักพัฒนา</p>
+          <h2>สร้างด้วยอะไร</h2>
+        </header>
+        <div class="tech">
+          <div><h3>Tauri 2 และ Rust</h3><p>งานที่ต้องใช้สิทธิ์ของระบบ เช่น เปิด process, เชื่อมต่อเครือข่าย และอ่านเขียนไฟล์ ทำในฝั่ง Rust ทั้งหมด หน้าจอเรียกใช้ผ่านคำสั่งที่ตรวจสอบข้อมูลแล้วเท่านั้น</p></div>
+          <div><h3>russh และ russh-sftp</h3><p>ไลบรารี SSH และ SFTP ที่เขียนด้วย Rust ทั้งหมด ทำงานแบบ async บน Tokio ไม่ต้องพึ่ง OpenSSL</p></div>
+          <div><h3>ConPTY และ xterm.js</h3><p>เทอร์มินัลบนเครื่องใช้ Windows ConPTY ผ่าน portable-pty ส่วนการแสดงผลใช้ xterm.js</p></div>
+          <div><h3>SQLite</h3><p>ข้อมูลทั้งหมดอยู่ในไฟล์ SQLite ไฟล์เดียว มีระบบ migration สำหรับอัปเกรดรุ่น</p></div>
+        </div>
+        <div class="cmd cmd-wide">
+          <code id="cmd-build">git clone https://github.com/bom-sudo/NexaTerm.git &amp;&amp; cd NexaTerm &amp;&amp; npm ci &amp;&amp; npm run tauri dev</code>
+          <button class="copy" type="button" data-copy="cmd-build" aria-label="คัดลอกคำสั่ง">คัดลอก</button>
+        </div>
+        <p class="more">ต้องใช้ Node.js 22 ขึ้นไป, Rust และ C compiler รายละเอียดอยู่ใน <a href="https://github.com/bom-sudo/NexaTerm/blob/main/docs/DEVELOPER.md" target="_blank" rel="noopener">docs/DEVELOPER.md</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <div class="footer-brand">
+        <img src="images/nexaterm-wordmark-dark.svg" alt="NexaTerm - Remote Administration Workstation" width="260" height="60">
+        <p>โปรแกรมฟรีและโอเพนซอร์สภายใต้สัญญาอนุญาต MIT</p>
+      </div>
+      <ul class="footer-links">
+        <li><a href="https://github.com/bom-sudo/NexaTerm" target="_blank" rel="noopener">ซอร์สโค้ดบน GitHub</a></li>
+        <li><a href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener">Releases</a></li>
+        <li><a href="https://github.com/bom-sudo/NexaTerm/issues" target="_blank" rel="noopener">แจ้งปัญหา</a></li>
+        <li><a href="https://github.com/bom-sudo/NexaTerm/blob/main/LICENSE" target="_blank" rel="noopener">สัญญาอนุญาต MIT</a></li>
+      </ul>
+    </div>
+    <div class="wrap footer-bottom">
+      <p>&copy; 2026 NexaTerm Project. โปรเจกต์อิสระ ไม่มีความเกี่ยวข้องกับผู้พัฒนาโปรแกรมเชิงพาณิชย์รายใด</p>
+    </div>
+  </footer>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="ภาพขยาย" hidden>
+    <button class="lightbox-close" type="button" aria-label="ปิด">ปิด</button>
+    <figure>
+      <img id="lightbox-img" src="" alt="">
+      <figcaption id="lightbox-cap"></figcaption>
+    </figure>
+  </div>
+
+  <script>
+    // Lightbox for screenshots
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightbox-img');
+    const lbCap = document.getElementById('lightbox-cap');
+    document.querySelectorAll('.shot-btn').forEach((b) => {
+      b.addEventListener('click', () => {
+        lbImg.src = b.dataset.full;
+        lbImg.alt = b.dataset.caption || '';
+        lbCap.textContent = b.dataset.caption || '';
+        lb.hidden = false;
+        document.body.style.overflow = 'hidden';
+      });
+    });
+    function closeLb() { lb.hidden = true; document.body.style.overflow = ''; }
+    lb.addEventListener('click', (e) => { if (e.target === lb || e.target.classList.contains('lightbox-close')) closeLb(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !lb.hidden) closeLb(); });
+
+    // Copy buttons
+    document.querySelectorAll('.copy').forEach((b) => {
+      b.addEventListener('click', () => {
+        const text = document.getElementById(b.dataset.copy).textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          b.textContent = 'คัดลอกแล้ว';
+          setTimeout(() => (b.textContent = 'คัดลอก'), 1800);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

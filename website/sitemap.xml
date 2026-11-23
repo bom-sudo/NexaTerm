@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://bom-sudo.github.io/NexaTerm/</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://bom-sudo.github.io/NexaTerm/images/workspace.png</image:loc>
+      <image:caption>PowerShell และ SSH แสดงคู่กันในแท็บเดียวของ NexaTerm</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bom-sudo.github.io/NexaTerm/images/sftp.png</image:loc>
+      <image:caption>หน้าจัดการไฟล์ SFTP ของ NexaTerm</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bom-sudo.github.io/NexaTerm/images/multiexec.png</image:loc>
+      <image:caption>สั่งงานหลายเซิร์ฟเวอร์พร้อมกันใน NexaTerm</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bom-sudo.github.io/NexaTerm/images/hostkey.png</image:loc>
+      <image:caption>หน้าต่างยืนยัน fingerprint ของเซิร์ฟเวอร์</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bom-sudo.github.io/NexaTerm/images/tunnels.png</image:loc>
+      <image:caption>หน้าจัดการ SSH tunnel</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bom-sudo.github.io/NexaTerm/images/keys.png</image:loc>
+      <image:caption>หน้าจัดการ SSH key</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bom-sudo.github.io/NexaTerm/images/snippets.png</image:loc>
+      <image:caption>ชุดคำสั่งที่บันทึกไว้</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://bom-sudo.github.io/NexaTerm/images/network-tools-light.png</image:loc>
+      <image:caption>เครื่องมือเครือข่ายในธีมสว่าง</image:caption>
+    </image:image>
+  </url>
+</urlset>
