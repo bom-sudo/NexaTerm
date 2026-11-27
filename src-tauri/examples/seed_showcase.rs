@@ -69,6 +69,27 @@ fn main() {
         repo::touch_connected(&conn, &s.id).unwrap();
         ids.push(s.id);
     }
+    // Two-factor login on the mock server: password (saved) + one-time code asked in a dialog.
+    let mut otp = ssh("otp-login", &lab.id, &["2fa"], false, None);
+    otp.username = Some("otp".into());
+    otp.auth_method = Some("keyboardInteractive".into());
+    let otp = repo::insert_session(&conn, &otp, None).unwrap();
+    store().set(&credentials::target(&otp.id, "password"), "secret").unwrap();
+    repo::set_secret_flags(&conn, &otp.id, Some(true), None).unwrap();
+
+    // A recorded macro.
+    repo::save_macro(
+        &conn,
+        None,
+        "Daily health check",
+        &[
+            MacroStep::Text { text: "uptime\r".into() },
+            MacroStep::Wait { ms: 1200 },
+            MacroStep::Text { text: "df -h /\r".into() },
+        ],
+    )
+    .unwrap();
+
     // A host that is NOT trusted yet ("localhost" is a different known_hosts entry) for the host-key dialog.
     let mut fresh = ssh("new-server", &lab.id, &["new"], false, None);
     fresh.host = Some("localhost".into());

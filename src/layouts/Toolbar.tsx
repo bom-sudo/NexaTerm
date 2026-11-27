@@ -1,6 +1,8 @@
-import { ArrowDownToLine, Columns2, Eraser, FileDown, FolderSync, Grid2x2, Minus, Plus, Radio, Rows2, Search, Settings, SquarePlus, SquareTerminal, CircleDot, Zap, ChevronDown, RotateCcw, TextSelect } from "lucide-react";
+import { PanelRight, Clapperboard, ArrowDownToLine, Columns2, Eraser, FileDown, FolderSync, Grid2x2, Minus, Plus, Radio, Rows2, Search, Settings, SquarePlus, SquareTerminal, CircleDot, Zap, ChevronDown, RotateCcw, TextSelect } from "lucide-react";
 import { useWorkspace } from "../store/workspace";
 import { useSessions } from "../store/sessions";
+import { useMacroRecorder } from "../store/macros";
+import { toggleMacroRecording } from "../features/macros/MacrosPanel";
 import { IconButton, useContextMenu, type MenuItem } from "../components/ui";
 import { newLocalTerminal, newSessionDialog, openSftpForActivePane, quickConnectDialog, terminalActions } from "../app/actions";
 
@@ -15,6 +17,7 @@ export function Toolbar() {
   const term = active?.kind === "terminal" ? active : undefined;
   const pane = ws.activePane();
   const menu = useContextMenu();
+  const recording = useMacroRecorder((s) => s.paneId);
 
   return (
     <div className="flex h-10 shrink-0 items-center gap-0.5 border-b border-line bg-panel px-2">
@@ -62,6 +65,12 @@ export function Toolbar() {
       <Sep />
       <IconButton title="Multi-execution: send input to several terminals" active={ws.multiExec.enabled} onClick={() => ws.setMultiExec({ enabled: !ws.multiExec.enabled })}>
         <Radio size={16} />
+      </IconButton>
+      <IconButton title="SFTP side panel next to the terminal (follows the shell folder when enabled for the session)" disabled={!term || pane?.spec.kind !== "ssh"} active={!!term?.sftpDock} onClick={() => term && ws.toggleSftpDock(term.id)}>
+        <PanelRight size={16} />
+      </IconButton>
+      <IconButton title={recording ? "Stop macro recording and save" : "Record a macro from the active terminal"} active={!!recording} onClick={() => toggleMacroRecording()}>
+        <Clapperboard size={16} className={recording ? "text-err" : ""} />
       </IconButton>
       <IconButton title="Open SFTP for the active SSH terminal" disabled={pane?.spec.kind !== "ssh"} onClick={openSftpForActivePane}>
         <FolderSync size={16} />

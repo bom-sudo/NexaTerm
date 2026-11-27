@@ -32,6 +32,9 @@ function TerminalTabView({ tab, visible }: { tab: Extract<Tab, { kind: "terminal
   const rects = paneRects(n, tab.layout, col, row);
   const showV = n === 2 ? tab.layout !== "rows" : n >= 3;
   const showH = n === 2 ? tab.layout === "rows" : n >= 3;
+  // SFTP side panel uses the active pane's SSH connection (or the first connected SSH pane).
+  const sshPanes = tab.panes.filter((p) => p.spec.kind === "ssh" && p.status === "connected" && p.terminalId);
+  const dockPane = sshPanes.find((p) => p.id === tab.activePane) ?? sshPanes[0];
 
   const drag = (axis: "col" | "row") => (e: React.MouseEvent) => {
     e.preventDefault();
@@ -52,7 +55,8 @@ function TerminalTabView({ tab, visible }: { tab: Extract<Tab, { kind: "terminal
   };
 
   return (
-    <div ref={box} className="relative h-full w-full">
+    <div className="flex h-full w-full gap-1">
+    <div ref={box} className="relative h-full min-w-0 flex-1">
       {tab.panes.map((p, i) => {
         const [x, y, w, h] = rects[i];
         return (
@@ -70,6 +74,18 @@ function TerminalTabView({ tab, visible }: { tab: Extract<Tab, { kind: "terminal
         />
       )}
       {showH && <div className="absolute z-10 h-[6px] w-full -translate-y-1/2 cursor-row-resize hover:bg-accent/40" style={{ top: `${row * 100}%`, left: 0 }} onMouseDown={drag("row")} title="Drag to resize" />}
+    </div>
+    {tab.sftpDock && (
+      <div className="h-full w-[min(440px,42%)] min-w-[300px] shrink-0 p-[3px]">
+        {dockPane ? (
+          <SftpBrowser key={dockPane.terminalId} tabId={tab.id} terminalId={dockPane.terminalId} followPath={dockPane.cwd} compact />
+        ) : (
+          <div className="flex h-full items-center justify-center rounded-lg border border-line bg-panel p-6 text-center text-[12.5px] text-dim">
+            Connect an SSH session in this tab to browse its files here.
+          </div>
+        )}
+      </div>
+    )}
     </div>
   );
 }

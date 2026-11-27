@@ -12,6 +12,9 @@ import { describeError, withSshPrompts } from "../ssh/connect";
 import { terminals } from "./registry";
 import { Button } from "../../components/ui";
 import { handleGlobalShortcut } from "../../app/shortcuts";
+import { OutputHighlighter } from "./highlight";
+import { useMacroRecorder } from "../../store/macros";
+import { confirmDialog } from "../../components/ui";
 
 interface Props {
   tabId: string;
@@ -26,6 +29,7 @@ export function TerminalPane({ tabId, pane, active, visible }: Props) {
   const fitRef = useRef<FitAddon | null>(null);
   const searchRef = useRef<SearchAddon | null>(null);
   const idRef = useRef<string | undefined>(undefined);
+  const hlRef = useRef(new OutputHighlighter({ enabled: useSettings.getState().settings.highlightOutput }));
   const settings = useSettings((s) => s.settings);
   const { updatePane, setActivePane, reconnectPane, closePane } = useWorkspace.getState();
   const multi = useWorkspace((s) => s.multiExec);
@@ -70,6 +74,46 @@ export function TerminalPane({ tabId, pane, active, visible }: Props) {
     safeFit();
     terminals.set(pane.id, { term, search, fit: safeFit, terminalId: () => idRef.current });
 
+    // Multi-line paste runs several commands at once: ask first (setting, on by default).
+    const pasteText = async (text: string) => {
+      if (!text) return;
+      const lines = text.replace(/\r\n/g, "\n").replace(/\n+$/, "").split("\n");
+      if (lines.length > 1 && useSettings.getState().settings.confirmMultilinePaste) {
+        const ok = await confirmDialog({
+          title: `Paste ${lines.length} lines?`,
+          confirmText: "Paste",
+          message: (
+            <div className="space-y-2">
+              <p>The text contains line breaks, so each line may run as a separate command.</p>
+              <pre className="max-h-48 overflow-auto rounded-lg border border-line bg-elev p-2 font-mono text-[12px] whitespace-pre-wrap select-text">
+                {lines.slice(0, 20).join("\n")}
+                {lines.length > 20 ? `\n... (${lines.length - 20} more lines)` : ""}
+              </pre>
+            </div>
+          ),
+        });
+        if (!ok) return term.focus();
+      }
+      term.paste(text);
+      term.focus();
+    };
+
+    // OSC 7 (file://host/path) from the shell reports the working directory; the SFTP side
+    // panel follows it. Shells that do not emit OSC 7 simply never update cwd.
+    const osc7 = term.parser.registerOscHandler(7, (data) => {
+      const m = /^file:\/\/[^/]*(\/.*)$/.exec(data);
+      if (m) {
+        let path = m[1];
+        try {
+          path = decodeURIComponent(path);
+        } catch {
+          /* keep raw */
+        }
+        useWorkspace.getState().updatePane(pane.id, { cwd: path });
+      }
+      return true;
+    });
+
     // Keyboard: app shortcuts, clipboard. Returning false stops xterm from handling the key.
     term.attachCustomKeyEventHandler((e) => {
       if (e.type !== "keydown") return true;
@@ -82,7 +126,7 @@ export function TerminalPane({ tabId, pane, active, visible }: Props) {
       }
       if (e.ctrlKey && e.shiftKey && e.code === "KeyV") {
         e.preventDefault();
-        readText().then((t) => t && term.paste(t));
+        readText().then((t) => void pasteText(t));
         return false;
       }
       if (e.ctrlKey && !e.shiftKey && e.key === "c" && term.hasSelection()) {
@@ -92,7 +136,7 @@ export function TerminalPane({ tabId, pane, active, visible }: Props) {
       }
       if (e.ctrlKey && !e.shiftKey && e.key === "v") {
         e.preventDefault();
-        readText().then((t) => t && term.paste(t));
+        readText().then((t) => void pasteText(t));
         return false;
       }
       if (e.ctrlKey && !e.shiftKey && e.key === "f") {
@@ -108,6 +152,7 @@ export function TerminalPane({ tabId, pane, active, visible }: Props) {
     });
 
     const dataSub = term.onData((d) => {
+      useMacroRecorder.getState().record(pane.id, d);
       const tid = idRef.current;
       if (!tid) return;
       const me = useWorkspace.getState().multiExec;
@@ -139,7 +184,7 @@ export function TerminalPane({ tabId, pane, active, visible }: Props) {
       if (term.hasSelection()) {
         writeText(term.getSelection());
         term.clearSelection();
-      } else readText().then((t) => t && term.paste(t));
+      } else readText().then((t) => void pasteText(t));
     };
     host.current!.addEventListener("contextmenu", onContext);
     const hostEl = host.current!;
@@ -148,6 +193,7 @@ export function TerminalPane({ tabId, pane, active, visible }: Props) {
       ro.disconnect();
       hostEl.removeEventListener("contextmenu", onContext);
       dataSub.dispose();
+      osc7.dispose();
       resizeSub.dispose();
       terminals.delete(pane.id);
       if (idRef.current) api.close(idRef.current).catch(() => {});
@@ -161,13 +207,14 @@ export function TerminalPane({ tabId, pane, active, visible }: Props) {
   useEffect(() => {
     const term = termRef.current!;
     let disposed = false;
+    hlRef.current = new OutputHighlighter({ enabled: useSettings.getState().settings.highlightOutput });
     const prev = idRef.current;
     if (prev) api.close(prev).catch(() => {});
     idRef.current = undefined;
     if (pane.generation > 0) term.write("\r\n\x1b[90m── reconnecting ──\x1b[0m\r\n");
 
     const handlers = {
-      onData: (b: Uint8Array) => !disposed && term.write(b),
+      onData: (b: Uint8Array) => !disposed && term.write(hlRef.current.process(b)),
       onEvent: (ev: { type: string; code?: number | null; reason?: string | null; state?: string; message?: string | null }) => {
         if (disposed) return;
         if (ev.type === "exit") {
@@ -185,7 +232,14 @@ export function TerminalPane({ tabId, pane, active, visible }: Props) {
       const { cols, rows } = term;
       let started = performance.now();
       try {
-        if (pane.spec.kind === "local") {
+        if (pane.spec.kind === "session") {
+          const spec = pane.spec;
+          term.write(`\x1b[90mOpening ${spec.protocol} session ${spec.label}...\x1b[0m\r\n`);
+          const id = await api.openSession({ sessionId: spec.sessionId, cols: term.cols, rows: term.rows }, handlers);
+          if (disposed) return void api.close(id);
+          idRef.current = id;
+          updatePane(pane.id, { terminalId: id, status: "connected", error: undefined });
+        } else if (pane.spec.kind === "local") {
           const spec = pane.spec;
           const id = await api.openLocal({ program: spec.program, args: spec.args, cwd: spec.cwd, label: spec.label, sessionId: spec.sessionId, cols, rows }, handlers);
           if (disposed) return void api.close(id);
@@ -237,6 +291,7 @@ export function TerminalPane({ tabId, pane, active, visible }: Props) {
     t.options.cursorBlink = settings.cursorBlink;
     t.options.scrollback = settings.scrollback;
     t.options.theme = TERMINAL_THEMES[settings.terminalTheme] ?? TERMINAL_THEMES.midnight;
+    hlRef.current.setEnabled(settings.highlightOutput);
     terminals.get(pane.id)?.fit();
   }, [settings, pane.id]);
 

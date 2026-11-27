@@ -66,8 +66,10 @@ server that ships with the source (`cargo run --example mock_sshd`), which is wh
 | Network tools | Ping, traceroute, DNS, reverse DNS, TCP port test, local interfaces/hostname, public IP (on click only) — all cancellable |
 | Data | SQLite with migrations, backup/restore, Windows Credential Manager for secrets, portable mode |
 
-Not yet implemented (no UI is shown for them): RDP, VNC, X11 forwarding, Telnet, serial, macro
-recording. See [DEVELOPMENT_STATUS.md](DEVELOPMENT_STATUS.md).
+Also: Telnet and Serial (COM) sessions, X11 forwarding to a local X server, 2FA logins, agent
+forwarding, SFTP folder transfer and permissions, an SFTP side panel, MobaXterm/PuTTY import,
+output highlighting and macros (see CHANGELOG, Unreleased). Not yet implemented: RDP, VNC,
+an embedded X server, master password and remote monitoring. See [DEVELOPMENT_STATUS.md](DEVELOPMENT_STATUS.md).
 
 ## Install (v1.0.0)
 

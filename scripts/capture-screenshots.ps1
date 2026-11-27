@@ -53,7 +53,7 @@ try {
     $app = Start-Process "$dbg\nexaterm.exe" -PassThru -NoNewWindow -RedirectStandardOutput "$Work\app-$scene.log" -RedirectStandardError "$Work\app-$scene.err"
     $w = Wait-ProcWindow @($app.Id) "NexaTerm" 60
     if (-not $w) { throw "no window for scene $scene" }
-    Start-Sleep -Seconds $wait[$scene]
+    Start-Sleep -Seconds $(if ($wait.ContainsKey($scene)) { $wait[$scene] } else { 10 })
     Save-WindowImage $w.Handle (Join-Path $Out "$scene.png")
     Write-Host "captured $scene"
     $app.CloseMainWindow() | Out-Null

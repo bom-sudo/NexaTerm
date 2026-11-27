@@ -57,7 +57,14 @@ and SSH against a real OpenSSH server (all SSH tests use the bundled mock server
 | SFTP + remote editor | Done (folder transfer: Not started) |
 | Tunnels, multi-execution, key manager, network tools, snippets, settings/backup | Partial (backend tested, UI type-checked, not clicked through) |
 | Portable mode, read-only fallback, app log, `--self-test` | Done |
-| Macros, RDP, VNC, X11, Telnet, Serial | Not started (hidden in the UI) |
+| Telnet, Serial (COM) | Done (Telnet: integration test against a scripted server; Serial: settings and port validation unit-tested, not tested with real COM hardware) |
+| X11 forwarding | Done (forwarding channel and X server detection implemented; not tested with a real X server and Linux GUI program) |
+| SSH 2FA (keyboard-interactive, several prompts), agent forwarding, compression, .ppk keys | Done (2FA and compression integration-tested; agent forwarding not tested against a server) |
+| SFTP folder transfer, permissions, side panel | Done (folder transfer and chmod integration-tested; follow-folder needs bash/zsh, not testable with the mock shell) |
+| Import MobaXterm / PuTTY | Done (parsers unit-tested with constructed samples; not yet tested with real export files) |
+| Output highlighting, multi-line paste confirmation | Done |
+| Macros (record / replay) | Done |
+| RDP, VNC, embedded X server, master password, remote monitoring bar, IP / port scanner, Wake-on-LAN, built-in TFTP/FTP/HTTP servers, detachable tabs, bundled Unix tools, custom key bindings | Not started |
 
 ## Known limitations
 

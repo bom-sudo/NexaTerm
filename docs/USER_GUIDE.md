@@ -66,6 +66,43 @@ Deletes always ask, and folder deletes are recursive.
 The editor saves by uploading a temporary copy, applying the original permissions, and renaming it
 over the original, so a failed save never corrupts the file.
 
+## SFTP side panel, folders and permissions
+
+* Toolbar **side panel** button opens an SFTP panel next to the terminal of the active SSH tab, using
+  the same connection. Enable *Follow terminal folder* in the session's Advanced tab and the panel
+  follows `cd` (bash and zsh; a one-line prompt hook is typed into the shell when it starts).
+* Upload a folder with the folder button, or drag folders from Explorer. Right-click a remote folder
+  to download it. Symbolic links are skipped.
+* Right-click → *Permissions and owner* changes mode bits (optionally for everything inside a folder)
+  and the numeric owner/group (usually needs root).
+
+## Importing from MobaXterm or PuTTY
+
+Sessions panel → import button: *Import from MobaXterm* (.mxtsessions or MobaXterm.ini),
+*Import from PuTTY (this PC)* (reads your PuTTY sessions from the registry) or a PuTTY *.reg* export.
+SSH and Telnet sessions are imported into folders; other types (RDP, VNC, serial in PuTTY) are listed
+as skipped. Passwords are never imported.
+
+## Telnet and Serial
+
+New session → *Telnet* (host and port; Telnet is unencrypted) or *Serial (COM)* (port, speed, data
+bits, parity, stop bits, flow control). Detected COM ports are suggested.
+
+## Two-factor logins, agent forwarding, X11
+
+* Servers that ask for a password and then a one-time code use *Keyboard-interactive*: a saved
+  password answers the first question, NexaTerm shows a dialog for the code.
+* *Forward SSH agent* lets the server use your Windows OpenSSH agent keys to go further. Only for
+  servers you trust.
+* *X11 forwarding* shows Linux GUI programs on this PC. Install and start a free X server (VcXsrv,
+  Xming or X410) with access control disabled; NexaTerm detects it and can start an installed one.
+
+## Macros
+
+Record button on the toolbar (or the Macros panel) records what you type in the active terminal,
+including pauses. Playing a macro always shows its full content first, with a warning for
+destructive commands.
+
 ## Tunnels
 
 SSH Tunnels → *New tunnel*: choose the gateway session and type:

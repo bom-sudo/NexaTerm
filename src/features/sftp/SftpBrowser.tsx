@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { open } from "@tauri-apps/plugin-dialog";
-import { ArrowLeft, ArrowRight, ArrowUp, Download, File, FilePlus, Folder, FolderPlus, Link2, Loader2, Pencil, RefreshCw, Trash2, Upload, X, Ban, FileEdit, Home } from "lucide-react";
+import { FolderUp, ShieldCheck, ArrowLeft, ArrowRight, ArrowUp, Download, File, FilePlus, Folder, FolderPlus, Link2, Loader2, Pencil, RefreshCw, Trash2, Upload, X, Ban, FileEdit, Home } from "lucide-react";
 import { api, toApiError } from "../../services/api";
 import { toast } from "../../store/ui";
 import { useWorkspace } from "../../store/workspace";
 import { Badge, Button, EmptyState, IconButton, confirmDialog, promptDialog, useContextMenu } from "../../components/ui";
 import { formatBytes, formatUnixTime, uid } from "../../utils/commands";
 import { withSshPrompts } from "../ssh/connect";
+import { PermissionsDialog } from "./PermissionsDialog";
+import { openDialog } from "../../store/ui";
 import type { RemoteEntry } from "../../types";
 
 interface Transfer {
@@ -18,12 +20,12 @@ interface Transfer {
   total: number;
   state: "queued" | "running" | "done" | "failed" | "cancelled";
   error?: string;
-  run: () => Promise<string>;
+  run: () => Promise<unknown>;
 }
 
 type SortKey = "name" | "size" | "modified";
 
-export function SftpBrowser({ tabId, terminalId, sessionId }: { tabId: string; terminalId?: string; sessionId?: string }) {
+export function SftpBrowser({ tabId, terminalId, sessionId, followPath, compact }: { tabId: string; terminalId?: string; sessionId?: string; followPath?: string; compact?: boolean }) {
   const [sftpId, setSftpId] = useState<string | null>(null);
   const [connErr, setConnErr] = useState<string | null>(null);
   const [path, setPath] = useState("/");
@@ -141,33 +143,51 @@ export function SftpBrowser({ tabId, terminalId, sessionId }: { tabId: string; t
     const dir = path;
     for (const f of files) {
       const name = f.split(/[\\/]/).pop()!;
+      const isDir = await api.localIsDir(f);
       const exists = entries.some((e) => e.name === name);
       let overwrite = false;
       if (exists) {
-        overwrite = await confirmDialog({ title: "File exists", message: <>“{name}” already exists in {dir}. Overwrite it?</>, confirmText: "Overwrite", danger: true });
+        overwrite = await confirmDialog({
+          title: isDir ? "Folder exists" : "File exists",
+          message: isDir ? <>Folder “{name}” already exists in {dir}. Merge into it and overwrite files with the same names?</> : <>“{name}” already exists in {dir}. Overwrite it?</>,
+          confirmText: isDir ? "Merge and overwrite" : "Overwrite",
+          danger: true,
+        });
         if (!overwrite) continue;
       }
       const id = uid();
-      setTransfers((ts) => [...ts, { id, kind: "upload", name, done: 0, total: 0, state: "queued", run: () => api.sftpUpload(sftpId, f, dir, overwrite, id, progress(id)) }]);
+      const run = isDir ? () => api.sftpUploadDir(sftpId, f, dir, overwrite, id, progress(id)) : () => api.sftpUpload(sftpId, f, dir, overwrite, id, progress(id));
+      setTransfers((ts) => [...ts, { id, kind: "upload", name: isDir ? `${name}/` : name, done: 0, total: 0, state: "queued", run }]);
     }
     setTimeout(pump, 0);
   };
 
   const enqueueDownload = async (e: RemoteEntry) => {
     if (!sftpId) return;
-    if (e.isDir) return toast("info", "Folder download is not supported yet — download files individually.");
     const dir = await open({ title: "Download to folder", directory: true, defaultPath: await api.downloadsDir() });
     if (typeof dir !== "string") return;
     const sep = dir.endsWith("\\") ? "" : "\\";
     let overwrite = false;
     if (await api.localExists(dir + sep + e.name)) {
-      overwrite = await confirmDialog({ title: "File exists", message: <>“{e.name}” already exists in {dir}. Overwrite it?</>, confirmText: "Overwrite", danger: true });
+      overwrite = await confirmDialog({
+        title: e.isDir ? "Folder exists" : "File exists",
+        message: e.isDir ? <>Folder “{e.name}” already exists in {dir}. Merge into it and overwrite files with the same names?</> : <>“{e.name}” already exists in {dir}. Overwrite it?</>,
+        confirmText: e.isDir ? "Merge and overwrite" : "Overwrite",
+        danger: true,
+      });
       if (!overwrite) return;
     }
     const id = uid();
-    setTransfers((ts) => [...ts, { id, kind: "download", name: e.name, done: 0, total: e.size, state: "queued", run: () => api.sftpDownload(sftpId, e.path, dir, overwrite, id, progress(id)) }]);
+    const run = e.isDir ? () => api.sftpDownloadDir(sftpId, e.path, dir, overwrite, id, progress(id)) : () => api.sftpDownload(sftpId, e.path, dir, overwrite, id, progress(id));
+    setTransfers((ts) => [...ts, { id, kind: "download", name: e.isDir ? `${e.name}/` : e.name, done: 0, total: e.isDir ? 0 : e.size, state: "queued", run }]);
     setTimeout(pump, 0);
   };
+
+  // Side panel: follow the shell's working directory reported via OSC 7.
+  useEffect(() => {
+    if (followPath && sftpId && followPath !== path) navigate(followPath);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [followPath, sftpId]);
 
   // Drag & drop from Windows Explorer (Tauri delivers native file paths).
   useEffect(() => {
@@ -215,7 +235,14 @@ export function SftpBrowser({ tabId, terminalId, sessionId }: { tabId: string; t
 
   const entryMenu = (e: RemoteEntry) => [
     ...(e.isDir ? [{ label: "Open", icon: <Folder size={13} />, onClick: () => navigate(e.path) }] : [{ label: "Edit", icon: <FileEdit size={13} />, onClick: () => useWorkspace.getState().openEditor(sftpId!, e.path) }]),
-    { label: "Download…", icon: <Download size={13} />, onClick: () => enqueueDownload(e), disabled: e.isDir },
+    { label: e.isDir ? "Download folder…" : "Download…", icon: <Download size={13} />, onClick: () => enqueueDownload(e) },
+    {
+      label: "Permissions and owner…",
+      icon: <ShieldCheck size={13} />,
+      onClick: async () => {
+        if (await openDialog<boolean>((close) => <PermissionsDialog sftpId={sftpId!} entry={e} onClose={close} />)) load(path);
+      },
+    },
     {
       label: "Rename…",
       icon: <Pencil size={13} />,
@@ -249,7 +276,7 @@ export function SftpBrowser({ tabId, terminalId, sessionId }: { tabId: string; t
 
   return (
     <div ref={rootRef} className={`flex h-full flex-col rounded-lg border bg-panel ${dragOver ? "border-accent" : "border-line"}`}>
-      <div className="flex items-center gap-1 border-b border-line p-2">
+      <div className={`flex items-center gap-1 border-b border-line p-2 ${compact ? "flex-wrap" : ""}`}>
         <IconButton title="Back" disabled={!back.length} onClick={() => { const b = back[back.length - 1]; setBack(back.slice(0, -1)); setFwd([path, ...fwd]); setPath(b); }}>
           <ArrowLeft size={15} />
         </IconButton>
@@ -262,14 +289,17 @@ export function SftpBrowser({ tabId, terminalId, sessionId }: { tabId: string; t
         <IconButton title="Home folder" onClick={async () => navigate(await api.sftpRealpath(sftpId, "."))}>
           <Home size={15} />
         </IconButton>
-        <form className="flex-1" onSubmit={(e) => { e.preventDefault(); navigate(pathInput.trim() || "/"); }}>
+        <form className={compact ? "order-last w-full basis-full" : "flex-1"} onSubmit={(e) => { e.preventDefault(); navigate(pathInput.trim() || "/"); }}>
           <input className="field font-mono !py-1" value={pathInput} onChange={(e) => setPathInput(e.target.value)} />
         </form>
         <IconButton title="Refresh" onClick={() => load(path)}>
           <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
         </IconButton>
-        <input className="field !w-40 !py-1" placeholder="Filter…" value={filter} onChange={(e) => setFilter(e.target.value)} />
+        {!compact && <input className="field !w-40 !py-1" placeholder="Filter…" value={filter} onChange={(e) => setFilter(e.target.value)} />}
         <div className="mx-1 h-5 w-px bg-line" />
+        <IconButton title="Upload a folder…" onClick={async () => { const d = await open({ title: "Upload folder", directory: true }); if (typeof d === "string") enqueueUploads([d]); }}>
+          <FolderUp size={15} />
+        </IconButton>
         <IconButton title="Upload files…" onClick={async () => { const f = await open({ title: "Upload files", multiple: true }); if (Array.isArray(f) && f.length) enqueueUploads(f); else if (typeof f === "string") enqueueUploads([f]); }}>
           <Upload size={15} />
         </IconButton>
@@ -298,8 +328,8 @@ export function SftpBrowser({ tabId, terminalId, sessionId }: { tabId: string; t
                 {sortHeader("name", "Name", "w-full")}
                 {sortHeader("size", "Size", "text-right whitespace-nowrap")}
                 {sortHeader("modified", "Modified", "whitespace-nowrap")}
-                <th className="px-2 py-1.5 font-medium">Permissions</th>
-                <th className="px-2 py-1.5 font-medium">Owner</th>
+                {!compact && <th className="px-2 py-1.5 font-medium">Permissions</th>}
+                {!compact && <th className="px-2 py-1.5 font-medium">Owner</th>}
               </tr>
             </thead>
             <tbody>
@@ -327,8 +357,8 @@ export function SftpBrowser({ tabId, terminalId, sessionId }: { tabId: string; t
                   </td>
                   <td className="px-2 py-1 text-right whitespace-nowrap text-dim">{e.isDir ? "" : formatBytes(e.size)}</td>
                   <td className="px-2 py-1 whitespace-nowrap text-dim">{formatUnixTime(e.modified)}</td>
-                  <td className="px-2 py-1 font-mono text-[11.5px] whitespace-nowrap text-dim">{e.permissions}</td>
-                  <td className="px-2 py-1 whitespace-nowrap text-dim">{e.owner}{e.group ? `:${e.group}` : ""}</td>
+                  {!compact && <td className="px-2 py-1 font-mono text-[11.5px] whitespace-nowrap text-dim">{e.permissions}</td>}
+                  {!compact && <td className="px-2 py-1 whitespace-nowrap text-dim">{e.owner}{e.group ? `:${e.group}` : ""}</td>}
                 </tr>
               ))}
             </tbody>

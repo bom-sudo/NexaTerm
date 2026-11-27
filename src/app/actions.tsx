@@ -32,6 +32,7 @@ export function newLocalTerminal(opts: { split?: boolean; shell?: ShellProfile }
 
 export function sessionSpec(s: Session): PaneSpec | null {
   if (s.protocol === "ssh") return { kind: "ssh", sessionId: s.id, label: s.name };
+  if (s.protocol === "telnet" || s.protocol === "serial") return { kind: "session", sessionId: s.id, label: s.name, protocol: s.protocol };
   if (s.protocol === "local") {
     const fallback = defaultShell();
     const program = s.options.shellPath || fallback?.path;

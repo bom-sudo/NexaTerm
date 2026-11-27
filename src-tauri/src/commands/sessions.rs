@@ -151,6 +151,30 @@ pub fn import_openssh_config(state: S, path: Option<String>) -> AppResult<usize>
     Ok(n)
 }
 
+/// Import a MobaXterm .mxtsessions export (or MobaXterm.ini).
+#[tauri::command]
+pub fn import_mobaxterm(state: S, path: String) -> AppResult<crate::importers::ImportReport> {
+    let bytes = std::fs::read(&path).map_err(|e| AppError::Validation(format!("Cannot read {path}: {e}")))?;
+    let parsed = crate::importers::mobaxterm::parse_mxtsessions(&crate::importers::decode_text(&bytes));
+    crate::importers::import(&state.db.lock().unwrap(), &parsed, "Imported (MobaXterm)")
+}
+
+/// Import PuTTY sessions from the registry of the current user, or from a .reg export file.
+#[tauri::command]
+pub fn import_putty(state: S, path: Option<String>) -> AppResult<crate::importers::ImportReport> {
+    let parsed = match path {
+        Some(p) => {
+            let bytes = std::fs::read(&p).map_err(|e| AppError::Validation(format!("Cannot read {p}: {e}")))?;
+            crate::importers::putty::parse_reg_export(&crate::importers::decode_text(&bytes))
+        }
+        #[cfg(windows)]
+        None => crate::importers::putty::read_registry()?,
+        #[cfg(not(windows))]
+        None => return Err(AppError::Validation("PuTTY registry import is only available on Windows".into())),
+    };
+    crate::importers::import(&state.db.lock().unwrap(), &parsed, "Imported (PuTTY)")
+}
+
 #[derive(Debug, Default, PartialEq)]
 pub struct SshConfigHost {
     pub alias: String,

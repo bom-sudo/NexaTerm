@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- SFTP: upload and download whole folders (also by dragging folders from Explorer), permissions dialog (chmod with checkboxes or octal, optionally recursive; chown by uid/gid), and an SFTP side panel next to the terminal that can follow the shell's current folder (OSC 7 prompt hook, opt-in per session).
+- Import sessions from MobaXterm (.mxtsessions / MobaXterm.ini) and PuTTY (registry of the current user or a .reg export).
+- Terminal output highlighting of error / warning / success words and IPv4 addresses (never inside full-screen programs or already coloured text); confirmation before pasting several lines. Both can be turned off in Settings.
+- Telnet sessions (option negotiation, window size, terminal type) and Serial (COM) sessions with speed, data bits, parity, stop bits and flow control.
+- SSH: keyboard-interactive logins with several prompts (password then one-time code), agent forwarding (ssh -A), zlib compression, X11 forwarding to a locally installed X server (VcXsrv, Xming, X410), PuTTY .ppk private keys.
+- Macros: record keystrokes from a terminal (including pauses) and replay them after a preview, with destructive-command warnings.
+
 ## 1.0.0 — 2026-11-23
 
 Release engineering (no new end-user features).

@@ -17,7 +17,7 @@ export interface DialogEntry {
 interface UiStore {
   toasts: Toast[];
   dialogs: DialogEntry[];
-  sidebarView: "sessions" | "snippets" | "history";
+  sidebarView: "sessions" | "snippets" | "history" | "macros";
   sessionSearchFocus: number;
   /** durationMs = 0 keeps the toast until the user dismisses it. */
   toast: (kind: Toast["kind"], text: string, durationMs?: number) => void;

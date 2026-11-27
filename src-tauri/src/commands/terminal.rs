@@ -139,6 +139,46 @@ pub async fn terminal_open_ssh(state: S<'_>, req: SshOpen, on_data: Channel<Invo
     Ok(SshOpened { terminal_id: id, host: conn.host.clone(), username: conn.username.clone(), label: session.name })
 }
 
+/// Open a saved Telnet or Serial session in a terminal.
+#[tauri::command]
+pub async fn terminal_open_session(state: S<'_>, session_id: String, cols: u16, rows: u16, on_data: Channel<InvokeResponseBody>, on_event: Channel<TermEvent>) -> AppResult<String> {
+    let session = { repo::get_session(&state.db.lock().unwrap(), &session_id)? };
+    let sink = make_sink(on_data, on_event);
+    let backend: std::sync::Arc<dyn crate::terminal::TerminalBackend> = match session.protocol.as_str() {
+        "telnet" => {
+            let spec = crate::terminal::telnet::TelnetSpec {
+                host: session.host.clone().unwrap_or_default(),
+                port: session.port.unwrap_or(23),
+                cols: cols.max(1),
+                rows: rows.max(1),
+                term: session.options.term_type.clone().filter(|t| !t.is_empty()).unwrap_or_else(|| "xterm-256color".into()),
+                connect_timeout_secs: session.options.connect_timeout_secs.unwrap_or(15),
+            };
+            crate::terminal::telnet::TelnetSession::open(spec, sink.clone()).await?
+        }
+        "serial" => {
+            let raw = session.options.serial.clone().ok_or_else(|| AppError::Validation("Serial settings are missing for this session".into()))?;
+            let spec: crate::terminal::serial::SerialSpec = serde_json::from_value(raw).map_err(|e| AppError::Validation(format!("Invalid serial settings: {e}")))?;
+            crate::terminal::serial::SerialSession::open(spec, sink.clone())?
+        }
+        other => return Err(AppError::Validation(format!("Protocol '{other}' cannot be opened here"))),
+    };
+    let id = uuid::Uuid::new_v4().to_string();
+    state.terminals.insert(id.clone(), &session.protocol, &session.name, backend, sink);
+    {
+        let db = state.db.lock().unwrap();
+        let _ = repo::touch_connected(&db, &session.id);
+        let _ = repo::add_history(&db, Some(&session.id), &session.name, &session.protocol, session.host.as_deref(), "connected");
+    }
+    log::info!("{} session {} opened", session.protocol, session.id);
+    Ok(id)
+}
+
+#[tauri::command]
+pub fn serial_ports() -> Vec<crate::terminal::serial::PortInfo> {
+    crate::terminal::serial::list_ports()
+}
+
 /// Answer (or cancel with None) a keyboard-interactive prompt raised during an SSH login.
 #[tauri::command]
 pub fn ssh_prompt_answer(state: S, id: String, answers: Option<Vec<String>>) -> bool {

@@ -29,7 +29,7 @@ async fn env() -> Env {
     let server = mock_server::start(cfg.clone(), 0).await;
     let db = Arc::new(Mutex::new(database::open_in_memory().unwrap()));
     let secrets: Arc<dyn SecretStore> = Arc::new(MemoryStore::default());
-    Env { ctx: SshContext { db, secrets }, server, cfg, _root: root }
+    Env { ctx: SshContext { db, secrets, prompter: None }, server, cfg, _root: root }
 }
 
 fn session_input(port: u16, auth: &str) -> SessionInput {
@@ -80,7 +80,7 @@ async fn read_until(rx: &mut mpsc::UnboundedReceiver<Vec<u8>>, needle: &str) -> 
 }
 
 fn opts() -> ShellOptions {
-    ShellOptions { term: "xterm-256color".into(), cols: 80, rows: 24, startup_dir: None, startup_command: None }
+    ShellOptions { term: "xterm-256color".into(), cols: 80, rows: 24, startup_dir: None, startup_command: None, x11: false, agent_forward: false, follow_folder: false }
 }
 
 #[tokio::test]
@@ -403,4 +403,114 @@ fn secrets_never_reach_logs_or_errors() {
     let e = AppError::AuthFailed("password=hunter2 rejected".into());
     let json = serde_json::to_string(&e).unwrap();
     assert!(!json.contains("hunter2"), "{json}");
+}
+
+#[tokio::test]
+async fn keyboard_interactive_two_factor_prompts() {
+    let mut e = env().await;
+    e.trust(e.server.port);
+    let mut input = session_input(e.server.port, "keyboardInteractive");
+    input.username = Some("otp".into());
+    let s = e.add_session(input);
+
+    // Without a prompter the second factor cannot be answered: clear error, no hang.
+    let r = ssh::connect(&e.ctx, &s, &Env::pw(), 0).await;
+    assert!(matches!(r, Err(AppError::AuthFailed(ref m)) if m.contains("one-time code")), "{:?}", r.err());
+
+    // With a prompter: the saved password answers round 1, the user answers the OTP round.
+    let seen = Arc::new(Mutex::new(Vec::new()));
+    let seen2 = seen.clone();
+    e.ctx.prompter = Some(Arc::new(move |p: ssh::KbdPrompt| {
+        seen2.lock().unwrap().push(p.clone());
+        Box::pin(async move { Some(vec!["123456".to_string()]) })
+    }));
+    ssh::connect(&e.ctx, &s, &Env::pw(), 0).await.expect("2FA login");
+    let asked = seen.lock().unwrap().clone();
+    assert_eq!(asked.len(), 1, "password round must not be shown to the user");
+    assert_eq!(asked[0].prompts[0].text, "Verification code: ");
+    assert!(asked[0].prompts[0].echo);
+    assert_eq!(asked[0].name, "Two-factor authentication");
+
+    // No saved password: both rounds go to the user; a wrong code fails cleanly.
+    let answers = Arc::new(Mutex::new(vec![vec!["secret".to_string()], vec!["000000".to_string()]]));
+    e.ctx.prompter = Some(Arc::new(move |_p: ssh::KbdPrompt| {
+        let next = answers.lock().unwrap().remove(0);
+        Box::pin(async move { Some(next) })
+    }));
+    assert!(matches!(ssh::connect(&e.ctx, &s, &Secrets::default(), 0).await, Err(AppError::AuthFailed(_))));
+
+    // Cancel from the dialog.
+    e.ctx.prompter = Some(Arc::new(|_p: ssh::KbdPrompt| Box::pin(async { None })));
+    let r = ssh::connect(&e.ctx, &s, &Secrets::default(), 0).await;
+    assert!(matches!(r, Err(AppError::AuthFailed(ref m)) if m.contains("cancelled")), "{:?}", r.err());
+}
+
+#[tokio::test]
+async fn compression_option_connects() {
+    let e = env().await;
+    e.trust(e.server.port);
+    let mut input = session_input(e.server.port, "password");
+    input.options.compression = Some(true);
+    let s = e.add_session(input);
+    let conn = ssh::connect(&e.ctx, &s, &Env::pw(), 0).await.expect("connect with compression enabled");
+    let (sk, mut data, _ev) = sink();
+    let shell = SshShell::open(conn, opts(), sk).await.unwrap();
+    read_until(&mut data, "ready").await;
+    shell.write(b"whoami\r").unwrap();
+    read_until(&mut data, "tester").await;
+}
+
+#[tokio::test]
+async fn sftp_folder_transfer_and_chmod() {
+    let e = env().await;
+    e.trust(e.server.port);
+    let s = e.add_session(session_input(e.server.port, "password"));
+    let conn = ssh::connect(&e.ctx, &s, &Env::pw(), 0).await.unwrap();
+    let mgr = SftpManager::default();
+    let h = mgr.get(&mgr.open(conn).await.unwrap()).unwrap();
+
+    // Local tree: project/{a.txt, sub/b.bin, sub/deeper/c.txt, empty/}
+    let local = tempfile::tempdir().unwrap();
+    let proj = local.path().join("project");
+    std::fs::create_dir_all(proj.join("sub/deeper")).unwrap();
+    std::fs::create_dir_all(proj.join("empty")).unwrap();
+    std::fs::write(proj.join("a.txt"), b"alpha").unwrap();
+    std::fs::write(proj.join("sub/b.bin"), vec![7u8; 300_000]).unwrap();
+    std::fs::write(proj.join("sub/deeper/c.txt"), "ไทย".as_bytes()).unwrap();
+
+    let mut last = (0, 0);
+    let up = h.upload_dir(&proj, "/", false, &CancelFlag::default(), |d, t| last = (d, t)).await.unwrap();
+    assert_eq!(up.path, "/project");
+    assert_eq!(up.files, 3);
+    assert_eq!(last, (300_014, 300_014));
+    assert!(h.list("/project").await.unwrap().iter().any(|x| x.name == "empty" && x.is_dir));
+    // Second upload without overwrite is refused before anything is sent.
+    assert!(matches!(h.upload_dir(&proj, "/", false, &CancelFlag::default(), |_, _| {}).await, Err(AppError::Validation(_))));
+    h.upload_dir(&proj, "/", true, &CancelFlag::default(), |_, _| {}).await.expect("overwrite allowed");
+
+    // Download the folder back and compare.
+    let dl = tempfile::tempdir().unwrap();
+    let down = h.download_dir("/project", dl.path(), false, &CancelFlag::default(), |_, _| {}).await.unwrap();
+    assert_eq!(down.files, 3);
+    let root = dl.path().join("project");
+    assert_eq!(std::fs::read(root.join("a.txt")).unwrap(), b"alpha");
+    assert_eq!(std::fs::read(root.join("sub").join("b.bin")).unwrap(), vec![7u8; 300_000]);
+    assert_eq!(std::fs::read(root.join("sub").join("deeper").join("c.txt")).unwrap(), "ไทย".as_bytes());
+    assert!(root.join("empty").is_dir());
+    assert!(matches!(h.download_dir("/project", dl.path(), false, &CancelFlag::default(), |_, _| {}).await, Err(AppError::Validation(_))));
+
+    // Cancelled folder download stops with Cancelled.
+    let cancel = CancelFlag::default();
+    cancel.cancel();
+    let dl2 = tempfile::tempdir().unwrap();
+    assert!(matches!(h.download_dir("/project", dl2.path(), false, &cancel, |_, _| {}).await, Err(AppError::Cancelled)));
+
+    // chmod: validation, single and recursive (the mock SFTP server accepts setstat).
+    assert!(h.chmod("/project/a.txt", 0o17777, false).await.is_err());
+    assert_eq!(h.chmod("/project/a.txt", 0o640, false).await.unwrap(), 1);
+    assert_eq!(h.chmod("/project", 0o755, true).await.unwrap(), 7);
+    assert!(h.chown("/project/a.txt", None, None).await.is_err());
+    let st = h.stat("/project/sub/b.bin").await.unwrap();
+    assert_eq!(st.size, 300_000);
+    assert!(!st.is_dir);
 }

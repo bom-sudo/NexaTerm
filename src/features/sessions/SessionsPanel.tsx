@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import {
+  Cable,
+  Network,
   ChevronDown, ChevronRight, Columns2, Copy, Download, FileInput, Folder, FolderPlus, FolderSync, Monitor, Pencil, Play, Plus, Search, Server, Star, StarOff, Trash2, Upload,
 } from "lucide-react";
 import { api, toApiError } from "../../services/api";
@@ -9,9 +11,15 @@ import { openDialog, toast, useUi } from "../../store/ui";
 import { useWorkspace } from "../../store/workspace";
 import { Button, IconButton, Modal, confirmDialog, promptDialog, useContextMenu, type MenuItem } from "../../components/ui";
 import { connectSession, editSessionDialog, newSessionDialog } from "../../app/actions";
-import type { Session } from "../../types";
+import type { ImportReport, Session } from "../../types";
 
 type Sort = "name" | "recent" | "host";
+
+/** Summarise an import: what came in and why entries were skipped. */
+function reportImport(r: ImportReport, source: string) {
+  const reasons = r.skipped.slice(0, 4).map(([n, why]) => `${n}: ${why}`).join("; ");
+  toast(r.imported ? "success" : "warn", `Imported ${r.imported} session(s) from ${source}.${r.skipped.length ? ` Skipped ${r.skipped.length}${reasons ? ` (${reasons}${r.skipped.length > 4 ? "; ..." : ""})` : ""}.` : ""}`, r.skipped.length ? 0 : undefined);
+}
 
 function matches(s: Session, q: string) {
   if (!q) return true;
@@ -130,6 +138,27 @@ export function SessionsPanel() {
         },
       },
       {
+        label: "Import from MobaXterm (.mxtsessions / MobaXterm.ini)…",
+        icon: <FileInput size={13} />,
+        onClick: async () => {
+          const p = await open({ title: "MobaXterm sessions file", filters: [{ name: "MobaXterm sessions", extensions: ["mxtsessions", "ini"] }] });
+          if (typeof p === "string") act(async () => reportImport(await api.importMobaXterm(p), "MobaXterm"));
+        },
+      },
+      {
+        label: "Import from PuTTY (this PC)",
+        icon: <FileInput size={13} />,
+        onClick: () => act(async () => reportImport(await api.importPutty(null), "PuTTY")),
+      },
+      {
+        label: "Import from PuTTY export (.reg)…",
+        icon: <FileInput size={13} />,
+        onClick: async () => {
+          const p = await open({ title: "PuTTY registry export", filters: [{ name: "Registry file", extensions: ["reg"] }] });
+          if (typeof p === "string") act(async () => reportImport(await api.importPutty(p), "PuTTY"));
+        },
+      },
+      {
         label: "Import NexaTerm sessions (.json)…",
         icon: <Upload size={13} />,
         onClick: async () => {
@@ -158,7 +187,15 @@ export function SessionsPanel() {
       style={{ paddingLeft: 8 + indent * 14 }}
       title={`${s.name}${s.host ? `\n${s.username}@${s.host}:${s.port}` : ""}${s.tags.length ? `\nTags: ${s.tags.join(", ")}` : ""}\nDouble-click to connect`}
     >
-      {s.protocol === "ssh" ? <Server size={14} className="shrink-0 text-accent" /> : <Monitor size={14} className="shrink-0 text-accent-2" />}
+      {s.protocol === "ssh" ? (
+        <Server size={14} className="shrink-0 text-accent" />
+      ) : s.protocol === "telnet" ? (
+        <Network size={14} className="shrink-0 text-warn" />
+      ) : s.protocol === "serial" ? (
+        <Cable size={14} className="shrink-0 text-warn" />
+      ) : (
+        <Monitor size={14} className="shrink-0 text-accent-2" />
+      )}
       <div className="min-w-0 flex-1">
         <div className="truncate text-[12.5px]">{s.name}</div>
         {s.host && <div className="truncate text-[11px] text-faint">{s.username}@{s.host}{s.port !== 22 ? `:${s.port}` : ""}</div>}

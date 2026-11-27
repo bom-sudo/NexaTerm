@@ -6,7 +6,7 @@ import { useSessions } from "../store/sessions";
 import { useSettings } from "../store/settings";
 import { useUi } from "../store/ui";
 import { useWorkspace, type PaneSpec } from "../store/workspace";
-import { sessionSpec } from "./actions";
+import { newSessionDialog, sessionSpec } from "./actions";
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -76,6 +76,35 @@ export async function runShowcase(scene: string) {
       return;
     case "hostkey":
       ws.openTerminal(ssh("new-server"));
+      return;
+    case "highlight": {
+      const sh = useSessions.getState().shells.find((s) => s.id === "powershell") ?? useSessions.getState().shells[0];
+      const lines = [
+        "2026-11-27 09:12:01 INFO  web-01 health check ok (10.20.0.11:443)",
+        "2026-11-27 09:12:02 WARN  db-01 replication lag 4.2 s, timeout in 30 s",
+        "2026-11-27 09:12:03 ERROR deploy failed: connection refused by 10.20.0.15:22",
+        "2026-11-27 09:12:04 INFO  cache cluster status active, 3 nodes ok",
+      ];
+      const script = "function prompt { 'PS NexaTerm> ' }; " + lines.map((l) => `Write-Output '${l}'`).join("; ");
+      ws.openTerminal({ kind: "local", program: sh.path, args: ["-NoLogo", "-NoExit", "-Command", script], cwd: null, label: "Highlighting", sessionId: null });
+      return;
+    }
+    case "sftpdock": {
+      ws.openTerminal(ssh("web-01"));
+      await wait(2500);
+      const tab = useWorkspace.getState().activeTab!;
+      useWorkspace.getState().toggleSftpDock(tab);
+      return;
+    }
+    case "twofa":
+      ws.openTerminal(ssh("otp-login"));
+      return;
+    case "serial":
+      void newSessionDialog({ protocol: "serial", name: "Core switch console" });
+      return;
+    case "macros":
+      useUi.getState().setSidebarView("macros");
+      ws.openTerminal(ssh("web-01"));
       return;
     case "settings":
       return ws.openTool("settings", "Settings");

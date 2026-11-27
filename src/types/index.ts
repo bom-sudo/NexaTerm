@@ -12,6 +12,60 @@ export interface SessionOptions {
   shellArgs?: string[] | null;
   cwd?: string | null;
   encoding?: string | null;
+  compression?: boolean | null;
+  agentForward?: boolean | null;
+  x11Forward?: boolean | null;
+  x11Display?: string | null;
+  followTerminalFolder?: boolean | null;
+  serial?: SerialSettings | null;
+}
+
+export interface SerialSettings {
+  port: string;
+  baud: number;
+  dataBits: number;
+  parity: "none" | "odd" | "even" | "mark" | "space";
+  stopBits: "one" | "onePointFive" | "two";
+  flow: "none" | "xonXoff" | "rtsCts";
+}
+
+export interface PortInfo {
+  name: string;
+  description: string | null;
+}
+
+export interface KbdPrompt {
+  id: string;
+  host: string;
+  username: string;
+  name: string;
+  instructions: string;
+  prompts: { text: string; echo: boolean }[];
+}
+
+export interface FolderTransfer {
+  path: string;
+  files: number;
+  skipped: string[];
+}
+
+export interface ImportReport {
+  imported: number;
+  skipped: [string, string][];
+}
+
+export type MacroStep = { kind: "text"; text: string } | { kind: "wait"; ms: number };
+
+export interface MacroProfile {
+  id: string;
+  name: string;
+  steps: MacroStep[];
+  createdAt: string;
+}
+
+export interface XStatus {
+  running: boolean;
+  installed: { id: string; name: string; path: string }[];
 }
 
 export interface Session {

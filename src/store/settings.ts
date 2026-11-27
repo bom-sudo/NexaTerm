@@ -17,6 +17,10 @@ export interface Settings {
   defaultShellId: string;
   confirmCloseConnected: boolean;
   onboarded: boolean;
+  /** Colour error/warning/success words and IP addresses in terminal output. */
+  highlightOutput: boolean;
+  /** Ask before pasting text that contains line breaks (it would run several commands). */
+  confirmMultilinePaste: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -34,6 +38,8 @@ export const DEFAULT_SETTINGS: Settings = {
   defaultShellId: "powershell",
   confirmCloseConnected: true,
   onboarded: false,
+  highlightOutput: true,
+  confirmMultilinePaste: true,
 };
 
 interface SettingsStore {

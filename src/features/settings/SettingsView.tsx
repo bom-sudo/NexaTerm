@@ -46,6 +46,8 @@ export function SettingsView() {
     { section: "Terminal", label: "Scrollback lines", hint: "Applies to newly written output.", control: num("scrollback", 100, 200000, 100) },
     { section: "Terminal", label: "Copy on select", control: chk("copyOnSelect") },
     { section: "Terminal", label: "Right-click copies selection / pastes", control: chk("rightClickPaste") },
+    { section: "Terminal", label: "Highlight errors, warnings and IP addresses in output", hint: "Colours words like error, failed, warning, ok and IPv4 addresses. Never applied inside full-screen programs (vim, less, htop) or to text a program already coloured.", control: chk("highlightOutput") },
+    { section: "Terminal", label: "Confirm before pasting several lines", hint: "Multi-line text may run several commands at once.", control: chk("confirmMultilinePaste") },
     { section: "Terminal", label: "Send Ctrl+W / Ctrl+T to the shell", hint: "When on, use Ctrl+Shift+W / Ctrl+Shift+T for tabs while a terminal has focus (bash uses Ctrl+W to delete a word).", control: chk("shellKeysPassThrough") },
     { section: "Local shells", label: "Default shell", control: sel("defaultShellId", shells.map((s) => [s.id, s.name])) },
     { section: "Connections", label: "Confirm before closing connected SSH tabs", control: chk("confirmCloseConnected") },

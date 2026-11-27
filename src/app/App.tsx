@@ -14,6 +14,7 @@ import { toast } from "../store/ui";
 import { installShortcuts, registerShortcutHandlers } from "./shortcuts";
 import { newLocalTerminal, newSessionDialog } from "./actions";
 import { Onboarding } from "./Onboarding";
+import { installKbdPromptListener } from "../features/ssh/KbdPromptDialog";
 
 export function App() {
   const theme = useSettings((s) => s.settings.theme);
@@ -36,6 +37,7 @@ export function App() {
     api.appInfo().then((i) => i.dataNotice && toast("warn", i.dataNotice, 0)).catch(() => {});
     registerShortcutHandlers({ newSession: () => newSessionDialog(), newTerminal: () => newLocalTerminal() });
     const off = installShortcuts();
+    const offPrompts = installKbdPromptListener();
     const noCtx = (e: MouseEvent) => {
       // Native browser context menu is never useful in the app; inputs keep it for copy/paste.
       const t = e.target as HTMLElement;
@@ -44,6 +46,7 @@ export function App() {
     window.addEventListener("contextmenu", noCtx);
     return () => {
       off();
+      offPrompts();
       window.removeEventListener("contextmenu", noCtx);
     };
   }, []);

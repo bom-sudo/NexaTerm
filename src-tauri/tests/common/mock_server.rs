@@ -52,7 +52,7 @@ pub async fn start(cfg: MockConfig, port: u16) -> MockServer {
     let task = tokio::spawn(async move {
         loop {
             let Ok((sock, _)) = listener.accept().await else { break };
-            let handler = SshHandler { cfg: cfg.clone(), user: String::new(), channels: Default::default(), lines: Default::default(), shells: Default::default(), pty: (0, 0) };
+            let handler = SshHandler { cfg: cfg.clone(), user: String::new(), channels: Default::default(), lines: Default::default(), shells: Default::default(), pty: (0, 0), kbd_stage: 0 };
             let config = config.clone();
             tokio::spawn(async move {
                 if let Ok(session) = russh::server::run_stream(config, sock, handler).await {
@@ -71,6 +71,8 @@ struct SshHandler {
     lines: HashMap<ChannelId, Vec<u8>>,
     shells: std::collections::HashSet<ChannelId>,
     pty: (u32, u32),
+    /// keyboard-interactive progress: 0 = nothing asked, 1 = password asked, 2 = code asked
+    kbd_stage: u8,
 }
 
 impl russh::server::Handler for SshHandler {
@@ -82,6 +84,36 @@ impl russh::server::Handler for SshHandler {
             Ok(Auth::Accept)
         } else {
             Ok(Auth::reject())
+        }
+    }
+
+    async fn auth_keyboard_interactive<'a>(&'a mut self, user: &str, _sub: &str, response: Option<russh::server::Response<'a>>) -> Result<Auth, Self::Error> {
+        use std::borrow::Cow;
+        if user != "otp" {
+            return Ok(Auth::reject());
+        }
+        let answers: Vec<String> = response.map(|r| r.map(|b| String::from_utf8_lossy(&b).to_string()).collect()).unwrap_or_default();
+        match self.kbd_stage {
+            0 => {
+                self.kbd_stage = 1;
+                Ok(Auth::Partial { name: Cow::Borrowed("Login"), instructions: Cow::Borrowed(""), prompts: Cow::Owned(vec![(Cow::Borrowed("Password: "), false)]) })
+            }
+            1 if answers.first().map(String::as_str) == Some("secret") => {
+                self.kbd_stage = 2;
+                Ok(Auth::Partial {
+                    name: Cow::Borrowed("Two-factor authentication"),
+                    instructions: Cow::Borrowed("Enter the code from your authenticator app"),
+                    prompts: Cow::Owned(vec![(Cow::Borrowed("Verification code: "), true)]),
+                })
+            }
+            2 if answers.first().map(String::as_str) == Some("123456") => {
+                self.user = user.into();
+                Ok(Auth::Accept)
+            }
+            _ => {
+                self.kbd_stage = 0;
+                Ok(Auth::reject())
+            }
         }
     }
 

@@ -6,7 +6,8 @@ export type PaneStatus = "connecting" | "connected" | "exited" | "lost" | "error
 /** What a terminal pane should launch. */
 export type PaneSpec =
   | { kind: "local"; program: string; args: string[]; cwd: string | null; label: string; sessionId: string | null }
-  | { kind: "ssh"; sessionId: string; label: string };
+  | { kind: "ssh"; sessionId: string; label: string }
+  | { kind: "session"; sessionId: string; label: string; protocol: "telnet" | "serial" };
 
 export interface Pane {
   id: string;
@@ -20,13 +21,15 @@ export interface Pane {
   username?: string;
   connectMs?: number;
   logging?: string | null;
+  /** Remote working directory reported by the shell (OSC 7). */
+  cwd?: string;
 }
 
 export type Layout = "single" | "columns" | "rows" | "grid";
 export type ToolKind = "tunnels" | "network" | "keys" | "settings" | "knownHosts";
 
 export type Tab =
-  | { id: string; kind: "terminal"; title: string; panes: Pane[]; layout: Layout; activePane: string; ratios: { col: number; row: number } }
+  | { id: string; kind: "terminal"; title: string; panes: Pane[]; layout: Layout; activePane: string; ratios: { col: number; row: number }; sftpDock?: boolean }
   | { id: string; kind: "sftp"; title: string; terminalId?: string; sessionId?: string }
   | { id: string; kind: "editor"; title: string; sftpId: string; path: string }
   | { id: string; kind: "tool"; title: string; tool: ToolKind };
@@ -53,6 +56,7 @@ interface WorkspaceStore {
   cycle: (dir: 1 | -1) => void;
   renameTab: (id: string, title: string) => void;
   setMultiExec: (patch: Partial<WorkspaceStore["multiExec"]>) => void;
+  toggleSftpDock: (tabId: string) => void;
   requestTerminalSearch: () => void;
   allPanes: () => { tab: Tab; pane: Pane }[];
   activePane: () => Pane | undefined;
@@ -166,6 +170,7 @@ export const useWorkspace = create<WorkspaceStore>((set, get) => ({
   },
   renameTab: (id, title) => set({ tabs: get().tabs.map((t) => (t.id === id ? { ...t, title } : t)) }),
   setMultiExec: (patch) => set({ multiExec: { ...get().multiExec, ...patch } }),
+  toggleSftpDock: (tabId) => set({ tabs: get().tabs.map((t) => (t.id === tabId && t.kind === "terminal" ? { ...t, sftpDock: !t.sftpDock } : t)) }),
   requestTerminalSearch: () => set({ terminalSearch: get().terminalSearch + 1 }),
 
   allPanes: () => get().tabs.flatMap((tab) => (tab.kind === "terminal" ? tab.panes.map((pane) => ({ tab, pane })) : [])),

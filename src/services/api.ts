@@ -11,6 +11,12 @@ import type {
   SessionGroup,
   SessionInput,
   ShellProfile,
+  FolderTransfer,
+  ImportReport,
+  MacroProfile,
+  MacroStep,
+  PortInfo,
+  XStatus,
   Snippet,
   SshKeyRecord,
   TermEvent,
@@ -81,6 +87,8 @@ export const api = {
   sessionsExport: (path: string) => call<number>("sessions_export", { path }),
   sessionsImport: (path: string) => call<number>("sessions_import", { path }),
   importOpenSshConfig: (path: string | null) => call<number>("import_openssh_config", { path }),
+  importMobaXterm: (path: string) => call<ImportReport>("import_mobaxterm", { path }),
+  importPutty: (path: string | null) => call<ImportReport>("import_putty", { path }),
 
   // terminals
   shellsList: () => call<ShellProfile[]>("shells_list"),
@@ -92,6 +100,10 @@ export const api = {
     req: { sessionId: string; password?: string; passphrase?: string; saveSecret?: boolean; cols: number; rows: number },
     h: TermChannels,
   ) => call<{ terminalId: string; host: string; username: string; label: string }>("terminal_open_ssh", { req, ...termChannels(h) }),
+  openSession: (req: { sessionId: string; cols: number; rows: number }, h: TermChannels) =>
+    call<string>("terminal_open_session", { ...req, ...termChannels(h) }),
+  serialPorts: () => call<PortInfo[]>("serial_ports"),
+  sshPromptAnswer: (id: string, answers: string[] | null) => call<boolean>("ssh_prompt_answer", { id, answers }),
   write: (id: string, data: string) => call<void>("terminal_write", { id, data }),
   broadcast: (ids: string[], data: string) => call<[string, string | null][]>("terminal_broadcast", { ids, data }),
   resize: (id: string, cols: number, rows: number) => call<void>("terminal_resize", { id, cols, rows }),
@@ -128,6 +140,20 @@ export const api = {
     ch.onmessage = (p) => onProgress(p.done, p.total);
     return call<string>("sftp_download", { sftpId, remotePath, localDir, overwrite, jobId, onProgress: ch });
   },
+  sftpUploadDir: (sftpId: string, localPath: string, remoteDir: string, overwrite: boolean, jobId: string, onProgress: (done: number, total: number) => void) => {
+    const ch = new Channel<{ done: number; total: number }>();
+    ch.onmessage = (p) => onProgress(p.done, p.total);
+    return call<FolderTransfer>("sftp_upload_dir", { sftpId, localPath, remoteDir, overwrite, jobId, onProgress: ch });
+  },
+  sftpDownloadDir: (sftpId: string, remotePath: string, localDir: string, overwrite: boolean, jobId: string, onProgress: (done: number, total: number) => void) => {
+    const ch = new Channel<{ done: number; total: number }>();
+    ch.onmessage = (p) => onProgress(p.done, p.total);
+    return call<FolderTransfer>("sftp_download_dir", { sftpId, remotePath, localDir, overwrite, jobId, onProgress: ch });
+  },
+  sftpStat: (sftpId: string, path: string) => call<RemoteEntry>("sftp_stat", { sftpId, path }),
+  sftpChmod: (sftpId: string, path: string, mode: number, recursive: boolean) => call<number>("sftp_chmod", { sftpId, path, mode, recursive }),
+  sftpChown: (sftpId: string, path: string, uid: number | null, gid: number | null) => call<void>("sftp_chown", { sftpId, path, uid, gid }),
+  localIsDir: (path: string) => call<boolean>("local_is_dir", { path }),
   localExists: (path: string) => call<boolean>("local_exists", { path }),
   downloadsDir: () => call<string>("downloads_dir"),
 
@@ -162,6 +188,15 @@ export const api = {
   keyInspect: (path: string) => call<KeyInfo>("key_inspect", { path }),
   keyChangePassphrase: (path: string, old: string | null, next: string | null) => call<KeyInfo>("key_change_passphrase", { path, old, new: next }),
   keyForget: (id: string) => call<void>("key_forget", { id }),
+
+  // X11
+  x11Status: () => call<XStatus>("x11_status"),
+  x11Start: (id: string) => call<void>("x11_start", { id }),
+
+  // macros
+  macrosList: () => call<MacroProfile[]>("macros_list"),
+  macroSave: (id: string | null, name: string, steps: MacroStep[]) => call<string>("macro_save", { id, name, steps }),
+  macroDelete: (id: string) => call<void>("macro_delete", { id }),
 
   // snippets
   snippetsList: () => call<Snippet[]>("snippets_list"),

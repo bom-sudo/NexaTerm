@@ -2,6 +2,8 @@
 //! split panes and multi-execution treat them identically.
 
 pub mod local;
+pub mod serial;
+pub mod telnet;
 pub mod shells;
 
 use crate::error::{AppError, AppResult};
