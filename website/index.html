@@ -41,9 +41,9 @@
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "NexaTerm",
-    "operatingSystem": "Windows 10 (1809+), Windows 11 (x64), Linux (x64 preview)",
+    "operatingSystem": "Windows 10 (1809+), Windows 11 (x64), Linux (x64)",
     "applicationCategory": "DeveloperApplication",
-    "softwareVersion": "1.0.0",
+    "softwareVersion": "1.1.0",
     "inLanguage": ["th", "en"],
     "license": "https://opensource.org/licenses/MIT",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "THB" },
@@ -148,8 +148,7 @@
       <div class="wrap">
         <p class="eyebrow">
           <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-terminal"/></svg>
-          <span data-i18n-html="hero_eyebrow">NexaTerm 1.0.0 <span>·</span> ฟรีและโอเพนซอร์ส (MIT)
-            <span>·</span> Windows 10/11 &amp; Linux x64 (Preview)</span>
+          <span data-i18n-html="hero_eyebrow">NexaTerm 1.1.0 <span>·</span> ฟรีและโอเพนซอร์ส (MIT) <span>·</span> Windows 10/11 และ Linux</span>
         </p>
         <h1 data-i18n-html="hero_title">หนึ่งพื้นที่ทำงาน<br><span class="grad">ครบทุกการเชื่อมต่อระยะไกล</span></h1>
         <p class="lead" data-i18n="hero_lead">
@@ -520,86 +519,97 @@
     <section class="section" id="download">
       <div class="wrap">
         <header class="section-head">
-          <p class="kicker"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-cloud-download"/></svg><span data-i18n="dl_kicker">ดาวน์โหลดและรุ่นล่าสุด</span></p>
-          <h2 data-i18n="dl_heading">ดาวน์โหลด NexaTerm 1.0.0 &amp; รุ่นพรีวิว</h2>
-          <p data-i18n="dl_sub">สำหรับ Windows 10 (1809 ขึ้นไป) / Windows 11 x64 และ Linux x64 (Preview) ฟรี ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ
-          </p>
+          <p class="kicker"><span data-i18n="dl_kicker">ดาวน์โหลด</span></p>
+          <h2 data-i18n="dl_heading">ดาวน์โหลด NexaTerm 1.1.0</h2>
+          <p data-i18n="dl_sub">ฟรีทุกฟังก์ชัน ไม่ต้องสมัครบัญชี ใช้ได้กับ Windows 10 / 11 และ Linux (64 บิต)</p>
         </header>
 
-        <!-- Windows v1.0.0 -->
+        <!-- Windows -->
         <div class="downloads">
           <article class="dl featured">
             <div class="dl-top">
-              <p class="dl-tag" data-i18n="dl_badge_rec">แนะนำ · โหลดทันที</p>
+              <p class="dl-tag" data-i18n="dl_badge_rec">แนะนำ</p>
               <span class="icon-badge"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-brand-windows"/></svg></span>
             </div>
-            <h3 data-i18n="dl_web_title">ตัวติดตั้งแบบออนไลน์ (Web)</h3>
-            <p class="dl-file">NexaTerm-Setup-x64-web.exe <span>3.0 MB</span></p>
-            <p data-i18n="dl_web_desc">ดาวน์โหลดเร็วและติดตั้งแบบรายผู้ใช้ (ไม่ต้องใช้สิทธิ์แอดมิน) ใช้ WebView2 ที่มีอยู่แล้วใน Windows 11 / 10 หรือโหลดเพิ่มเฉพาะเครื่องที่ยังไม่มี</p>
-            <a class="btn btn-primary"
-              href="downloads/NexaTerm-Setup-x64-web.exe" download>
+            <h3 data-i18n="dl_web_title">ตัวติดตั้งสำหรับ Windows</h3>
+            <p class="dl-file">NexaTerm-Setup-x64-web.exe <span>3 MB</span></p>
+            <p data-i18n="dl_web_desc">ดับเบิลคลิกแล้วกด Next ไม่กี่ครั้งก็ใช้ได้ ติดตั้งเฉพาะบัญชีของคุณ ไม่ต้องใช้สิทธิ์แอดมิน ถอนการติดตั้งได้จาก Settings ของ Windows</p>
+            <a class="btn btn-primary" href="downloads/NexaTerm-Setup-x64-web.exe" download>
               <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-download"/></svg>
-              <span data-i18n="dl_web_btn">ดาวน์โหลดตัวติดตั้ง (3 MB)</span>
+              <span data-i18n="dl_web_btn">ดาวน์โหลดตัวติดตั้ง</span>
             </a>
           </article>
           <article class="dl">
             <div class="dl-top">
-              <p class="dl-tag muted" data-i18n="dl_badge_port">ไม่ต้องติดตั้ง · โหลดทันที</p>
+              <p class="dl-tag muted" data-i18n="dl_badge_port">ไม่ต้องติดตั้ง</p>
               <span class="icon-badge cyan"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-usb"/></svg></span>
             </div>
-            <h3 data-i18n="dl_port_title">รุ่นพกพา (Portable)</h3>
-            <p class="dl-file">NexaTerm-Portable-x64.zip <span>3.6 MB</span></p>
-            <p data-i18n-html="dl_port_desc">แตกไฟล์ไว้ที่ไหนก็ได้ รวมถึงแฟลชไดรฟ์ แล้วเปิด <code>NexaTerm.exe</code> ได้เลย ข้อมูลทั้งหมดอยู่ในโฟลเดอร์ <code>portable-data\</code> ข้างโปรแกรม</p>
-            <a class="btn btn-ghost"
-              href="downloads/NexaTerm-Portable-x64.zip" download>
-              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-archive"/></svg>
-              <span data-i18n="dl_port_btn">ดาวน์โหลด ZIP (3.6 MB)</span>
+            <h3 data-i18n="dl_port_title">รุ่นพกพา</h3>
+            <p class="dl-file">NexaTerm-Portable-x64.zip <span>4 MB</span></p>
+            <p data-i18n-html="dl_port_desc">แตกไฟล์ ZIP แล้วเปิด <code>NexaTerm.exe</code> ได้เลย ใช้จากแฟลชไดรฟ์ได้ ข้อมูลเก็บในโฟลเดอร์ข้างโปรแกรม</p>
+            <a class="btn btn-ghost" href="downloads/NexaTerm-Portable-x64.zip" download>
+              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-download"/></svg>
+              <span data-i18n="dl_port_btn">ดาวน์โหลด ZIP</span>
             </a>
           </article>
           <article class="dl">
             <div class="dl-top">
-              <p class="dl-tag muted" data-i18n="dl_badge_offline">รวม WebView2 · GitHub</p>
+              <p class="dl-tag muted" data-i18n="dl_badge_offline">เครื่องไม่มีเน็ต</p>
               <span class="icon-badge"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-hard-drive"/></svg></span>
             </div>
             <h3 data-i18n="dl_offline_title">ตัวติดตั้งแบบออฟไลน์</h3>
-            <p class="dl-file">NexaTerm-Setup-x64.exe <span>287 MB</span></p>
-            <p data-i18n="dl_offline_desc">รวมตัวติดตั้ง WebView2 Runtime ไว้สำหรับเครื่องออฟไลน์ (ใช้พื้นที่ใน %TEMP% ~300 MB) เนื่องจากเกินโควตา 25 MB ของ Cloudflare Pages จึงเผยแพร่ผ่าน GitHub Releases</p>
-            <a class="btn btn-ghost"
-              href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener">
-              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-brand-github"/></svg>
-              <span data-i18n="dl_offline_btn">ดูบน GitHub Releases</span>
+            <p class="dl-file">NexaTerm-Setup-x64.exe <span>290 MB</span></p>
+            <p data-i18n="dl_offline_desc">รวม Microsoft WebView2 ไว้ในไฟล์เดียว ใช้กับเครื่องที่ต่ออินเทอร์เน็ตไม่ได้ ไฟล์ใหญ่ประมาณ 290 MB จึงเก็บไว้บน GitHub</p>
+            <a class="btn btn-ghost" href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Setup-x64.exe">
+              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-download"/></svg>
+              <span data-i18n="dl_offline_btn">ดาวน์โหลด (290 MB)</span>
             </a>
           </article>
         </div>
 
-        <!-- Linux & CI Preview (Unreleased features) -->
-        <div class="downloads-extra">
+        <!-- Linux -->
+        <h3 class="dl-group" data-i18n="dl_linux_heading">Linux</h3>
+        <div class="downloads">
           <article class="dl">
             <div class="dl-top">
-              <p class="dl-tag muted" data-i18n="dl_badge_linux">Linux x64 · Preview</p>
+              <h3>Ubuntu / Debian</h3>
               <span class="icon-badge cyan"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-brand-linux"/></svg></span>
             </div>
-            <h3 data-i18n="dl_linux_title">แพ็กเกจสำหรับ Linux</h3>
-            <p class="dl-file">.deb · .rpm · .AppImage <span>x64</span></p>
-            <p data-i18n-html="dl_linux_desc">สร้างอัตโนมัติใน GitHub Actions รองรับ Debian/Ubuntu (<code>.deb</code>), Fedora/openSUSE (<code>.rpm</code>) และ <code>.AppImage</code> พร้อม Secret Service keyring, <code>SSH_AUTH_SOCK</code>, Serial และ X11 ผ่าน <code>$DISPLAY</code></p>
-            <a class="btn btn-ghost"
-              href="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml" target="_blank" rel="noopener">
-              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-external-link"/></svg>
-              <span data-i18n="dl_linux_btn">ดาวน์โหลดจาก GitHub Actions (CI)</span>
+            <p class="dl-file">NexaTerm-x64.deb</p>
+            <p data-i18n="dl_deb_desc">Ubuntu, Debian, Linux Mint, Pop!_OS</p>
+            <div class="cmd"><code id="cmd-deb">sudo apt install ./NexaTerm-x64.deb</code>
+              <button class="copy" type="button" data-copy="cmd-deb" aria-label="คัดลอกคำสั่ง" data-i18n="copy_btn">คัดลอก</button></div>
+            <a class="btn btn-ghost" href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-x64.deb">
+              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-download"/></svg>
+              <span>NexaTerm-x64.deb</span>
             </a>
           </article>
           <article class="dl">
             <div class="dl-top">
-              <p class="dl-tag muted" data-i18n="dl_badge_dev">พรีวิวล่าสุด · main</p>
-              <span class="icon-badge warn"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-rocket"/></svg></span>
+              <h3>Fedora / openSUSE</h3>
+              <span class="icon-badge cyan"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-brand-linux"/></svg></span>
             </div>
-            <h3 data-i18n="dl_dev_title">รุ่นพัฒนาล่าสุด (Unreleased Features)</h3>
-            <p class="dl-file">Windows &amp; Linux CI Artifacts <span>Auto-built</span></p>
-            <p data-i18n="dl_dev_desc">รวมความสามารถใหม่ที่เพิ่งเขียนเพิ่มหลัง v1.0.0: Telnet, Serial (COM), X11 forwarding, SFTP Side Panel + ส่งทั้งโฟลเดอร์ + chmod, 2FA, Agent forwarding, .ppk, นำเข้า MobaXterm/PuTTY, Output Highlighting และ Macros</p>
-            <a class="btn btn-ghost"
-              href="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml" target="_blank" rel="noopener">
-              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-brand-github"/></svg>
-              <span data-i18n="dl_dev_btn">ดู Artifacts ล่าสุดบน GitHub CI</span>
+            <p class="dl-file">NexaTerm-x64.rpm</p>
+            <p data-i18n="dl_rpm_desc">Fedora, RHEL, Rocky, openSUSE</p>
+            <div class="cmd"><code id="cmd-rpm">sudo dnf install ./NexaTerm-x64.rpm</code>
+              <button class="copy" type="button" data-copy="cmd-rpm" aria-label="คัดลอกคำสั่ง" data-i18n="copy_btn">คัดลอก</button></div>
+            <a class="btn btn-ghost" href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-x64.rpm">
+              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-download"/></svg>
+              <span>NexaTerm-x64.rpm</span>
+            </a>
+          </article>
+          <article class="dl">
+            <div class="dl-top">
+              <h3>AppImage</h3>
+              <span class="icon-badge cyan"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-brand-linux"/></svg></span>
+            </div>
+            <p class="dl-file">NexaTerm-x64.AppImage</p>
+            <p data-i18n="dl_appimage_desc">ดิสโทรอื่น ๆ ไม่ต้องติดตั้ง</p>
+            <div class="cmd"><code id="cmd-appimage">chmod +x NexaTerm-x64.AppImage &amp;&amp; ./NexaTerm-x64.AppImage</code>
+              <button class="copy" type="button" data-copy="cmd-appimage" aria-label="คัดลอกคำสั่ง" data-i18n="copy_btn">คัดลอก</button></div>
+            <a class="btn btn-ghost" href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-x64.AppImage">
+              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-download"/></svg>
+              <span>NexaTerm-x64.AppImage</span>
             </a>
           </article>
         </div>
@@ -608,9 +618,9 @@
           <div>
             <div class="verify-head">
               <span class="icon-badge sm"><svg class="ico ico-md" aria-hidden="true"><use href="#ico-shield-check"/></svg></span>
-              <h3 data-i18n="verify_title">ตรวจสอบไฟล์และสถานะลายเซ็น (Code Signing)</h3>
+              <h3 data-i18n="verify_title">ถ้า Windows ขึ้นหน้าจอสีน้ำเงิน "Windows protected your PC"</h3>
             </div>
-            <p data-i18n-html="verify_desc">ไฟล์ v1.0.0 ชุดแรกยังไม่ได้ลงลายเซ็นดิจิทัล (Windows SmartScreen อาจแจ้งเตือน) ส่วนระบบ CI/Release ได้เตรียมการเซ็นอัตโนมัติผ่าน <strong>SignPath Foundation</strong> และ <code>scripts/sign-file.ps1</code> ไว้แล้ว โปรดตรวจค่า SHA-256 กับ <a href="downloads/SHA256SUMS.txt" target="_blank" rel="noopener">SHA256SUMS.txt</a> ก่อนติดตั้ง</p>
+            <p data-i18n-html="verify_desc">กด <strong>More info</strong> แล้วกด <strong>Run anyway</strong> หน้าจอนี้ขึ้นกับโปรแกรมใหม่ที่ยังมีคนดาวน์โหลดไม่มาก ไม่ได้แปลว่าไฟล์อันตราย NexaTerm อยู่ระหว่างขอใบรับรองลงนามโค้ดฟรีจาก SignPath Foundation ซึ่งเป็นโครงการสำหรับซอฟต์แวร์โอเพนซอร์ส ไฟล์ทุกตัวสร้างจากซอร์สโค้ดบน GitHub และตรวจได้ด้วยค่า SHA-256 ใน <a href="downloads/SHA256SUMS.txt" target="_blank" rel="noopener">SHA256SUMS.txt</a></p>
           </div>
           <div class="cmd">
             <code id="cmd-hash">Get-FileHash .\NexaTerm-Setup-x64-web.exe -Algorithm SHA256</code>
@@ -620,12 +630,11 @@
         </div>
 
         <div class="dl-docs">
+          <a href="guide.html#install"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-book-open"/></svg><span data-i18n="dl_doc_install">วิธีติดตั้งทีละขั้นตอน</span></a>
+          <a href="https://github.com/bom-sudo/NexaTerm/releases/latest" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-tag"/></svg><span data-i18n="dl_doc_changes">มีอะไรใหม่ในรุ่นนี้</span></a>
           <a href="downloads/SHA256SUMS.txt" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-file-check"/></svg><span>SHA256SUMS.txt</span></a>
-          <a href="downloads/RELEASE_NOTES.md" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-tag"/></svg><span>Release Notes (v1.0.0)</span></a>
-          <a href="downloads/INSTALLATION_GUIDE.md" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-book-open"/></svg><span data-i18n="dl_doc_install">คู่มือการติดตั้ง</span></a>
-          <a href="downloads/PORTABLE_GUIDE.md" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-usb"/></svg><span data-i18n="dl_doc_portable">คู่มือรุ่นพกพา</span></a>
-          <a href="https://github.com/bom-sudo/NexaTerm/blob/main/docs/CODE_SIGNING.md" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-shield-check"/></svg><span data-i18n="dl_doc_signing">นโยบาย Code Signing (SignPath)</span></a>
-          <a href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-brand-github"/></svg><span>GitHub Releases</span></a>
+          <a href="https://github.com/bom-sudo/NexaTerm/blob/main/docs/CODE_SIGNING.md" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-shield-check"/></svg><span data-i18n="dl_doc_signing">นโยบายการลงนามโค้ด</span></a>
+          <a href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-brand-github"/></svg><span data-i18n="dl_doc_all">ทุกเวอร์ชันบน GitHub</span></a>
         </div>
       </div>
     </section>
@@ -668,7 +677,7 @@
           </details>
           <details>
             <summary><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-help-circle"/></svg><span data-i18n="faq_q6">รองรับ Telnet, Serial, X11, RDP หรือ VNC ไหม</span></summary>
-            <p data-i18n-html="faq_a6">ในโค้ดล่าสุด (<code>main</code> / CI builds) รองรับ <strong>Telnet, Serial (COM / /dev/ttyUSB*), X11 forwarding</strong> (ไปยัง VcXsrv/Xming/X410 หรือ <code>$DISPLAY</code> บน Linux), 2FA, SSH agent forwarding, คีย์ <code>.ppk</code>, SFTP ส่งทั้งโฟลเดอร์ + side panel, นำเข้า MobaXterm/PuTTY และ Macros แล้ว ส่วนที่ยังไม่รองรับคือ RDP, VNC, embedded X server ในตัว, Master Password และ Remote Monitoring ดูรายละเอียดใน <a href="https://github.com/bom-sudo/NexaTerm/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG.md</a></p>
+            <p data-i18n-html="faq_a6">ตั้งแต่รุ่น 1.1.0 รองรับ <strong>Telnet, Serial (COM / /dev/ttyUSB*), X11 forwarding</strong> (ไปยัง VcXsrv/Xming/X410 หรือ <code>$DISPLAY</code> บน Linux), 2FA, SSH agent forwarding, คีย์ <code>.ppk</code>, SFTP ส่งทั้งโฟลเดอร์ + side panel, นำเข้า MobaXterm/PuTTY และ Macros แล้ว ส่วนที่ยังไม่รองรับคือ RDP, VNC, embedded X server ในตัว, Master Password และ Remote Monitoring ดูรายละเอียดใน <a href="https://github.com/bom-sudo/NexaTerm/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG.md</a></p>
           </details>
           <details>
             <summary><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-help-circle"/></svg><span data-i18n="faq_q7">เกี่ยวข้องกับโปรแกรมเชิงพาณิชย์ตัวอื่นไหม</span></summary>

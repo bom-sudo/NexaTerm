@@ -411,3 +411,8 @@ td code { white-space: nowrap; }
   .quickstart { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   .qs-shot { position: static; }
 }
+
+/* Linux group heading in the download section */
+.dl-group { font-size: 18px; margin: 34px 0 14px; color: var(--text); }
+.dl .cmd { margin-top: 4px; }
+.dl .cmd code { font-size: 12.5px; }
