@@ -57,7 +57,11 @@
         "displayLanguageSelector": true,
         "installerIcon": "icons/nexaterm.ico",
         "startMenuFolder": "NexaTerm",
-        "installerHooks": "../packaging/nsis-hooks.nsh"
+        "installerHooks": "../packaging/nsis-hooks.nsh",
+        "sidebarImage": "../packaging/nsis/sidebar.bmp",
+        "customLanguageFiles": {
+          "Thai": "../packaging/nsis/Thai.nsh"
+        }
       }
     },
     "useLocalToolsDir": true
