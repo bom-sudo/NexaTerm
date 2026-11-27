@@ -1,6 +1,7 @@
 //! Detect locally available shells.
 
 use serde::Serialize;
+#[allow(unused_imports)]
 use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, Serialize)]

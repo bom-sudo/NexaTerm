@@ -61,11 +61,13 @@ pub async fn status() -> XStatus {
         return XStatus { running, installed: vec![] };
     }
     #[cfg(not(unix))]
-    let running = matches!(
-        tokio::time::timeout(Duration::from_millis(400), tokio::net::TcpStream::connect(("127.0.0.1", 6000))).await,
-        Ok(Ok(_))
-    );
-    XStatus { running, installed: installed() }
+    {
+        let running = matches!(
+            tokio::time::timeout(Duration::from_millis(400), tokio::net::TcpStream::connect(("127.0.0.1", 6000))).await,
+            Ok(Ok(_))
+        );
+        XStatus { running, installed: installed() }
+    }
 }
 
 /// Start an installed X server on display :0 with TCP enabled and access control disabled

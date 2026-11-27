@@ -16,6 +16,7 @@
 use super::{TermSink, TerminalBackend};
 use crate::error::{AppError, AppResult};
 use serde::{Deserialize, Serialize};
+#[allow(unused_imports)]
 use std::sync::Arc;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
