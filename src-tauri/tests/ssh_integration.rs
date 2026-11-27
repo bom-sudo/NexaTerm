@@ -514,3 +514,26 @@ async fn sftp_folder_transfer_and_chmod() {
     assert_eq!(st.size, 300_000);
     assert!(!st.is_dir);
 }
+
+#[tokio::test]
+async fn server_monitor_samples_over_the_same_connection() {
+    let e = env().await;
+    e.trust(e.server.port);
+    let s = e.add_session(session_input(e.server.port, "password"));
+    let conn = ssh::connect(&e.ctx, &s, &Env::pw(), 0).await.unwrap();
+    // A live shell on the same connection keeps working while the monitor samples.
+    let (sk, mut data, _ev) = sink();
+    let shell = SshShell::open(conn.clone(), opts(), sk).await.unwrap();
+    read_until(&mut data, "ready").await;
+    let st = ssh::monitor::sample(&conn).await.expect("monitor sample");
+    assert!(st.supported);
+    assert_eq!(st.os, "Linux");
+    assert_eq!(st.cpus, 2);
+    assert_eq!((st.mem_total_kb, st.mem_available_kb), (4_000_000, 3_000_000));
+    assert_eq!((st.disk_total_kb, st.disk_used_kb), (20_000_000, 5_000_000));
+    assert!(st.rx_bytes >= 4096 && st.tx_bytes >= 1024);
+    let again = ssh::monitor::sample(&conn).await.expect("second sample");
+    assert!(again.cpu_total > st.cpu_total, "counters advance between samples");
+    shell.write(b"whoami\r").unwrap();
+    read_until(&mut data, "tester").await;
+}

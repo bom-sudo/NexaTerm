@@ -317,16 +317,44 @@ export function TerminalPane({ tabId, pane, active, visible }: Props) {
 
   const selected = multi.enabled && multi.selected.includes(pane.id);
   const bg = (TERMINAL_THEMES[settings.terminalTheme] ?? TERMINAL_THEMES.midnight).background;
+  const paneCount = useWorkspace((s) => {
+    const t = s.tabs.find((x) => x.id === tabId);
+    return t && t.kind === "terminal" ? t.panes.length : 1;
+  });
+
+  // ปิดเฉพาะช่องนี้ ถ้ายังต่อ SSH อยู่ให้ถามก่อน (ตามการตั้งค่า "Confirm before closing connected SSH tabs")
+  const closeThisPane = async () => {
+    const live = pane.spec.kind === "ssh" && pane.status === "connected";
+    if (live && useSettings.getState().settings.confirmCloseConnected) {
+      const ok = await confirmDialog({ title: "Close pane", message: `Disconnect ${pane.spec.label} and close this pane?`, confirmText: "Close", danger: true });
+      if (!ok) return;
+    }
+    closePane(tabId, pane.id);
+  };
 
   return (
     <div
-      className={`relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-lg border ${
+      className={`group/pane relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-lg border ${
         selected ? "border-warn" : active ? "border-accent/60" : "border-line"
       }`}
       style={{ background: bg }}
       onMouseDown={() => setActivePane(tabId, pane.id)}
     >
-      {selected && <div className="absolute top-1 right-2 z-10 rounded bg-warn px-1.5 text-[10px] font-bold text-black">MULTI-EXEC</div>}
+      {selected && <div className="absolute top-1 right-9 z-10 rounded bg-warn px-1.5 text-[10px] font-bold text-black">MULTI-EXEC</div>}
+      {paneCount > 1 && (
+        <button
+          type="button"
+          className={`absolute top-1.5 right-1.5 z-20 rounded-md border border-line-strong bg-panel/90 p-1 text-dim shadow hover:border-err hover:text-err ${
+            active ? "opacity-100" : "opacity-0 group-hover/pane:opacity-100"
+          }`}
+          title="Close this pane"
+          aria-label="Close this pane"
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={() => void closeThisPane()}
+        >
+          <X size={13} />
+        </button>
+      )}
       {searchOpen && (
         <div className="absolute top-2 right-3 z-20 flex items-center gap-1 rounded-lg border border-line-strong bg-panel p-1 shadow-xl">
           <input

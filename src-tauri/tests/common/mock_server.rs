@@ -167,6 +167,28 @@ impl russh::server::Handler for SshHandler {
         Ok(())
     }
 
+    /// Answers the status-bar monitor probe with fixed Linux-style /proc output.
+    async fn exec_request(&mut self, ch: ChannelId, data: &[u8], s: &mut Session) -> Result<(), Self::Error> {
+        let cmd = String::from_utf8_lossy(data);
+        if cmd.contains("##stat") {
+            s.channel_success(ch)?;
+            // Counters advance per call (n = 0 on the first one) like a busy server: about 30% CPU,
+            // 24 KB/s down and 3 KB/s up at the app's 3-second interval.
+            static CALLS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+            let n = CALLS.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            let (user, idle) = (100 + n * 30, 800 + n * 70);
+            let (rx, tx) = (4096 + n * 73_728, 1024 + n * 9_216);
+            let out = format!("##os\nLinux\n##stat\ncpu  {user} 5 50 {idle} 20 0 5 0 0 0\n##cpus\n2\n##mem\nMemTotal: 4000000 kB\nMemAvailable: 3000000 kB\nSwapTotal: 0 kB\nSwapFree: 0 kB\n##df\n/dev/vda1 20000000 5000000 15000000 25% /\n##uptime\n7200.5 100.0\n##load\n0.25 0.20 0.10 1/100 42\n##net\n  eth0: {rx} 1 0 0 0 0 0 0 {tx} 1 0 0 0 0 0 0\n##end\n");
+            s.data(ch, out.into_bytes())?;
+            s.exit_status_request(ch, 0)?;
+            s.eof(ch)?;
+            s.close(ch)?;
+        } else {
+            s.channel_failure(ch)?;
+        }
+        Ok(())
+    }
+
     async fn shell_request(&mut self, ch: ChannelId, s: &mut Session) -> Result<(), Self::Error> {
         self.shells.insert(ch);
         s.channel_success(ch)?;

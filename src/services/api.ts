@@ -103,6 +103,8 @@ export const api = {
   openSession: (req: { sessionId: string; cols: number; rows: number }, h: TermChannels) =>
     call<string>("terminal_open_session", { ...req, ...termChannels(h) }),
   serialPorts: () => call<PortInfo[]>("serial_ports"),
+  /** CPU / memory / disk / network counters of the server behind an SSH terminal. */
+  sshMonitorSample: (terminalId: string) => call<import("../features/monitor/serverStats").RemoteStats>("ssh_monitor_sample", { terminalId }),
   sshPromptAnswer: (id: string, answers: string[] | null) => call<boolean>("ssh_prompt_answer", { id, answers }),
   write: (id: string, data: string) => call<void>("terminal_write", { id, data }),
   broadcast: (ids: string[], data: string) => call<[string, string | null][]>("terminal_broadcast", { ids, data }),

@@ -21,6 +21,8 @@ export interface Settings {
   highlightOutput: boolean;
   /** Ask before pasting text that contains line breaks (it would run several commands). */
   confirmMultilinePaste: boolean;
+  /** Show the SSH server's CPU, memory, disk and network in the status bar. */
+  serverMonitor: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -40,6 +42,7 @@ export const DEFAULT_SETTINGS: Settings = {
   onboarded: false,
   highlightOutput: true,
   confirmMultilinePaste: true,
+  serverMonitor: true,
 };
 
 interface SettingsStore {

@@ -106,6 +106,15 @@ export async function runShowcase(scene: string) {
       useUi.getState().setSidebarView("macros");
       ws.openTerminal(ssh("web-01"));
       return;
+    case "monitor": {
+      ws.openTerminal(ssh("web-01"));
+      ws.splitActive(localShell());
+      // Focus the SSH pane so the status bar shows its server's resources.
+      const tab = useWorkspace.getState().tabs.find((t) => t.id === useWorkspace.getState().activeTab);
+      if (tab?.kind === "terminal") ws.setActivePane(tab.id, tab.panes[0].id);
+      await wait(9000);
+      return;
+    }
     case "settings":
       return ws.openTool("settings", "Settings");
   }

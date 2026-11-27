@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useWorkspace } from "../store/workspace";
 import { api } from "../services/api";
 import type { AppInfo } from "../types";
+import { useSettings } from "../store/settings";
+import { useServerMonitor } from "../features/monitor/useServerMonitor";
+import { ServerMonitorBar } from "../features/monitor/ServerMonitorBar";
 
 export function StatusBar() {
   const ws = useWorkspace();
@@ -13,6 +16,10 @@ export function StatusBar() {
   const all = ws.allPanes();
   const connected = all.filter((x) => x.pane.status === "connected");
   const sshCount = connected.filter((x) => x.pane.spec.kind === "ssh").length;
+  const monitorOn = useSettings((s) => s.settings.serverMonitor);
+  const monitorTarget = pane && pane.spec.kind === "ssh" && pane.status === "connected" ? pane.terminalId : undefined;
+  const monitor = useServerMonitor(monitorTarget, monitorOn);
+  const compact = monitor.kind !== "off";
 
   const stateColor = !pane ? "bg-faint" : pane.status === "connected" ? "bg-ok" : pane.status === "connecting" ? "bg-warn" : pane.status === "exited" ? "bg-faint" : "bg-err";
   const stateText = !pane ? "No active terminal" : { connected: "Connected", connecting: "Connecting…", exited: "Exited", lost: "Connection lost", error: "Error" }[pane.status];
@@ -25,17 +32,18 @@ export function StatusBar() {
   );
 
   return (
-    <div className="flex h-6 shrink-0 items-center border-t border-line bg-elev text-[11px]">
+    <div className="flex h-6 shrink-0 items-center overflow-hidden whitespace-nowrap border-t border-line bg-elev text-[11px]">
       <div className="flex items-center gap-1.5 px-2.5">
         <span className={`h-2 w-2 rounded-full ${stateColor}`} />
         <span className="text-dim">{stateText}</span>
       </div>
       {pane && pane.spec.kind === "ssh" && (
         <>
-          {item("Host", pane.host ?? "—")}
+          {item("Host", pane.host ?? "—", [pane.connectMs != null ? `Connected in ${pane.connectMs} ms` : "", pane.status === "connected" ? "SSH host key verified" : ""].filter(Boolean).join(" · "))}
           {item("User", pane.username ?? "—")}
-          {pane.connectMs != null && item("Connect", `${pane.connectMs} ms`, "Time to establish and authenticate the SSH connection")}
-          {pane.status === "connected" && item("SSH", "host key verified")}
+          {!compact && pane.connectMs != null && item("Connect", `${pane.connectMs} ms`, "Time to establish and authenticate the SSH connection")}
+          {!compact && pane.status === "connected" && item("SSH", "host key verified")}
+          <ServerMonitorBar state={monitor} />
         </>
       )}
       {pane && pane.spec.kind === "local" && item("Shell", pane.spec.label)}
@@ -43,7 +51,7 @@ export function StatusBar() {
       {ws.multiExec.enabled && <div className="border-l border-line bg-warn/20 px-2.5 font-semibold text-warn">MULTI-EXEC ({ws.multiExec.selected.length})</div>}
       <div className="flex-1" />
       {item("Sessions", `${connected.length} active · ${sshCount} SSH`)}
-      {item("Encoding", "UTF-8")}
+      {!compact && item("Encoding", "UTF-8")}
       {info && item("", `NexaTerm ${info.version}${info.portable ? " (portable)" : ""}`)}
     </div>
   );

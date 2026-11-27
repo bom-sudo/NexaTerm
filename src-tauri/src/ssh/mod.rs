@@ -1,6 +1,7 @@
 //! SSH transport (russh). One [`SshConnection`] can carry many channels: shells, SFTP, tunnels.
 
 pub mod shell;
+pub mod monitor;
 pub mod x11fwd;
 
 use crate::credentials::{self, SecretStore};

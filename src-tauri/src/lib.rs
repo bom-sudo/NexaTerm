@@ -107,6 +107,7 @@ pub fn run() {
             terminal::terminal_write,
             terminal::terminal_open_session,
             terminal::serial_ports,
+            terminal::ssh_monitor_sample,
             terminal::ssh_prompt_answer,
             terminal::terminal_broadcast,
             terminal::terminal_resize,

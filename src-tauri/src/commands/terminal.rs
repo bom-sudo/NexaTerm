@@ -257,3 +257,20 @@ pub fn write_text_file(path: String, content: String) -> AppResult<()> {
     std::fs::write(path, content)?;
     Ok(())
 }
+
+/// Server resource sample for the status bar, taken over the SSH connection of a terminal.
+/// Errors (closed connection, non-Linux server) are returned so the UI can hide the monitor.
+#[tauri::command]
+pub async fn ssh_monitor_sample(state: S<'_>, terminal_id: String) -> AppResult<ssh::monitor::RemoteStats> {
+    let conn = state
+        .ssh_conns
+        .lock()
+        .unwrap()
+        .get(&terminal_id)
+        .cloned()
+        .ok_or_else(|| AppError::NotFound("SSH connection for this terminal".into()))?;
+    if conn.is_closed() {
+        return Err(AppError::Connection("connection is closed".into()));
+    }
+    ssh::monitor::sample(&conn).await
+}
