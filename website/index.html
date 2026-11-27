@@ -8,7 +8,7 @@
   <meta name="description"
     content="NexaTerm รวมเทอร์มินัล SSH, SFTP, SSH tunnel, การสั่งงานหลายเซิร์ฟเวอร์พร้อมกัน และเครื่องมือเครือข่ายไว้ในโปรแกรมเดียวสำหรับ Windows 10/11 ฟรีและโอเพนซอร์ส (MIT) ไม่ต้องสมัครบัญชี ไม่ส่งข้อมูลการใช้งานออกจากเครื่อง">
   <meta name="keywords"
-    content="NexaTerm, SSH, SFTP, เทอร์มินัล, Windows, SSH tunnel, โปรแกรมฟรี, โอเพนซอร์ส, ผู้ดูแลระบบ, network tools">
+    content="NexaTerm, SSH, SFTP, เทอร์มินัล, Windows, Linux, SSH tunnel, โปรแกรมฟรี, โอเพนซอร์ส, ผู้ดูแลระบบ, network tools">
   <meta name="theme-color" content="#0a1020">
   <meta name="color-scheme" content="dark">
   <link rel="canonical" href="https://nexaterm.pages.dev/">
@@ -22,7 +22,7 @@
   <meta property="og:locale" content="th_TH">
   <meta property="og:title" content="NexaTerm - หนึ่งพื้นที่ทำงาน ครบทุกการเชื่อมต่อระยะไกล">
   <meta property="og:description"
-    content="เทอร์มินัล SSH, SFTP, SSH tunnel และเครื่องมือเครือข่ายสำหรับ Windows ฟรีและโอเพนซอร์ส">
+    content="เทอร์มินัล SSH, SFTP, SSH tunnel และเครื่องมือเครือข่ายสำหรับ Windows และ Linux ฟรีและโอเพนซอร์ส">
   <meta property="og:image" content="https://nexaterm.pages.dev/images/workspace.png">
   <meta property="og:image:width" content="1376">
   <meta property="og:image:height" content="819">
@@ -41,13 +41,13 @@
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "NexaTerm",
-    "operatingSystem": "Windows 10 (1809+), Windows 11 (x64), Linux (x64)",
+    "operatingSystem": "Windows 10 (1809+), Windows 11 (x64), Linux (x64 preview)",
     "applicationCategory": "DeveloperApplication",
-    "softwareVersion": "1.1.0",
+    "softwareVersion": "1.0.0",
     "inLanguage": ["th", "en"],
     "license": "https://opensource.org/licenses/MIT",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "THB" },
-    "downloadUrl": "https://github.com/bom-sudo/NexaTerm/releases/latest",
+    "downloadUrl": "https://nexaterm.pages.dev/downloads/NexaTerm-Setup-x64-web.exe",
     "description": "โปรแกรมเทอร์มินัล SSH, Telnet, Serial, SFTP, SSH tunnel, X11 forwarding และเครื่องมือเครือข่ายสำหรับ Windows และ Linux ฟรีและโอเพนซอร์ส",
     "screenshot": "https://nexaterm.pages.dev/images/workspace.png"
   }
@@ -55,6 +55,57 @@
 </head>
 
 <body>
+  <!-- Vector Icon Sprite (Lucide + Simple Icons from icones.js.org) -->
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+    <symbol id="ico-brand-windows" viewBox="0 0 24 24"><path fill="currentColor" d="M0 0h11.377v11.372H0Zm12.623 0H24v11.372H12.623ZM0 12.623h11.377V24H0Zm12.623 0H24V24H12.623"/></symbol>
+    <symbol id="ico-brand-linux" viewBox="0 0 24 24"><path fill="currentColor" d="M12.504 0q-.232 0-.48.021c-4.226.333-3.105 4.807-3.17 6.298c-.076 1.092-.3 1.953-1.05 3.02c-.885 1.051-2.127 2.75-2.716 4.521c-.278.832-.41 1.684-.287 2.489a.4.4 0 0 0-.11.135c-.26.268-.45.6-.663.839c-.199.199-.485.267-.797.4c-.313.136-.658.269-.864.68c-.09.189-.136.394-.132.602c0 .199.027.4.055.536c.058.399.116.728.04.97c-.249.68-.28 1.145-.106 1.484c.174.334.535.47.94.601c.81.2 1.91.135 2.774.6c.926.466 1.866.67 2.616.47c.526-.116.97-.464 1.208-.946c.587-.003 1.23-.269 2.26-.334c.699-.058 1.574.267 2.577.2c.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071s1.592-.536 2.257-1.306c.631-.765 1.683-1.084 2.378-1.503c.348-.199.629-.469.649-.853c.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926c-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.36.36 0 0 0-.19-.064c.431-1.278.264-2.55-.173-3.694c-.533-1.41-1.465-2.638-2.175-3.483c-.796-1.005-1.576-1.957-1.56-3.368c.026-2.152.236-6.133-3.544-6.139m.529 3.405h.013c.213 0 .396.062.584.198c.19.135.33.332.438.533c.105.259.158.459.166.724c0-.02.006-.04.006-.06v.105l-.004-.021l-.004-.024a1.8 1.8 0 0 1-.15.706a.95.95 0 0 1-.213.335a1 1 0 0 0-.088-.042c-.104-.045-.198-.064-.284-.133a1.3 1.3 0 0 0-.22-.066c.05-.06.146-.133.183-.198q.08-.193.088-.402v-.02a1.2 1.2 0 0 0-.061-.4c-.045-.134-.101-.2-.183-.333c-.084-.066-.167-.132-.267-.132h-.016c-.093 0-.176.03-.262.132a.8.8 0 0 0-.205.334a1.2 1.2 0 0 0-.09.4v.019q.002.134.02.267c-.193-.067-.438-.135-.607-.202a2 2 0 0 1-.018-.2v-.02a1.8 1.8 0 0 1 .15-.768a1.08 1.08 0 0 1 .43-.533a1 1 0 0 1 .594-.2zm-2.962.059h.036c.142 0 .27.048.399.135c.146.129.264.288.344.465c.09.199.14.4.153.667v.004c.007.134.006.2-.002.266v.08c-.03.007-.056.018-.083.024c-.152.055-.274.135-.393.2q.018-.136.003-.267v-.015c-.012-.133-.04-.2-.082-.333a.6.6 0 0 0-.166-.267a.25.25 0 0 0-.183-.064h-.021c-.071.006-.13.04-.186.132a.55.55 0 0 0-.12.27a1 1 0 0 0-.023.33v.015c.012.135.037.2.08.334c.046.134.098.2.166.268q.014.014.034.024c-.07.057-.117.07-.176.136a.3.3 0 0 1-.131.068a2.6 2.6 0 0 1-.275-.402a1.8 1.8 0 0 1-.155-.667a1.8 1.8 0 0 1 .08-.668a1.4 1.4 0 0 1 .283-.535c.128-.133.26-.2.418-.2m1.37 1.706c.332 0 .733.065 1.216.399c.293.2.523.269 1.052.468h.003c.255.136.405.266.478.399v-.131a.57.57 0 0 1 .016.47c-.123.31-.516.643-1.063.842v.002c-.268.135-.501.333-.775.465c-.276.135-.588.292-1.012.267a1.1 1.1 0 0 1-.448-.067a4 4 0 0 1-.322-.198c-.195-.135-.363-.332-.612-.465v-.005h-.005c-.4-.246-.616-.512-.686-.71q-.104-.403.193-.6c.224-.135.38-.271.483-.336c.104-.074.143-.102.176-.131h.002v-.003c.169-.202.436-.47.839-.601c.139-.036.294-.065.466-.065zm2.8 2.142c.358 1.417 1.196 3.475 1.735 4.473c.286.534.855 1.659 1.102 3.024c.156-.005.33.018.513.064c.646-1.671-.546-3.467-1.089-3.966c-.22-.2-.232-.335-.123-.335c.59.534 1.365 1.572 1.646 2.757c.13.535.16 1.104.021 1.67c.067.028.135.06.205.067c1.032.534 1.413.938 1.23 1.537v-.043c-.06-.003-.12 0-.18 0h-.016c.151-.467-.182-.825-1.065-1.224c-.915-.4-1.646-.336-1.77.465c-.008.043-.013.066-.018.135c-.068.023-.139.053-.209.064c-.43.268-.662.669-.793 1.187c-.13.533-.17 1.156-.205 1.869v.003c-.02.334-.17.838-.319 1.35c-1.5 1.072-3.58 1.538-5.348.334a2.7 2.7 0 0 0-.402-.533a1.5 1.5 0 0 0-.275-.333c.182 0 .338-.03.465-.067a.62.62 0 0 0 .314-.334c.108-.267 0-.697-.345-1.163s-.931-.995-1.788-1.521c-.63-.4-.986-.87-1.15-1.396c-.165-.534-.143-1.085-.015-1.645c.245-1.07.873-2.11 1.274-2.763c.107-.065.037.135-.408.974c-.396.751-1.14 2.497-.122 3.854a8.1 8.1 0 0 1 .647-2.876c.564-1.278 1.743-3.504 1.836-5.268c.048.036.217.135.289.202c.218.133.38.333.59.465c.21.201.477.335.876.335q.058.005.11.006c.412 0 .73-.134.997-.268c.29-.134.52-.334.74-.4h.005c.467-.135.835-.402 1.044-.7zm2.185 8.958c.037.6.343 1.245.882 1.377c.588.134 1.434-.333 1.791-.765l.211-.01c.315-.007.577.01.847.268l.003.003c.208.199.305.53.391.876c.085.4.154.78.409 1.066c.486.527.645.906.636 1.14l.003-.007v.018l-.003-.012c-.015.262-.185.396-.498.595c-.63.401-1.746.712-2.457 1.57c-.618.737-1.37 1.14-2.036 1.191c-.664.053-1.237-.2-1.574-.898l-.005-.003c-.21-.4-.12-1.025.056-1.69c.176-.668.428-1.344.463-1.897c.037-.714.076-1.335.195-1.814c.12-.465.308-.797.641-.984l.045-.022zm-10.814.049h.01q.08 0 .157.014c.376.055.706.333 1.023.752l.91 1.664l.003.003c.243.533.754 1.064 1.189 1.637c.434.598.77 1.131.729 1.57v.006c-.057.744-.48 1.148-1.125 1.294c-.645.135-1.52.002-2.395-.464c-.968-.536-2.118-.469-2.857-.602q-.553-.1-.723-.4c-.11-.2-.113-.602.123-1.23v-.004l.002-.003c.117-.334.03-.752-.027-1.118c-.055-.401-.083-.71.043-.94c.16-.334.396-.4.69-.533c.294-.135.64-.202.915-.47h.002v-.002c.256-.268.445-.601.668-.838c.19-.201.38-.336.663-.336m7.159-9.074c-.435.201-.945.535-1.488.535c-.542 0-.97-.267-1.28-.466c-.154-.134-.28-.268-.373-.335c-.164-.134-.144-.333-.074-.333c.109.016.129.134.199.2c.096.066.215.2.36.333c.292.2.68.467 1.167.467c.485 0 1.053-.267 1.398-.466c.195-.135.445-.334.648-.467c.156-.136.149-.267.279-.267c.128.016.034.134-.147.332a8 8 0 0 1-.69.468zm-1.082-1.583V5.64c-.006-.02.013-.042.029-.05c.074-.043.18-.027.26.004c.063 0 .16.067.15.135c-.006.049-.085.066-.135.066c-.055 0-.092-.043-.141-.068c-.052-.018-.146-.008-.163-.065m-.551 0c-.02.058-.113.049-.166.066c-.047.025-.086.068-.14.068c-.05 0-.13-.02-.136-.068c-.01-.066.088-.133.15-.133c.08-.031.184-.047.259-.005c.019.009.036.03.03.05v.02h.003z"/></symbol>
+    <symbol id="ico-brand-rust" viewBox="0 0 24 24"><path fill="currentColor" d="m23.835 11.703l-1.008-.623l-.028-.294l.866-.807a.348.348 0 0 0-.116-.578l-1.106-.414a9 9 0 0 0-.087-.285l.69-.96a.346.346 0 0 0-.226-.544l-1.166-.19a9 9 0 0 0-.14-.261l.49-1.076a.34.34 0 0 0-.028-.336a.35.35 0 0 0-.3-.154l-1.185.041a7 7 0 0 0-.188-.227l.273-1.153a.347.347 0 0 0-.417-.417l-1.153.273l-.228-.188l.041-1.184a.344.344 0 0 0-.49-.328l-1.076.49l-.262-.14l-.19-1.167a.348.348 0 0 0-.545-.226l-.96.69a9 9 0 0 0-.285-.086L14.597.453a.348.348 0 0 0-.578-.116l-.807.867a9 9 0 0 0-.294-.028L12.295.168a.346.346 0 0 0-.59 0l-.623 1.008l-.294.028L9.98.337a.346.346 0 0 0-.578.116l-.414 1.106l-.285.086l-.959-.69a.348.348 0 0 0-.545.226l-.19 1.167a9 9 0 0 0-.262.14l-1.076-.49a.346.346 0 0 0-.49.328l.041 1.184a8 8 0 0 0-.228.187l-1.153-.272a.347.347 0 0 0-.417.417l.271 1.153l-.186.227l-1.184-.042a.346.346 0 0 0-.328.49l.49 1.077a9 9 0 0 0-.14.262l-1.166.19a.348.348 0 0 0-.226.544l.69.958l-.087.286l-1.106.414a.348.348 0 0 0-.116.578l.866.807a9 9 0 0 0-.028.294l-1.008.623a.344.344 0 0 0 0 .59l1.008.623q.012.147.028.294l-.866.807a.346.346 0 0 0 .116.578l1.106.415q.042.144.087.285l-.69.959a.345.345 0 0 0 .227.544l1.166.19q.069.132.14.262l-.49 1.076a.346.346 0 0 0 .328.49l1.183-.041q.093.115.187.227l-.27 1.154a.346.346 0 0 0 .416.417l1.153-.272q.113.096.228.187l-.041 1.184a.344.344 0 0 0 .49.327l1.076-.49q.13.073.262.14l.19 1.167a.348.348 0 0 0 .545.227l.959-.69a9 9 0 0 0 .285.086l.414 1.107a.345.345 0 0 0 .578.115l.808-.865l.294.03l.623 1.006a.347.347 0 0 0 .59 0l.623-1.007q.148-.013.294-.03l.807.866a.348.348 0 0 0 .578-.115l.414-1.107a9 9 0 0 0 .285-.087l.959.69a.345.345 0 0 0 .545-.226l.19-1.166l.262-.14l1.076.49a.347.347 0 0 0 .49-.328l-.041-1.184a7 7 0 0 0 .227-.187l1.153.272a.347.347 0 0 0 .417-.416l-.272-1.155q.095-.112.187-.227l1.184.041a.344.344 0 0 0 .328-.49l-.49-1.076q.072-.13.141-.262l1.166-.19a.348.348 0 0 0 .226-.544l-.69-.959l.087-.285l1.106-.414a.346.346 0 0 0 .116-.579l-.866-.807q.016-.147.028-.294l1.008-.624a.344.344 0 0 0 0-.589zm-6.742 8.355a.714.714 0 0 1 .299-1.396a.714.714 0 1 1-.3 1.396zm-.342-2.314a.65.65 0 0 0-.771.5l-.358 1.669a8.7 8.7 0 0 1-3.619.78a8.7 8.7 0 0 1-3.695-.815L7.95 18.21a.65.65 0 0 0-.772-.5l-1.473.317a9 9 0 0 1-.761-.898h7.167c.081 0 .136-.014.136-.088v-2.536c0-.074-.054-.088-.136-.088h-2.096v-1.608h2.268c.206 0 1.106.059 1.393 1.209c.09.353.288 1.504.424 1.873c.134.413.683 1.238 1.268 1.238h3.572a1 1 0 0 0 .13-.013a9 9 0 0 1-.813.952zm-9.914 2.28a.714.714 0 1 1-.3-1.396a.714.714 0 0 1 .3 1.396M4.117 8.997a.714.714 0 1 1-1.303.58a.714.714 0 0 1 1.304-.58m-.834 1.981l1.534-.682a.65.65 0 0 0 .33-.858l-.316-.715h1.244v5.602H3.567a8.8 8.8 0 0 1-.284-3.348zm6.734-.543V8.784h2.96c.153 0 1.08.177 1.08.87c0 .574-.712.78-1.296.78zm10.757 1.486q0 .329-.024.651h-.9c-.09 0-.127.059-.127.148v.413c0 .973-.548 1.184-1.03 1.238c-.457.052-.964-.191-1.027-.472c-.27-1.518-.72-1.843-1.43-2.403c.882-.56 1.799-1.386 1.799-2.492c0-1.193-.82-1.945-1.377-2.315c-.783-.516-1.65-.62-1.883-.62H5.468a8.77 8.77 0 0 1 4.907-2.77l1.098 1.152a.65.65 0 0 0 .918.02l1.227-1.173a8.78 8.78 0 0 1 6.004 4.276l-.84 1.898a.65.65 0 0 0 .33.859l1.618.718q.042.43.042.872zm-9.3-9.6a.713.713 0 1 1 .984 1.032a.714.714 0 0 1-.984-1.031m8.339 6.71a.71.71 0 0 1 .939-.362a.714.714 0 1 1-.94.364z"/></symbol>
+    <symbol id="ico-brand-sqlite" viewBox="0 0 24 24"><path fill="currentColor" d="M21.678.521c-1.032-.92-2.28-.55-3.513.544a9 9 0 0 0-.547.535c-2.109 2.237-4.066 6.38-4.674 9.544c.237.48.422 1.093.544 1.561a13 13 0 0 1 .164.703s-.019-.071-.096-.296l-.05-.146l-.033-.08c-.138-.32-.518-.995-.686-1.289c-.143.423-.27.818-.376 1.176c.484.884.778 2.4.778 2.4s-.025-.099-.147-.442c-.107-.303-.644-1.244-.772-1.464c-.217.804-.304 1.346-.226 1.478c.152.256.296.698.422 1.186c.286 1.1.485 2.44.485 2.44l.017.224a22 22 0 0 0 .056 2.748c.095 1.146.273 2.13.5 2.657l.155-.084c-.334-1.038-.47-2.399-.41-3.967c.09-2.398.642-5.29 1.661-8.304c1.723-4.55 4.113-8.201 6.3-9.945c-1.993 1.8-4.692 7.63-5.5 9.788c-.904 2.416-1.545 4.684-1.931 6.857c.666-2.037 2.821-2.912 2.821-2.912s1.057-1.304 2.292-3.166c-.74.169-1.955.458-2.362.629c-.6.251-.762.337-.762.337s1.945-1.184 3.613-1.72C21.695 7.9 24.195 2.767 21.678.521m-18.573.543A1.84 1.84 0 0 0 1.27 2.9v16.608a1.84 1.84 0 0 0 1.835 1.834h9.418a23 23 0 0 1-.052-2.707c-.006-.062-.011-.141-.016-.2a27 27 0 0 0-.473-2.378c-.121-.47-.275-.898-.369-1.057c-.116-.197-.098-.31-.097-.432c0-.12.015-.245.037-.386a10 10 0 0 1 .234-1.045l.217-.028c-.017-.035-.014-.065-.031-.097l-.041-.381a33 33 0 0 1 .382-1.194l.2-.019c-.008-.016-.01-.038-.018-.053l-.043-.316c.63-3.28 2.587-7.443 4.8-9.791c.066-.069.133-.128.198-.194Z"/></symbol>
+    <symbol id="ico-brand-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12c0 5.303 3.438 9.8 8.205 11.385c.6.113.82-.258.82-.577c0-.285-.01-1.04-.015-2.04c-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729c1.205.084 1.838 1.236 1.838 1.236c1.07 1.835 2.809 1.305 3.495.998c.108-.776.417-1.305.76-1.605c-2.665-.3-5.466-1.332-5.466-5.93c0-1.31.465-2.38 1.235-3.22c-.135-.303-.54-1.523.105-3.176c0 0 1.005-.322 3.3 1.23c.96-.267 1.98-.399 3-.405c1.02.006 2.04.138 3 .405c2.28-1.552 3.285-1.23 3.285-1.23c.645 1.653.24 2.873.12 3.176c.765.84 1.23 1.91 1.23 3.22c0 4.61-2.805 5.625-5.475 5.92c.42.36.81 1.096.81 2.22c0 1.606-.015 2.896-.015 3.286c0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></symbol>
+    <symbol id="ico-brand-tauri" viewBox="0 0 24 24"><path fill="currentColor" d="M13.912 0a8.72 8.72 0 0 0-8.308 6.139c1.05-.515 2.18-.845 3.342-.976c2.415-3.363 7.4-3.412 9.88-.097s1.025 8.084-2.883 9.45a6.1 6.1 0 0 1-.3 2.762a8.7 8.7 0 0 0 3.01-1.225A8.72 8.72 0 0 0 13.913 0zm.082 6.451a2.284 2.284 0 1 0-.15 4.566a2.284 2.284 0 0 0 .15-4.566m-5.629.27a8.7 8.7 0 0 0-3.031 1.235a8.72 8.72 0 1 0 13.06 9.913a10.2 10.2 0 0 1-3.343.965a6.125 6.125 0 1 1-7.028-9.343a6.114 6.115 0 0 1 .342-2.772zm1.713 6.27a2.284 2.284 0 0 0-2.284 2.283a2.284 2.284 0 0 0 2.284 2.284a2.284 2.284 0 0 0 2.284-2.284a2.284 2.284 0 0 0-2.284-2.284z"/></symbol>
+    <symbol id="ico-archive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></symbol>
+    <symbol id="ico-badge-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m16 9-5.5 5.5L8 12"/></symbol>
+    <symbol id="ico-book-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v16"/><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"/></symbol>
+    <symbol id="ico-cable" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 19a1 1 0 0 1-1-1v-2a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a1 1 0 0 1-1 1z"/><path d="M17 21v-2"/><path d="M19 14V6.5a1 1 0 0 0-7 0v11a1 1 0 0 1-7 0V10"/><path d="M21 21v-2"/><path d="M3 5V3"/><path d="M4 10a2 2 0 0 1-2-2V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2a2 2 0 0 1-2 2z"/><path d="M7 5V3"/></symbol>
+    <symbol id="ico-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="ico-cloud-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 13v8l-4-4"/><path d="m12 21 4-4"/><path d="M4.393 15.269A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.436 8.284"/></symbol>
+    <symbol id="ico-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></symbol>
+    <symbol id="ico-columns-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/></symbol>
+    <symbol id="ico-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+    <symbol id="ico-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v2"/><path d="M12 2v2"/><path d="M17 20v2"/><path d="M17 2v2"/><path d="M2 12h2"/><path d="M2 17h2"/><path d="M2 7h2"/><path d="M20 12h2"/><path d="M20 17h2"/><path d="M20 7h2"/><path d="M7 20v2"/><path d="M7 2v2"/><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/></symbol>
+    <symbol id="ico-database" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></symbol>
+    <symbol id="ico-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></symbol>
+    <symbol id="ico-external-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+    <symbol id="ico-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></symbol>
+    <symbol id="ico-file-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m9 15 2 2 4-4"/></symbol>
+    <symbol id="ico-file-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 12.5 8 15l2 2.5"/><path d="m14 12.5 2 2.5-2 2.5"/></symbol>
+    <symbol id="ico-folder-sync" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v.5"/><path d="M12 10v4h4"/><path d="m12 14 1.535-1.605a5 5 0 0 1 8 1.5"/><path d="M22 22v-4h-4"/><path d="m22 18-1.535 1.605a5 5 0 0 1-8-1.5"/></symbol>
+    <symbol id="ico-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+    <symbol id="ico-hard-drive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16h.01"/><path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><path d="M21.946 12.013H2.054"/><path d="M6 16h.01"/></symbol>
+    <symbol id="ico-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></symbol>
+    <symbol id="ico-help-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 9.5a3 2.5 0 016 0c0 2-2 2-3 3.5"/><path d="M12 17h.01"/></symbol>
+    <symbol id="ico-key-round" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></symbol>
+    <symbol id="ico-keyboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8h.01"/><path d="M12 12h.01"/><path d="M14 8h.01"/><path d="M16 12h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M7 16h10"/><path d="M8 12h.01"/><rect width="20" height="16" x="2" y="4" rx="2"/></symbol>
+    <symbol id="ico-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></symbol>
+    <symbol id="ico-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    <symbol id="ico-network" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></symbol>
+    <symbol id="ico-package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></symbol>
+    <symbol id="ico-radio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.247 7.761a6 6 0 0 1 0 8.478"/><path d="M19.075 4.933a10 10 0 0 1 0 14.134"/><path d="M4.925 19.067a10 10 0 0 1 0-14.134"/><path d="M7.753 16.239a6 6 0 0 1 0-8.478"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="ico-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09"/><path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05"/></symbol>
+    <symbol id="ico-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></symbol>
+    <symbol id="ico-shield-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="ico-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></symbol>
+    <symbol id="ico-square-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 9-3 3 3 3"/><path d="m14 15 3-3-3-3"/><rect x="3" y="3" width="18" height="18" rx="2"/></symbol>
+    <symbol id="ico-square-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 11 2-2-2-2"/><path d="M11 13h4"/><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></symbol>
+    <symbol id="ico-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></symbol>
+    <symbol id="ico-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></symbol>
+    <symbol id="ico-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></symbol>
+    <symbol id="ico-usb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="1"/><circle cx="4" cy="20" r="1"/><path d="M4.7 19.3 19 5"/><path d="m21 3-3 1 2 2Z"/><path d="M9.26 7.68 5 12l2 5"/><path d="m10 14 5 2 3.5-3.5"/><path d="m18 12 1-1 1 1-1 1Z"/></symbol>
+    <symbol id="ico-waypoints" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.586 5.414-5.172 5.172"/><path d="m18.586 13.414-5.172 5.172"/><path d="M6 12h12"/><circle cx="12" cy="20" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="20" cy="12" r="2"/><circle cx="4" cy="12" r="2"/></symbol>
+    <symbol id="ico-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z"/></symbol>
+    </defs>
+  </svg>
 
   <header class="nav">
     <div class="wrap nav-inner">
@@ -64,29 +115,29 @@
       </a>
       <nav aria-label="เมนูหลัก">
         <ul class="nav-links">
-          <li><a href="#features" data-i18n="nav_features">ความสามารถ</a></li>
-          <li><a href="#guide" data-i18n="nav_guide">วิธีใช้งาน</a></li>
-          <li><a href="#privacy" data-i18n="nav_privacy">ความปลอดภัย</a></li>
-          <li><a href="#download" data-i18n="nav_download">ดาวน์โหลด</a></li>
-          <li><a href="#faq" data-i18n="nav_faq">คำถามที่พบบ่อย</a></li>
+          <li><a href="#features"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-layers"/></svg><span data-i18n="nav_features">ความสามารถ</span></a></li>
+          <li><a href="#guide"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-book-open"/></svg><span data-i18n="nav_guide">วิธีใช้งาน</span></a></li>
+          <li><a href="#privacy"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-shield-check"/></svg><span data-i18n="nav_privacy">ความปลอดภัย</span></a></li>
+          <li><a href="#download"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-download"/></svg><span data-i18n="nav_download">ดาวน์โหลด</span></a></li>
+          <li><a href="#faq"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-help-circle"/></svg><span data-i18n="nav_faq">คำถามที่พบบ่อย</span></a></li>
         </ul>
       </nav>
       <div class="nav-actions">
         <!-- Language Switcher -->
         <div class="lang-switch" role="group" aria-label="Language selection">
+          <svg class="ico ico-sm" style="margin:0 4px 0 6px;color:var(--text-dim)" aria-hidden="true"><use href="#ico-globe"/></svg>
           <button class="lang-btn active" type="button" data-lang="th" aria-pressed="true">TH</button>
           <button class="lang-btn" type="button" data-lang="en" aria-pressed="false">EN</button>
         </div>
         <a class="btn btn-ghost btn-sm" href="https://github.com/bom-sudo/NexaTerm" target="_blank"
           rel="noopener noreferrer">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd"
-              d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-              clip-rule="evenodd" />
-          </svg>
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-brand-github"/></svg>
           <span>GitHub</span>
         </a>
-        <a class="btn btn-primary btn-sm" href="#download" data-i18n="nav_download_btn">ดาวน์โหลด</a>
+        <a class="btn btn-primary btn-sm" href="#download">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-download"/></svg>
+          <span data-i18n="nav_download_btn">ดาวน์โหลด</span>
+        </a>
       </div>
     </div>
   </header>
@@ -95,8 +146,11 @@
     <!-- Hero -->
     <section class="hero">
       <div class="wrap">
-        <p class="eyebrow" data-i18n-html="hero_eyebrow">NexaTerm 1.1.0 <span>·</span> ฟรีและโอเพนซอร์ส (MIT)
-          <span>·</span> Windows 10/11 และ Linux</p>
+        <p class="eyebrow">
+          <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-terminal"/></svg>
+          <span data-i18n-html="hero_eyebrow">NexaTerm 1.0.0 <span>·</span> ฟรีและโอเพนซอร์ส (MIT)
+            <span>·</span> Windows 10/11 &amp; Linux x64 (Preview)</span>
+        </p>
         <h1 data-i18n-html="hero_title">หนึ่งพื้นที่ทำงาน<br><span class="grad">ครบทุกการเชื่อมต่อระยะไกล</span></h1>
         <p class="lead" data-i18n="hero_lead">
           เทอร์มินัล, SSH, SFTP, SSH tunnel และเครื่องมือตรวจสอบเครือข่ายสำหรับผู้ดูแลระบบ รวมอยู่ในโปรแกรมเดียวบน
@@ -104,16 +158,14 @@
           ไม่ต้องสมัครบัญชี ไม่มีรุ่นเสียเงิน และไม่ส่งข้อมูลการใช้งานออกจากเครื่อง
         </p>
         <div class="cta">
-          <a class="btn btn-primary btn-lg" href="#download" id="hero-download">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            <span data-i18n="hero_cta_download">ดาวน์โหลดสำหรับ Windows</span>
+          <a class="btn btn-primary btn-lg" href="downloads/NexaTerm-Setup-x64-web.exe" download>
+            <svg class="ico ico-md" aria-hidden="true"><use href="#ico-download"/></svg>
+            <span data-i18n="hero_cta_download">ดาวน์โหลดสำหรับ Windows (3 MB)</span>
           </a>
-          <a class="btn btn-ghost btn-lg" href="#guide" data-i18n="hero_cta_guide">ดูวิธีใช้งาน</a>
+          <a class="btn btn-ghost btn-lg" href="#guide">
+            <svg class="ico ico-md" aria-hidden="true"><use href="#ico-book-open"/></svg>
+            <span data-i18n="hero_cta_guide">ดูวิธีใช้งาน</span>
+          </a>
         </div>
         <p class="hero-note" data-i18n="hero_note">ติดตั้งแบบรายผู้ใช้ ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ
           หรือใช้รุ่นพกพาที่ไม่ต้องติดตั้งเลย</p>
@@ -135,22 +187,34 @@
     <section class="facts" aria-label="จุดเด่น">
       <div class="wrap facts-grid">
         <div class="fact">
-          <h3 data-i18n="fact1_title">ใช้ได้ฟรีทุกฟังก์ชัน</h3>
+          <div class="fact-head">
+            <span class="icon-badge"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-badge-check"/></svg></span>
+            <h3 data-i18n="fact1_title">ใช้ได้ฟรีทุกฟังก์ชัน</h3>
+          </div>
           <p data-i18n="fact1_desc">สัญญาอนุญาต MIT ไม่มีรุ่นเสียเงิน ไม่มีคีย์ลิขสิทธิ์ และไม่จำกัดจำนวน session หรือ
             tunnel</p>
         </div>
         <div class="fact">
-          <h3 data-i18n="fact2_title">ไม่เก็บข้อมูลการใช้งาน</h3>
+          <div class="fact-head">
+            <span class="icon-badge cyan"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-eye-off"/></svg></span>
+            <h3 data-i18n="fact2_title">ไม่เก็บข้อมูลการใช้งาน</h3>
+          </div>
           <p data-i18n="fact2_desc">ไม่มี telemetry และไม่เชื่อมต่ออินเทอร์เน็ตเองตอนเปิดโปรแกรม
             ข้อมูลทุกอย่างอยู่ในเครื่องคุณ</p>
         </div>
         <div class="fact">
-          <h3 data-i18n="fact3_title">รหัสผ่านอยู่ใน Windows</h3>
+          <div class="fact-head">
+            <span class="icon-badge"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-lock"/></svg></span>
+            <h3 data-i18n="fact3_title">รหัสผ่านอยู่ใน Windows</h3>
+          </div>
           <p data-i18n="fact3_desc">เก็บใน Windows Credential Manager ไม่อยู่ในฐานข้อมูลของโปรแกรม ไฟล์ log หรือไฟล์ที่
             export ออกไป</p>
         </div>
         <div class="fact">
-          <h3 data-i18n="fact4_title">ตรวจ host key ทุกครั้ง</h3>
+          <div class="fact-head">
+            <span class="icon-badge cyan"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-shield-check"/></svg></span>
+            <h3 data-i18n="fact4_title">ตรวจ host key ทุกครั้ง</h3>
+          </div>
           <p data-i18n="fact4_desc">เซิร์ฟเวอร์ใหม่ต้องยืนยัน fingerprint SHA-256 ก่อน ถ้า key เปลี่ยน
             โปรแกรมจะไม่เชื่อมต่อจนกว่าคุณตัดสินใจ</p>
         </div>
@@ -161,13 +225,16 @@
     <section class="section" id="features">
       <div class="wrap">
         <header class="section-head">
-          <p class="kicker" data-i18n="feat_kicker">ความสามารถ</p>
+          <p class="kicker"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-sparkles"/></svg><span data-i18n="feat_kicker">ความสามารถ</span></p>
           <h2 data-i18n="feat_heading">งานที่ผู้ดูแลระบบทำทุกวัน อยู่ในหน้าต่างเดียว</h2>
         </header>
 
         <article class="feature">
           <div class="feature-text">
-            <h3 data-i18n="feat1_title">เปิดหลายเทอร์มินัลในแท็บเดียว</h3>
+            <div class="feature-head">
+              <span class="icon-badge"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-columns-2"/></svg></span>
+              <h3 data-i18n="feat1_title">เปิดหลายเทอร์มินัลในแท็บเดียว</h3>
+            </div>
             <p data-i18n="feat1_desc">แบ่งหน้าจอได้ 2 หรือ 4 ช่อง แล้วลากเส้นแบ่งเพื่อปรับขนาด ใช้ PowerShell, Command
               Prompt, Git Bash, WSL และ SSH ร่วมกันได้ในแท็บเดียว โปรแกรมตรวจหา shell ที่ติดตั้งไว้ในเครื่องให้เอง</p>
             <ul class="ticks">
@@ -187,7 +254,10 @@
 
         <article class="feature reverse">
           <div class="feature-text">
-            <h3 data-i18n="feat2_title">จัดการไฟล์บนเซิร์ฟเวอร์ด้วย SFTP</h3>
+            <div class="feature-head">
+              <span class="icon-badge cyan"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-folder-sync"/></svg></span>
+              <h3 data-i18n="feat2_title">จัดการไฟล์บนเซิร์ฟเวอร์ด้วย SFTP</h3>
+            </div>
             <p data-i18n="feat2_desc">เปิด SFTP จาก SSH ที่เชื่อมต่ออยู่ได้ทันทีโดยไม่ต้องล็อกอินซ้ำ ลากไฟล์จาก File
               Explorer มาวางเพื่ออัปโหลด ดูความคืบหน้าและยกเลิกได้ ไฟล์ที่ส่งไม่ครบจะถูกลบทิ้ง ไม่ค้างอยู่บนเซิร์ฟเวอร์
             </p>
@@ -208,7 +278,10 @@
 
         <article class="feature">
           <div class="feature-text">
-            <h3 data-i18n="feat3_title">สั่งงานหลายเซิร์ฟเวอร์พร้อมกัน</h3>
+            <div class="feature-head">
+              <span class="icon-badge warn"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-radio"/></svg></span>
+              <h3 data-i18n="feat3_title">สั่งงานหลายเซิร์ฟเวอร์พร้อมกัน</h3>
+            </div>
             <p data-i18n="feat3_desc">เลือกเทอร์มินัลที่จะรับคำสั่ง แล้วพิมพ์ครั้งเดียว
               ก่อนส่งจะมีหน้าต่างยืนยันที่แสดงรายชื่อเครื่องปลายทางทั้งหมด
               ช่องที่ถูกเลือกมีกรอบสีเหลืองให้เห็นชัดตลอดเวลา</p>
@@ -233,7 +306,10 @@
               data-caption="หน้าต่างยืนยันตัวตนเซิร์ฟเวอร์">
               <img src="images/hostkey.png" width="1376" height="819" alt="หน้าต่างยืนยัน host key" loading="lazy">
             </button>
-            <h3 data-i18n="card_hostkey_title">ยืนยันตัวตนเซิร์ฟเวอร์</h3>
+            <div class="card-head">
+              <span class="icon-badge sm"><svg class="ico ico-md" aria-hidden="true"><use href="#ico-shield-check"/></svg></span>
+              <h3 data-i18n="card_hostkey_title">ยืนยันตัวตนเซิร์ฟเวอร์</h3>
+            </div>
             <p data-i18n="card_hostkey_desc">แสดง fingerprint SHA-256 ก่อนเชื่อมต่อเซิร์ฟเวอร์ใหม่ทุกครั้ง ไม่มีตัวเลือก
               "เชื่อทุกเครื่อง" ให้กดข้าม</p>
           </article>
@@ -241,7 +317,10 @@
             <button class="shot-btn" type="button" data-full="images/tunnels.png" data-caption="จัดการ SSH tunnel">
               <img src="images/tunnels.png" width="1376" height="819" alt="หน้าจัดการ SSH tunnel" loading="lazy">
             </button>
-            <h3 data-i18n="card_tunnels_title">SSH tunnel</h3>
+            <div class="card-head">
+              <span class="icon-badge sm"><svg class="ico ico-md" aria-hidden="true"><use href="#ico-waypoints"/></svg></span>
+              <h3 data-i18n="card_tunnels_title">SSH tunnel</h3>
+            </div>
             <p data-i18n="card_tunnels_desc">ส่งต่อพอร์ตแบบ local (-L), remote (-R) และ SOCKS5 (-D) เริ่ม หยุด
               หรือเริ่มใหม่ได้ แจ้งเตือนเมื่อพอร์ตถูกใช้อยู่แล้ว</p>
           </article>
@@ -249,7 +328,10 @@
             <button class="shot-btn" type="button" data-full="images/keys.png" data-caption="จัดการ SSH key">
               <img src="images/keys.png" width="1376" height="819" alt="หน้าจัดการ SSH key" loading="lazy">
             </button>
-            <h3 data-i18n="card_keys_title">จัดการ SSH key</h3>
+            <div class="card-head">
+              <span class="icon-badge sm"><svg class="ico ico-md" aria-hidden="true"><use href="#ico-key-round"/></svg></span>
+              <h3 data-i18n="card_keys_title">จัดการ SSH key</h3>
+            </div>
             <p data-i18n="card_keys_desc">สร้าง key แบบ Ed25519 หรือ RSA พร้อมรหัสผ่าน นำเข้า key เดิม คัดลอกหรือ export
               public key และเปลี่ยนรหัสผ่านของ key ได้</p>
           </article>
@@ -257,7 +339,10 @@
             <button class="shot-btn" type="button" data-full="images/snippets.png" data-caption="ชุดคำสั่งที่บันทึกไว้">
               <img src="images/snippets.png" width="1376" height="819" alt="รายการชุดคำสั่ง" loading="lazy">
             </button>
-            <h3 data-i18n="card_snippets_title">ชุดคำสั่งที่ใช้บ่อย</h3>
+            <div class="card-head">
+              <span class="icon-badge sm"><svg class="ico ico-md" aria-hidden="true"><use href="#ico-square-code"/></svg></span>
+              <h3 data-i18n="card_snippets_title">ชุดคำสั่งที่ใช้บ่อย</h3>
+            </div>
             <p data-i18n-html="card_snippets_desc">บันทึกคำสั่งแยกหมวด ใส่ตัวแปรแบบ <code>{{service}}</code>
               ให้โปรแกรมถามค่าตอนใช้ และแสดงคำสั่งเต็มให้ดูก่อนส่งทุกครั้ง</p>
           </article>
@@ -267,18 +352,24 @@
               <img src="images/network-tools-light.png" width="1376" height="819" alt="เครื่องมือเครือข่ายในธีมสว่าง"
                 loading="lazy">
             </button>
-            <h3 data-i18n="card_net_title">เครื่องมือเครือข่าย</h3>
+            <div class="card-head">
+              <span class="icon-badge sm"><svg class="ico ico-md" aria-hidden="true"><use href="#ico-network"/></svg></span>
+              <h3 data-i18n="card_net_title">เครื่องมือเครือข่าย</h3>
+            </div>
             <p data-i18n="card_net_desc">Ping, Traceroute, DNS, Reverse DNS, ทดสอบพอร์ต TCP และดูข้อมูลการ์ดเครือข่าย
               ทุกอย่างทำงานเมื่อคุณกดเท่านั้น และยกเลิกกลางคันได้</p>
           </article>
           <article class="card card-list">
-            <h3 data-i18n="card_other_title">ความสามารถเพิ่มเติมและรุ่นล่าสุด</h3>
-            <ul class="ticks">
-              <li data-i18n="card_other_t1">รองรับ Telnet, Serial (COM / /dev/ttyUSB*), X11 forwarding และ 2FA multi-prompt</li>
-              <li data-i18n="card_other_t2">ProxyJump, SSH agent forwarding, zlib compression และคีย์ PuTTY (.ppk)</li>
-              <li data-i18n-html="card_other_t3">SFTP ส่งทั้งโฟลเดอร์, แก้ <code>chmod</code>/<code>chown</code>, แถบ SFTP ข้าง terminal และ Macros</li>
-              <li data-i18n-html="card_other_t4">นำเข้า session จาก <code>~/.ssh/config</code>, MobaXterm (<code>.mxtsessions</code>) และ PuTTY</li>
-              <li data-i18n="card_other_t5">Output highlighting, ยืนยันก่อนวางหลายบรรทัด, ธีมมืด/สว่าง และรองรับ Linux x64</li>
+            <div class="card-head">
+              <span class="icon-badge sm cyan"><svg class="ico ico-md" aria-hidden="true"><use href="#ico-sparkles"/></svg></span>
+              <h3 data-i18n="card_other_title">ความสามารถเพิ่มเติมและรุ่นล่าสุด</h3>
+            </div>
+            <ul class="ico-list">
+              <li><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-cable"/></svg><span data-i18n="card_other_t1">รองรับ Telnet, Serial (COM / /dev/ttyUSB*), X11 forwarding และ 2FA multi-prompt</span></li>
+              <li><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-server"/></svg><span data-i18n="card_other_t2">ProxyJump, SSH agent forwarding, zlib compression และคีย์ PuTTY (.ppk)</span></li>
+              <li><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-folder-sync"/></svg><span data-i18n-html="card_other_t3">SFTP ส่งทั้งโฟลเดอร์, แก้ <code>chmod</code>/<code>chown</code>, แถบ SFTP ข้าง terminal และ Macros</span></li>
+              <li><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-upload"/></svg><span data-i18n-html="card_other_t4">นำเข้า session จาก <code>~/.ssh/config</code>, MobaXterm (<code>.mxtsessions</code>) และ PuTTY</span></li>
+              <li><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-terminal"/></svg><span data-i18n="card_other_t5">Output highlighting, ยืนยันก่อนวางหลายบรรทัด, ธีมมืด/สว่าง และรองรับ Linux x64</span></li>
             </ul>
           </article>
         </div>
@@ -290,44 +381,35 @@
       <div class="wrap">
         <header class="section-head">
           <p class="kicker" data-i18n="guide_kicker">วิธีใช้งาน</p>
-          <h2 data-i18n="guide_heading">เริ่มต้นใช้งานใน 6 ขั้นตอน</h2>
+          <h2 data-i18n="guide_heading">ใช้งานครั้งแรก</h2>
         </header>
-        <ol class="steps">
+        <div class="quickstart">
+          <ol class="qs-steps">
           <li>
-            <h3 data-i18n="guide_step1_title">ติดตั้งหรือแตกไฟล์</h3>
-            <p data-i18n-html="guide_step1_desc">ดับเบิลคลิก <code>NexaTerm-Setup-x64.exe</code> แล้วทำตามตัวช่วยติดตั้ง
-              หรือแตกไฟล์ <code>NexaTerm-Portable-x64.zip</code> แล้วเปิด <code>NexaTerm.exe</code> ได้เลย</p>
+            <h3 data-i18n="guide_step1_title">ติดตั้ง</h3>
+            <p data-i18n-html="guide_step1_desc">Windows: ดับเบิลคลิก <code>NexaTerm-Setup-x64-web.exe</code> แล้วกด Next จนจบ ไม่ต้องใช้สิทธิ์แอดมิน ถ้าไม่อยากติดตั้ง ให้แตก <code>NexaTerm-Portable-x64.zip</code> แล้วเปิด <code>NexaTerm.exe</code> ส่วน Linux ใช้ไฟล์ .deb, .rpm หรือ AppImage</p>
           </li>
           <li>
-            <h3 data-i18n="guide_step2_title">เปิดเทอร์มินัลบนเครื่อง</h3>
-            <p data-i18n-html="guide_step2_desc">กด <kbd>Ctrl</kbd> + <kbd>T</kbd> เพื่อเปิด shell เริ่มต้น
-              หรือกดลูกศรข้างปุ่มเทอร์มินัลบนแถบเครื่องมือเพื่อเลือก PowerShell, Command Prompt, Git Bash หรือ WSL</p>
+            <h3 data-i18n="guide_step2_title">เพิ่มเซิร์ฟเวอร์</h3>
+            <p data-i18n-html="guide_step2_desc">กด <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> ใส่ host ชื่อผู้ใช้ แล้วเลือกว่าจะล็อกอินด้วยรหัสผ่านหรือคีย์ ช่องรหัสผ่านเว้นว่างได้ โปรแกรมจะถามตอนเชื่อมต่อ</p>
           </li>
           <li>
-            <h3 data-i18n="guide_step3_title">เพิ่ม session SSH</h3>
-            <p data-i18n-html="guide_step3_desc">กด <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> ใส่ชื่อเครื่อง
-              พอร์ต ชื่อผู้ใช้ และวิธีล็อกอิน ถ้าใส่รหัสผ่านไว้ รหัสจะถูกเก็บใน Windows Credential Manager
-              หรือเว้นว่างไว้ให้โปรแกรมถามตอนเชื่อมต่อก็ได้</p>
+            <h3 data-i18n="guide_step3_title">เชื่อมต่อ</h3>
+            <p data-i18n-html="guide_step3_desc">ดับเบิลคลิก session ครั้งแรกโปรแกรมจะแสดง fingerprint ของเซิร์ฟเวอร์ (รูปด้านข้าง) เทียบกับค่าที่ได้จากผู้ดูแลเครื่อง ถ้าตรงกันค่อยกด "Trust and connect" ครั้งต่อไปจะไม่ถามอีก</p>
           </li>
           <li>
-            <h3 data-i18n="guide_step4_title">เชื่อมต่อครั้งแรก</h3>
-            <p data-i18n="guide_step4_desc">ดับเบิลคลิก session ในแถบด้านซ้าย โปรแกรมจะแสดง fingerprint ของเซิร์ฟเวอร์
-              ให้เทียบกับค่าที่ผู้ดูแลเซิร์ฟเวอร์ให้มา ถ้าตรงกันจึงกด "Trust and connect"</p>
+            <h3 data-i18n="guide_step4_title">รับส่งไฟล์</h3>
+            <p data-i18n-html="guide_step4_desc">ระหว่างอยู่ในเทอร์มินัล SSH กดปุ่ม SFTP บนแถบเครื่องมือ ลากไฟล์จากเครื่องมาวางเพื่ออัปโหลด ดับเบิลคลิกไฟล์ข้อความเพื่อแก้แล้วบันทึกกลับ</p>
           </li>
-          <li>
-            <h3 data-i18n="guide_step5_title">เปิด SFTP</h3>
-            <p data-i18n-html="guide_step5_desc">ขณะอยู่ในเทอร์มินัล SSH ให้กดปุ่ม SFTP บนแถบเครื่องมือ หรือคลิกขวาที่
-              session แล้วเลือก "Open SFTP browser" ลากไฟล์มาวางเพื่ออัปโหลด ดับเบิลคลิกไฟล์ข้อความเพื่อแก้ไข</p>
-          </li>
-          <li>
-            <h3 data-i18n="guide_step6_title">แบ่งหน้าจอและสั่งงานหลายเครื่อง</h3>
-            <p data-i18n="guide_step6_desc">คลิกขวาที่ session แล้วเลือก "Connect in split pane" เพื่อเปิดในช่องใหม่
-              จากนั้นกดปุ่ม multi-execution บนแถบเครื่องมือ เลือกเครื่องปลายทาง พิมพ์คำสั่ง แล้วกด Broadcast</p>
-          </li>
-        </ol>
-        <p class="more" data-i18n-html="guide_more">คู่มือฉบับเต็มอยู่ที่ <a
-            href="https://github.com/bom-sudo/NexaTerm/blob/main/docs/USER_GUIDE.md" target="_blank"
-            rel="noopener">docs/USER_GUIDE.md</a></p>
+          </ol>
+          <figure class="qs-shot">
+            <button class="shot-btn" type="button" data-full="images/hostkey.png" data-caption="หน้าต่างยืนยัน host key ตอนเชื่อมต่อเซิร์ฟเวอร์ครั้งแรก">
+              <img src="images/hostkey.png" alt="หน้าต่างยืนยัน host key ของ NexaTerm แสดง fingerprint SHA-256" loading="lazy">
+            </button>
+            <figcaption data-i18n="guide_shot_caption">หน้าต่างยืนยัน host key ตอนเชื่อมต่อเซิร์ฟเวอร์ครั้งแรก</figcaption>
+          </figure>
+        </div>
+        <p class="more" data-i18n-html="guide_more">tunnel, สั่งหลายเครื่องพร้อมกัน, Serial, X11 และการตั้งค่าอื่น ๆ อยู่ใน<a href="guide.html">คู่มือฉบับเต็ม</a></p>
       </div>
     </section>
 
@@ -335,15 +417,15 @@
     <section class="section" id="shortcuts">
       <div class="wrap narrow">
         <header class="section-head">
-          <p class="kicker" data-i18n="sc_kicker">คีย์ลัด</p>
+          <p class="kicker"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-keyboard"/></svg><span data-i18n="sc_kicker">คีย์ลัด</span></p>
           <h2 data-i18n="sc_heading">คีย์ลัดที่ใช้บ่อย</h2>
         </header>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col" data-i18n="sc_th_key">คีย์</th>
-                <th scope="col" data-i18n="sc_th_action">การทำงาน</th>
+                <th scope="col"><span class="td-ico"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-keyboard"/></svg><span data-i18n="sc_th_key">คีย์</span></span></th>
+                <th scope="col"><span class="td-ico"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-zap"/></svg><span data-i18n="sc_th_action">การทำงาน</span></span></th>
               </tr>
             </thead>
             <tbody>
@@ -394,7 +476,7 @@
     <section class="section alt" id="privacy">
       <div class="wrap narrow">
         <header class="section-head">
-          <p class="kicker" data-i18n="priv_kicker">ความปลอดภัย</p>
+          <p class="kicker"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-shield-check"/></svg><span data-i18n="priv_kicker">ความปลอดภัย</span></p>
           <h2 data-i18n="priv_heading">ข้อมูลของคุณเก็บไว้ที่ไหน</h2>
         </header>
         <div class="table-wrap">
@@ -407,20 +489,20 @@
             </thead>
             <tbody>
               <tr>
-                <td data-i18n="priv_row1_data">Session, โฟลเดอร์, การตั้งค่า, known hosts</td>
+                <td><span class="td-ico"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-database"/></svg><span data-i18n="priv_row1_data">Session, โฟลเดอร์, การตั้งค่า, known hosts</span></span></td>
                 <td data-i18n-html="priv_row1_loc">ฐานข้อมูล SQLite ใน <code>%APPDATA%\NexaTerm</code> (รุ่นพกพาเก็บใน
                   <code>portable-data\</code>)</td>
               </tr>
               <tr>
-                <td data-i18n="priv_row2_data">รหัสผ่านและรหัสของ key</td>
+                <td><span class="td-ico"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-key-round"/></svg><span data-i18n="priv_row2_data">รหัสผ่านและรหัสของ key</span></span></td>
                 <td data-i18n="priv_row2_loc">Windows Credential Manager ของผู้ใช้ Windows คนนั้น</td>
               </tr>
               <tr>
-                <td data-i18n="priv_row3_data">Private key</td>
+                <td><span class="td-ico"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-file-check"/></svg><span data-i18n="priv_row3_data">Private key</span></span></td>
                 <td data-i18n="priv_row3_loc">อยู่ในไฟล์ที่คุณเลือกตามเดิม โปรแกรมจำไว้แค่ตำแหน่งไฟล์</td>
               </tr>
               <tr>
-                <td data-i18n="priv_row4_data">Log ของโปรแกรม</td>
+                <td><span class="td-ico"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-file-code"/></svg><span data-i18n="priv_row4_data">Log ของโปรแกรม</span></span></td>
                 <td data-i18n-html="priv_row4_loc">โฟลเดอร์ <code>logs\</code>
                   ข้อความที่เป็นรหัสผ่านจะถูกปิดบังก่อนเขียน</td>
               </tr>
@@ -438,132 +520,112 @@
     <section class="section" id="download">
       <div class="wrap">
         <header class="section-head">
-          <p class="kicker" data-i18n="dl_kicker">ดาวน์โหลด</p>
-          <h2 data-i18n="dl_heading">ดาวน์โหลด NexaTerm</h2>
-          <p data-i18n="dl_sub">ฟรีทุกฟังก์ชัน ไม่ต้องสมัครบัญชี ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ</p>
-          <p class="dl-release" id="dl-release">
-            <span data-i18n="dl_version_label">รุ่นล่าสุด</span>
-            <strong class="js-version">1.1.0</strong>
-            <span class="js-date"></span>
-            <a href="https://github.com/bom-sudo/NexaTerm/releases/latest" target="_blank" rel="noopener"
-              data-i18n="dl_whatsnew">มีอะไรใหม่</a>
+          <p class="kicker"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-cloud-download"/></svg><span data-i18n="dl_kicker">ดาวน์โหลดและรุ่นล่าสุด</span></p>
+          <h2 data-i18n="dl_heading">ดาวน์โหลด NexaTerm 1.0.0 &amp; รุ่นพรีวิว</h2>
+          <p data-i18n="dl_sub">สำหรับ Windows 10 (1809 ขึ้นไป) / Windows 11 x64 และ Linux x64 (Preview) ฟรี ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ
           </p>
         </header>
 
-        <div class="os-tabs" role="tablist" aria-label="ระบบปฏิบัติการ">
-          <button class="os-tab" role="tab" type="button" id="tab-windows" aria-controls="panel-windows" aria-selected="true">Windows</button>
-          <button class="os-tab" role="tab" type="button" id="tab-linux" aria-controls="panel-linux" aria-selected="false">Linux</button>
-        </div>
-
-        <!-- Windows -->
-        <div class="os-panel" id="panel-windows" role="tabpanel" aria-labelledby="tab-windows">
-          <article class="dl-main">
-            <div class="dl-main-text">
-              <p class="dl-tag" data-i18n="dl_win_tag">แนะนำสำหรับคนส่วนใหญ่</p>
-              <h3 data-i18n="dl_win_title">ตัวติดตั้งสำหรับ Windows 10 / 11</h3>
-              <p data-i18n="dl_win_desc">ดาวน์โหลดแล้วดับเบิลคลิก กด Next ไม่กี่ครั้งก็ใช้งานได้ ติดตั้งเฉพาะบัญชีผู้ใช้ของคุณ ถอนการติดตั้งได้จาก Settings ของ Windows ตามปกติ</p>
+        <!-- Windows v1.0.0 -->
+        <div class="downloads">
+          <article class="dl featured">
+            <div class="dl-top">
+              <p class="dl-tag" data-i18n="dl_badge_rec">แนะนำ · โหลดทันที</p>
+              <span class="icon-badge"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-brand-windows"/></svg></span>
             </div>
-            <div class="dl-main-action">
-              <a class="btn btn-primary btn-lg" data-asset="NexaTerm-Setup-x64-web.exe"
-                href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Setup-x64-web.exe">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                <span data-i18n="dl_win_btn">ดาวน์โหลดตัวติดตั้ง</span>
-              </a>
-              <p class="dl-meta"><span>NexaTerm-Setup-x64-web.exe</span> <span class="js-size" data-for="NexaTerm-Setup-x64-web.exe">3 MB</span></p>
-            </div>
+            <h3 data-i18n="dl_web_title">ตัวติดตั้งแบบออนไลน์ (Web)</h3>
+            <p class="dl-file">NexaTerm-Setup-x64-web.exe <span>3.0 MB</span></p>
+            <p data-i18n="dl_web_desc">ดาวน์โหลดเร็วและติดตั้งแบบรายผู้ใช้ (ไม่ต้องใช้สิทธิ์แอดมิน) ใช้ WebView2 ที่มีอยู่แล้วใน Windows 11 / 10 หรือโหลดเพิ่มเฉพาะเครื่องที่ยังไม่มี</p>
+            <a class="btn btn-primary"
+              href="downloads/NexaTerm-Setup-x64-web.exe" download>
+              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-download"/></svg>
+              <span data-i18n="dl_web_btn">ดาวน์โหลดตัวติดตั้ง (3 MB)</span>
+            </a>
           </article>
-
-          <div class="dl-alt">
-            <a class="dl-row" data-asset="NexaTerm-Portable-x64.zip"
-              href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Portable-x64.zip">
-              <span class="dl-row-text">
-                <strong data-i18n="dl_port_title">รุ่นพกพา (ไม่ต้องติดตั้ง)</strong>
-                <span data-i18n="dl_port_desc">แตก ZIP แล้วเปิด NexaTerm.exe ใช้จากแฟลชไดรฟ์ได้ ข้อมูลอยู่ในโฟลเดอร์ข้างโปรแกรม</span>
-              </span>
-              <span class="dl-row-meta">.zip <span class="js-size" data-for="NexaTerm-Portable-x64.zip">3.6 MB</span></span>
-            </a>
-            <a class="dl-row" data-asset="NexaTerm-Setup-x64.exe"
-              href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Setup-x64.exe">
-              <span class="dl-row-text">
-                <strong data-i18n="dl_offline_title">ตัวติดตั้งสำหรับเครื่องที่ไม่มีอินเทอร์เน็ต</strong>
-                <span data-i18n="dl_offline_desc">รวม Microsoft WebView2 ไว้ในไฟล์เดียว ไฟล์ใหญ่ ใช้เมื่อเครื่องปลายทางออนไลน์ไม่ได้เท่านั้น</span>
-              </span>
-              <span class="dl-row-meta">.exe <span class="js-size" data-for="NexaTerm-Setup-x64.exe">287 MB</span></span>
-            </a>
-          </div>
-
-          <details class="smartscreen">
-            <summary data-i18n="dl_ss_q">Windows แสดงหน้าจอสีน้ำเงิน "Windows protected your PC" ต้องทำอย่างไร</summary>
-            <div data-i18n-html="dl_ss_a">
-              <p>กด <strong>More info</strong> (ข้อมูลเพิ่มเติม) แล้วกด <strong>Run anyway</strong> (เรียกใช้ต่อไป)</p>
-              <p>หน้าจอนี้ขึ้นกับโปรแกรมใหม่ที่ยังมีคนดาวน์โหลดไม่มาก ไม่ได้แปลว่าไฟล์มีไวรัส NexaTerm อยู่ระหว่างขอใบรับรองลงนามโค้ดจาก SignPath Foundation (โครงการที่ให้ใบรับรองฟรีแก่ซอฟต์แวร์โอเพนซอร์ส) เมื่อได้แล้ว ไฟล์จะแสดงชื่อผู้เผยแพร่ และคำเตือนจะค่อย ๆ หายไป</p>
+          <article class="dl">
+            <div class="dl-top">
+              <p class="dl-tag muted" data-i18n="dl_badge_port">ไม่ต้องติดตั้ง · โหลดทันที</p>
+              <span class="icon-badge cyan"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-usb"/></svg></span>
             </div>
-          </details>
+            <h3 data-i18n="dl_port_title">รุ่นพกพา (Portable)</h3>
+            <p class="dl-file">NexaTerm-Portable-x64.zip <span>3.6 MB</span></p>
+            <p data-i18n-html="dl_port_desc">แตกไฟล์ไว้ที่ไหนก็ได้ รวมถึงแฟลชไดรฟ์ แล้วเปิด <code>NexaTerm.exe</code> ได้เลย ข้อมูลทั้งหมดอยู่ในโฟลเดอร์ <code>portable-data\</code> ข้างโปรแกรม</p>
+            <a class="btn btn-ghost"
+              href="downloads/NexaTerm-Portable-x64.zip" download>
+              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-archive"/></svg>
+              <span data-i18n="dl_port_btn">ดาวน์โหลด ZIP (3.6 MB)</span>
+            </a>
+          </article>
+          <article class="dl">
+            <div class="dl-top">
+              <p class="dl-tag muted" data-i18n="dl_badge_offline">รวม WebView2 · GitHub</p>
+              <span class="icon-badge"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-hard-drive"/></svg></span>
+            </div>
+            <h3 data-i18n="dl_offline_title">ตัวติดตั้งแบบออฟไลน์</h3>
+            <p class="dl-file">NexaTerm-Setup-x64.exe <span>287 MB</span></p>
+            <p data-i18n="dl_offline_desc">รวมตัวติดตั้ง WebView2 Runtime ไว้สำหรับเครื่องออฟไลน์ (ใช้พื้นที่ใน %TEMP% ~300 MB) เนื่องจากเกินโควตา 25 MB ของ Cloudflare Pages จึงเผยแพร่ผ่าน GitHub Releases</p>
+            <a class="btn btn-ghost"
+              href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener">
+              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-brand-github"/></svg>
+              <span data-i18n="dl_offline_btn">ดูบน GitHub Releases</span>
+            </a>
+          </article>
         </div>
 
-        <!-- Linux -->
-        <div class="os-panel" id="panel-linux" role="tabpanel" aria-labelledby="tab-linux" hidden>
-          <div class="dl-linux">
-            <article class="dl-card">
-              <h3>Ubuntu / Debian / Mint</h3>
-              <a class="btn btn-primary" data-asset="NexaTerm-x64.deb"
-                href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-x64.deb">
-                <span data-i18n="dl_get_deb">ดาวน์โหลด .deb</span>
-              </a>
-              <p class="dl-meta"><span class="js-size" data-for="NexaTerm-x64.deb"></span></p>
-              <div class="cmd small"><code id="cmd-deb">sudo apt install ./NexaTerm-x64.deb</code>
-                <button class="copy" type="button" data-copy="cmd-deb" data-i18n="copy_btn">คัดลอก</button></div>
-            </article>
-            <article class="dl-card">
-              <h3>Fedora / openSUSE / RHEL</h3>
-              <a class="btn btn-primary" data-asset="NexaTerm-x64.rpm"
-                href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-x64.rpm">
-                <span data-i18n="dl_get_rpm">ดาวน์โหลด .rpm</span>
-              </a>
-              <p class="dl-meta"><span class="js-size" data-for="NexaTerm-x64.rpm"></span></p>
-              <div class="cmd small"><code id="cmd-rpm">sudo dnf install ./NexaTerm-x64.rpm</code>
-                <button class="copy" type="button" data-copy="cmd-rpm" data-i18n="copy_btn">คัดลอก</button></div>
-            </article>
-            <article class="dl-card">
-              <h3 data-i18n="dl_appimage_title">ลินุกซ์อื่น ๆ (AppImage)</h3>
-              <a class="btn btn-ghost" data-asset="NexaTerm-x64.AppImage"
-                href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-x64.AppImage">
-                <span data-i18n="dl_get_appimage">ดาวน์โหลด AppImage</span>
-              </a>
-              <p class="dl-meta"><span class="js-size" data-for="NexaTerm-x64.AppImage"></span></p>
-              <div class="cmd small"><code id="cmd-appimage">chmod +x NexaTerm-x64.AppImage && ./NexaTerm-x64.AppImage</code>
-                <button class="copy" type="button" data-copy="cmd-appimage" data-i18n="copy_btn">คัดลอก</button></div>
-            </article>
+        <!-- Linux & CI Preview (Unreleased features) -->
+        <div class="downloads-extra">
+          <article class="dl">
+            <div class="dl-top">
+              <p class="dl-tag muted" data-i18n="dl_badge_linux">Linux x64 · Preview</p>
+              <span class="icon-badge cyan"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-brand-linux"/></svg></span>
+            </div>
+            <h3 data-i18n="dl_linux_title">แพ็กเกจสำหรับ Linux</h3>
+            <p class="dl-file">.deb · .rpm · .AppImage <span>x64</span></p>
+            <p data-i18n-html="dl_linux_desc">สร้างอัตโนมัติใน GitHub Actions รองรับ Debian/Ubuntu (<code>.deb</code>), Fedora/openSUSE (<code>.rpm</code>) และ <code>.AppImage</code> พร้อม Secret Service keyring, <code>SSH_AUTH_SOCK</code>, Serial และ X11 ผ่าน <code>$DISPLAY</code></p>
+            <a class="btn btn-ghost"
+              href="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml" target="_blank" rel="noopener">
+              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-external-link"/></svg>
+              <span data-i18n="dl_linux_btn">ดาวน์โหลดจาก GitHub Actions (CI)</span>
+            </a>
+          </article>
+          <article class="dl">
+            <div class="dl-top">
+              <p class="dl-tag muted" data-i18n="dl_badge_dev">พรีวิวล่าสุด · main</p>
+              <span class="icon-badge warn"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-rocket"/></svg></span>
+            </div>
+            <h3 data-i18n="dl_dev_title">รุ่นพัฒนาล่าสุด (Unreleased Features)</h3>
+            <p class="dl-file">Windows &amp; Linux CI Artifacts <span>Auto-built</span></p>
+            <p data-i18n="dl_dev_desc">รวมความสามารถใหม่ที่เพิ่งเขียนเพิ่มหลัง v1.0.0: Telnet, Serial (COM), X11 forwarding, SFTP Side Panel + ส่งทั้งโฟลเดอร์ + chmod, 2FA, Agent forwarding, .ppk, นำเข้า MobaXterm/PuTTY, Output Highlighting และ Macros</p>
+            <a class="btn btn-ghost"
+              href="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml" target="_blank" rel="noopener">
+              <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-brand-github"/></svg>
+              <span data-i18n="dl_dev_btn">ดู Artifacts ล่าสุดบน GitHub CI</span>
+            </a>
+          </article>
+        </div>
+
+        <div class="verify">
+          <div>
+            <div class="verify-head">
+              <span class="icon-badge sm"><svg class="ico ico-md" aria-hidden="true"><use href="#ico-shield-check"/></svg></span>
+              <h3 data-i18n="verify_title">ตรวจสอบไฟล์และสถานะลายเซ็น (Code Signing)</h3>
+            </div>
+            <p data-i18n-html="verify_desc">ไฟล์ v1.0.0 ชุดแรกยังไม่ได้ลงลายเซ็นดิจิทัล (Windows SmartScreen อาจแจ้งเตือน) ส่วนระบบ CI/Release ได้เตรียมการเซ็นอัตโนมัติผ่าน <strong>SignPath Foundation</strong> และ <code>scripts/sign-file.ps1</code> ไว้แล้ว โปรดตรวจค่า SHA-256 กับ <a href="downloads/SHA256SUMS.txt" target="_blank" rel="noopener">SHA256SUMS.txt</a> ก่อนติดตั้ง</p>
           </div>
-          <p class="dl-linux-note" data-i18n-html="dl_linux_note">ใช้ได้กับเครื่อง 64 บิตที่มีหน้าจอเดสก์ท็อป (GNOME, KDE, XFCE ฯลฯ) รหัสผ่านเก็บใน keyring ของเดสก์ท็อป ถ้าจะใช้พอร์ต Serial ให้เพิ่มผู้ใช้เข้ากลุ่ม <code>dialout</code></p>
+          <div class="cmd">
+            <code id="cmd-hash">Get-FileHash .\NexaTerm-Setup-x64-web.exe -Algorithm SHA256</code>
+            <button class="copy" type="button" data-copy="cmd-hash" aria-label="คัดลอกคำสั่ง"
+              data-i18n="copy_btn">คัดลอก</button>
+          </div>
         </div>
 
-        <!-- Trust -->
-        <ul class="trust">
-          <li>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-            <span data-i18n-html="dl_trust_source">ซอร์สโค้ดเปิดทั้งหมดบน <a href="https://github.com/bom-sudo/NexaTerm" target="_blank" rel="noopener">GitHub</a> สัญญาอนุญาต MIT</span>
-          </li>
-          <li>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span data-i18n="dl_trust_build">ไฟล์ทุกตัวสร้างจากซอร์สโค้ดโดย GitHub Actions และผ่านชุดทดสอบก่อนเผยแพร่</span>
-          </li>
-          <li>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-            <span data-i18n-html="dl_trust_hash">ตรวจไฟล์ได้ด้วยค่า SHA-256 ใน <a href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/SHA256SUMS.txt" target="_blank" rel="noopener">SHA256SUMS.txt</a></span>
-          </li>
-        </ul>
-
-        <div class="dl-docs" data-i18n-html="dl_docs_links">
-          <a href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener">รุ่นก่อนหน้าทั้งหมด</a>
-          <a href="https://github.com/bom-sudo/NexaTerm/blob/main/docs/INSTALL.md" target="_blank" rel="noopener">คู่มือการติดตั้ง</a>
-          <a href="https://github.com/bom-sudo/NexaTerm/blob/main/CHANGELOG.md" target="_blank" rel="noopener">บันทึกการเปลี่ยนแปลง</a>
-          <a href="https://github.com/bom-sudo/NexaTerm/blob/main/docs/CODE_SIGNING.md" target="_blank" rel="noopener">นโยบายลงนามโค้ด</a>
+        <div class="dl-docs">
+          <a href="downloads/SHA256SUMS.txt" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-file-check"/></svg><span>SHA256SUMS.txt</span></a>
+          <a href="downloads/RELEASE_NOTES.md" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-tag"/></svg><span>Release Notes (v1.0.0)</span></a>
+          <a href="downloads/INSTALLATION_GUIDE.md" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-book-open"/></svg><span data-i18n="dl_doc_install">คู่มือการติดตั้ง</span></a>
+          <a href="downloads/PORTABLE_GUIDE.md" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-usb"/></svg><span data-i18n="dl_doc_portable">คู่มือรุ่นพกพา</span></a>
+          <a href="https://github.com/bom-sudo/NexaTerm/blob/main/docs/CODE_SIGNING.md" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-shield-check"/></svg><span data-i18n="dl_doc_signing">นโยบาย Code Signing (SignPath)</span></a>
+          <a href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-brand-github"/></svg><span>GitHub Releases</span></a>
         </div>
       </div>
     </section>
@@ -572,43 +634,44 @@
     <section class="section alt" id="faq">
       <div class="wrap narrow">
         <header class="section-head">
+          <p class="kicker"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-help-circle"/></svg><span data-i18n="nav_faq">คำถามที่พบบ่อย</span></p>
           <h2 data-i18n="faq_heading">คำถามที่พบบ่อย</h2>
         </header>
         <div class="faq">
           <details open>
-            <summary data-i18n="faq_q1">ใช้ฟรีจริงไหม มีเงื่อนไขอะไรบ้าง</summary>
+            <summary><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-help-circle"/></svg><span data-i18n="faq_q1">ใช้ฟรีจริงไหม มีเงื่อนไขอะไรบ้าง</span></summary>
             <p data-i18n="faq_a1">ฟรีทุกฟังก์ชัน เผยแพร่ภายใต้สัญญาอนุญาต MIT ใช้งานส่วนตัวหรือในองค์กรได้
               แก้ไขและนำไปแจกจ่ายต่อได้ ไม่มีรุ่นเสียเงินและไม่มีระยะทดลองใช้</p>
           </details>
           <details>
-            <summary data-i18n="faq_q2">โปรแกรมส่งข้อมูลอะไรออกไปบ้าง</summary>
+            <summary><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-help-circle"/></svg><span data-i18n="faq_q2">โปรแกรมส่งข้อมูลอะไรออกไปบ้าง</span></summary>
             <p data-i18n="faq_a2">ไม่ส่งข้อมูลการใช้งานใดๆ ไม่มี telemetry และไม่ตรวจหาอัปเดตเอง
               การเชื่อมต่อออกไปข้างนอกเกิดขึ้นเฉพาะเมื่อคุณเชื่อมต่อเซิร์ฟเวอร์ หรือกดปุ่ม "Public IP"
               ในหน้าเครื่องมือเครือข่าย</p>
           </details>
           <details>
-            <summary data-i18n="faq_q3">ต้องใช้สิทธิ์ผู้ดูแลระบบไหม</summary>
+            <summary><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-help-circle"/></svg><span data-i18n="faq_q3">ต้องใช้สิทธิ์ผู้ดูแลระบบไหม</span></summary>
             <p data-i18n-html="faq_a3">ไม่ต้อง ตัวติดตั้งติดตั้งให้เฉพาะผู้ใช้ปัจจุบัน (ค่าเริ่มต้นคือ
               <code>%LOCALAPPDATA%\NexaTerm</code>) ส่วนรุ่นพกพาไม่ต้องติดตั้งเลย</p>
           </details>
           <details>
-            <summary data-i18n="faq_q4">WebView2 คืออะไร ต้องติดตั้งเพิ่มไหม</summary>
+            <summary><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-help-circle"/></svg><span data-i18n="faq_q4">WebView2 คืออะไร ต้องติดตั้งเพิ่มไหม</span></summary>
             <p data-i18n="faq_a4">WebView2 เป็นส่วนประกอบของ Microsoft ที่ NexaTerm ใช้แสดงหน้าจอ Windows 11 และ Windows
               10 ที่อัปเดตแล้วมีอยู่แล้ว ถ้าเครื่องยังไม่มี ตัวติดตั้งจะติดตั้งให้ ส่วนรุ่นพกพาต้องติดตั้ง WebView2
               เองก่อน</p>
           </details>
           <details>
-            <summary data-i18n="faq_q5">ย้ายรุ่นพกพาไปเครื่องอื่น รหัสผ่านไปด้วยไหม</summary>
+            <summary><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-help-circle"/></svg><span data-i18n="faq_q5">ย้ายรุ่นพกพาไปเครื่องอื่น รหัสผ่านไปด้วยไหม</span></summary>
             <p data-i18n-html="faq_a5">ไม่ไป เพราะรหัสผ่านเก็บใน Windows Credential Manager ของผู้ใช้แต่ละคน Session,
               โฟลเดอร์, การตั้งค่าและ known hosts ย้ายไปพร้อมโฟลเดอร์ <code>portable-data\</code>
               แต่โปรแกรมจะถามรหัสผ่านใหม่บนเครื่องใหม่</p>
           </details>
           <details>
-            <summary data-i18n="faq_q6">รองรับ Telnet, Serial, X11, RDP หรือ VNC ไหม</summary>
+            <summary><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-help-circle"/></svg><span data-i18n="faq_q6">รองรับ Telnet, Serial, X11, RDP หรือ VNC ไหม</span></summary>
             <p data-i18n-html="faq_a6">ในโค้ดล่าสุด (<code>main</code> / CI builds) รองรับ <strong>Telnet, Serial (COM / /dev/ttyUSB*), X11 forwarding</strong> (ไปยัง VcXsrv/Xming/X410 หรือ <code>$DISPLAY</code> บน Linux), 2FA, SSH agent forwarding, คีย์ <code>.ppk</code>, SFTP ส่งทั้งโฟลเดอร์ + side panel, นำเข้า MobaXterm/PuTTY และ Macros แล้ว ส่วนที่ยังไม่รองรับคือ RDP, VNC, embedded X server ในตัว, Master Password และ Remote Monitoring ดูรายละเอียดใน <a href="https://github.com/bom-sudo/NexaTerm/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG.md</a></p>
           </details>
           <details>
-            <summary data-i18n="faq_q7">เกี่ยวข้องกับโปรแกรมเชิงพาณิชย์ตัวอื่นไหม</summary>
+            <summary><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-help-circle"/></svg><span data-i18n="faq_q7">เกี่ยวข้องกับโปรแกรมเชิงพาณิชย์ตัวอื่นไหม</span></summary>
             <p data-i18n="faq_a7">ไม่เกี่ยวข้อง NexaTerm เป็นโปรเจกต์อิสระที่เขียนขึ้นใหม่ทั้งหมดด้วย Rust และ
               TypeScript ไม่มีโค้ดหรือไฟล์ภาพจากโปรแกรมอื่น</p>
           </details>
@@ -620,39 +683,52 @@
     <section class="section" id="tech">
       <div class="wrap">
         <header class="section-head">
-          <p class="kicker" data-i18n="tech_kicker">สำหรับนักพัฒนา</p>
+          <p class="kicker"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-cpu"/></svg><span data-i18n="tech_kicker">สำหรับนักพัฒนา</span></p>
           <h2 data-i18n="tech_heading">สร้างด้วยอะไร</h2>
         </header>
         <div class="tech">
           <div>
-            <h3 data-i18n="tech_t1_title">Tauri 2 และ Rust</h3>
+            <div class="tech-head">
+              <span class="icon-badge sm"><svg class="ico ico-md" aria-hidden="true"><use href="#ico-brand-rust"/></svg></span>
+              <h3 data-i18n="tech_t1_title">Tauri 2 และ Rust</h3>
+            </div>
             <p data-i18n="tech_t1_desc">งานที่ต้องใช้สิทธิ์ของระบบ เช่น เปิด process, เชื่อมต่อเครือข่าย
               และอ่านเขียนไฟล์ ทำในฝั่ง Rust ทั้งหมด หน้าจอเรียกใช้ผ่านคำสั่งที่ตรวจสอบข้อมูลแล้วเท่านั้น</p>
           </div>
           <div>
-            <h3 data-i18n="tech_t2_title">russh และ russh-sftp</h3>
+            <div class="tech-head">
+              <span class="icon-badge sm cyan"><svg class="ico ico-md" aria-hidden="true"><use href="#ico-lock"/></svg></span>
+              <h3 data-i18n="tech_t2_title">russh และ russh-sftp</h3>
+            </div>
             <p data-i18n="tech_t2_desc">ไลบรารี SSH และ SFTP ที่เขียนด้วย Rust ทั้งหมด ทำงานแบบ async บน Tokio
               ไม่ต้องพึ่ง OpenSSL</p>
           </div>
           <div>
-            <h3 data-i18n="tech_t3_title">ConPTY และ xterm.js</h3>
+            <div class="tech-head">
+              <span class="icon-badge sm"><svg class="ico ico-md" aria-hidden="true"><use href="#ico-square-terminal"/></svg></span>
+              <h3 data-i18n="tech_t3_title">ConPTY และ xterm.js</h3>
+            </div>
             <p data-i18n="tech_t3_desc">เทอร์มินัลบนเครื่องใช้ Windows ConPTY ผ่าน portable-pty ส่วนการแสดงผลใช้
               xterm.js</p>
           </div>
           <div>
-            <h3 data-i18n="tech_t4_title">SQLite</h3>
+            <div class="tech-head">
+              <span class="icon-badge sm cyan"><svg class="ico ico-md" aria-hidden="true"><use href="#ico-brand-sqlite"/></svg></span>
+              <h3 data-i18n="tech_t4_title">SQLite</h3>
+            </div>
             <p data-i18n="tech_t4_desc">ข้อมูลทั้งหมดอยู่ในไฟล์ SQLite ไฟล์เดียว มีระบบ migration สำหรับอัปเกรดรุ่น</p>
           </div>
         </div>
         <div class="sponsor-box">
-          <div>
-            <h3 data-i18n="sponsor_title">สนับสนุนการพัฒนา NexaTerm</h3>
-            <p data-i18n="sponsor_desc">NexaTerm เป็นโปรแกรมฟรีและโอเพนซอร์ส 100% หากโปรแกรมนี้ช่วยงานประจำวันของคุณได้ สามารถร่วมสนับสนุนค่ายาหอมและค่าพัฒนาต่อได้ผ่าน GitHub Sponsors</p>
+          <div class="sponsor-info">
+            <span class="icon-badge rose"><svg class="ico ico-lg" aria-hidden="true"><use href="#ico-heart"/></svg></span>
+            <div>
+              <h3 data-i18n="sponsor_title">สนับสนุนการพัฒนา NexaTerm</h3>
+              <p data-i18n="sponsor_desc">NexaTerm เป็นโปรแกรมฟรีและโอเพนซอร์ส 100% หากโปรแกรมนี้ช่วยงานประจำวันของคุณได้ สามารถร่วมสนับสนุนการพัฒนาต่อได้ผ่าน GitHub Sponsors</p>
+            </div>
           </div>
           <a class="btn btn-primary" href="https://github.com/sponsors/bom-sudo" target="_blank" rel="noopener">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-            </svg>
+            <svg class="ico ico-sm" aria-hidden="true"><use href="#ico-heart"/></svg>
             <span data-i18n="sponsor_btn">สนับสนุนผ่าน GitHub Sponsors</span>
           </a>
         </div>
@@ -668,16 +744,11 @@
         <p data-i18n="footer_tag">โปรแกรมฟรีและโอเพนซอร์สภายใต้สัญญาอนุญาต MIT</p>
       </div>
       <ul class="footer-links">
-        <li><a href="https://github.com/bom-sudo/NexaTerm" target="_blank" rel="noopener"
-            data-i18n="footer_gh">ซอร์สโค้ดบน GitHub</a></li>
-        <li><a href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener"
-            data-i18n="footer_releases">Releases</a></li>
-        <li><a href="https://github.com/bom-sudo/NexaTerm/issues" target="_blank" rel="noopener"
-            data-i18n="footer_issues">แจ้งปัญหา</a></li>
-        <li><a href="https://github.com/bom-sudo/NexaTerm/blob/main/LICENSE" target="_blank" rel="noopener"
-            data-i18n="footer_license">สัญญาอนุญาต MIT</a></li>
-        <li><a href="https://github.com/sponsors/bom-sudo" target="_blank" rel="noopener"
-            data-i18n="footer_sponsor">สนับสนุนผู้พัฒนา (Donate)</a></li>
+        <li><a href="https://github.com/bom-sudo/NexaTerm" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-brand-github"/></svg><span data-i18n="footer_gh">ซอร์สโค้ดบน GitHub</span></a></li>
+        <li><a href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-tag"/></svg><span data-i18n="footer_releases">Releases</span></a></li>
+        <li><a href="https://github.com/bom-sudo/NexaTerm/issues" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-help-circle"/></svg><span data-i18n="footer_issues">แจ้งปัญหา</span></a></li>
+        <li><a href="https://github.com/bom-sudo/NexaTerm/blob/main/LICENSE" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-shield-check"/></svg><span data-i18n="footer_license">สัญญาอนุญาต MIT</span></a></li>
+        <li><a href="https://github.com/sponsors/bom-sudo" target="_blank" rel="noopener"><svg class="ico ico-sm" aria-hidden="true"><use href="#ico-heart"/></svg><span data-i18n="footer_sponsor">สนับสนุนผู้พัฒนา (Donate)</span></a></li>
       </ul>
     </div>
     <div class="wrap footer-bottom">
@@ -714,54 +785,6 @@
     function closeLb() { lb.hidden = true; document.body.style.overflow = ''; }
     lb.addEventListener('click', (e) => { if (e.target === lb || e.target.classList.contains('lightbox-close')) closeLb(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !lb.hidden) closeLb(); });
-
-    // Download section: pick the visitor's OS, and show the real version / file sizes of the
-    // latest GitHub release. Links work without this script (they point at releases/latest/download).
-    (function () {
-      const tabs = { windows: document.getElementById('tab-windows'), linux: document.getElementById('tab-linux') };
-      const panels = { windows: document.getElementById('panel-windows'), linux: document.getElementById('panel-linux') };
-      function showOs(os) {
-        Object.keys(tabs).forEach((k) => {
-          tabs[k].setAttribute('aria-selected', k === os ? 'true' : 'false');
-          panels[k].hidden = k !== os;
-        });
-      }
-      Object.keys(tabs).forEach((k) => tabs[k].addEventListener('click', () => showOs(k)));
-      const ua = navigator.userAgent || '';
-      const isLinux = /Linux|X11/.test(ua) && !/Android|CrOS/.test(ua);
-      if (isLinux) {
-        showOs('linux');
-        const heroLabel = document.querySelector('#hero-download [data-i18n]');
-        // i18n.js applies the text on DOMContentLoaded, which runs after this script.
-        if (heroLabel) heroLabel.setAttribute('data-i18n', 'hero_cta_download_linux');
-      }
-
-      function fmtSize(bytes) {
-        return bytes >= 1048576 ? (bytes / 1048576).toFixed(bytes >= 104857600 ? 0 : 1) + ' MB' : Math.round(bytes / 1024) + ' KB';
-      }
-      fetch('https://api.github.com/repos/bom-sudo/NexaTerm/releases/latest', { headers: { Accept: 'application/vnd.github+json' } })
-        .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-        .then((rel) => {
-          const assets = {};
-          (rel.assets || []).forEach((a) => (assets[a.name] = a));
-          const v = (rel.tag_name || '').replace(/^v/, '');
-          if (v) document.querySelectorAll('.js-version').forEach((el) => (el.textContent = v));
-          if (rel.published_at) {
-            const lang = document.documentElement.lang === 'en' ? 'en-GB' : 'th-TH';
-            const d = new Date(rel.published_at).toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric' });
-            document.querySelectorAll('.js-date').forEach((el) => (el.textContent = '· ' + d));
-          }
-          document.querySelectorAll('.js-size').forEach((el) => {
-            const a = assets[el.dataset.for];
-            if (a) el.textContent = fmtSize(a.size);
-          });
-          // A file missing from the latest release: send people to the release page instead of a 404.
-          document.querySelectorAll('[data-asset]').forEach((link) => {
-            if (!assets[link.dataset.asset]) link.href = rel.html_url || 'https://github.com/bom-sudo/NexaTerm/releases';
-          });
-        })
-        .catch(() => { /* offline or rate-limited: the static links still work */ });
-    })();
 
     // Copy buttons
     document.querySelectorAll('.copy').forEach((b) => {

@@ -391,3 +391,23 @@ td code { white-space: nowrap; }
   .dl-main-action { align-items: stretch; }
   .dl-alt, .dl-linux, .trust { grid-template-columns: 1fr; }
 }
+
+/* ---- First steps (#guide): plain numbered list + one real screenshot ---- */
+.quickstart { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 48px; align-items: start; }
+.qs-steps { list-style: none; counter-reset: qs; margin: 0; padding: 0; }
+.qs-steps li { counter-increment: qs; position: relative; padding: 0 0 26px 48px; }
+.qs-steps li::before {
+  content: counter(qs); position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%;
+  border: 1px solid var(--line-strong); color: var(--accent); font: 600 15px/28px var(--mono); text-align: center;
+}
+.qs-steps li:not(:last-child)::after { content: ""; position: absolute; left: 15px; top: 36px; bottom: 6px; width: 1px; background: var(--line); }
+.qs-steps h3 { font-size: 18px; margin-bottom: 4px; }
+.qs-steps p { color: var(--text-dim); font-size: 15px; line-height: 1.8; }
+.qs-shot { margin: 0; position: sticky; top: 90px; }
+.qs-shot img { width: 100%; height: auto; display: block; }
+.qs-shot figcaption { font-size: 13.5px; color: var(--text-faint); margin-top: 10px; }
+#guide .more { margin-top: 8px; text-align: center; color: var(--text-dim); }
+@media (max-width: 900px) {
+  .quickstart { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .qs-shot { position: static; }
+}
