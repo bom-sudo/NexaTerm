@@ -41,14 +41,14 @@
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "NexaTerm",
-    "operatingSystem": "Windows 10 (1809+), Windows 11 (x64)",
+    "operatingSystem": "Windows 10 (1809+), Windows 11 (x64), Linux (x64 preview)",
     "applicationCategory": "DeveloperApplication",
     "softwareVersion": "1.0.0",
-    "inLanguage": "th",
+    "inLanguage": ["th", "en"],
     "license": "https://opensource.org/licenses/MIT",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "THB" },
-    "downloadUrl": "https://github.com/bom-sudo/NexaTerm/releases/latest",
-    "description": "โปรแกรมเทอร์มินัล SSH, SFTP, SSH tunnel และเครื่องมือเครือข่ายสำหรับ Windows ฟรีและโอเพนซอร์ส",
+    "downloadUrl": "https://nexaterm.pages.dev/downloads/NexaTerm-Setup-x64-web.exe",
+    "description": "โปรแกรมเทอร์มินัล SSH, Telnet, Serial, SFTP, SSH tunnel, X11 forwarding และเครื่องมือเครือข่ายสำหรับ Windows และ Linux ฟรีและโอเพนซอร์ส",
     "screenshot": "https://nexaterm.pages.dev/images/workspace.png"
   }
   </script>
@@ -96,7 +96,7 @@
     <section class="hero">
       <div class="wrap">
         <p class="eyebrow" data-i18n-html="hero_eyebrow">NexaTerm 1.0.0 <span>·</span> ฟรีและโอเพนซอร์ส (MIT)
-          <span>·</span> Windows 10 และ 11</p>
+          <span>·</span> Windows 10/11 &amp; Linux x64 (Preview)</p>
         <h1 data-i18n-html="hero_title">หนึ่งพื้นที่ทำงาน<br><span class="grad">ครบทุกการเชื่อมต่อระยะไกล</span></h1>
         <p class="lead" data-i18n="hero_lead">
           เทอร์มินัล, SSH, SFTP, SSH tunnel และเครื่องมือตรวจสอบเครือข่ายสำหรับผู้ดูแลระบบ รวมอยู่ในโปรแกรมเดียวบน
@@ -272,15 +272,13 @@
               ทุกอย่างทำงานเมื่อคุณกดเท่านั้น และยกเลิกกลางคันได้</p>
           </article>
           <article class="card card-list">
-            <h3 data-i18n="card_other_title">รายละเอียดอื่นๆ</h3>
+            <h3 data-i18n="card_other_title">ความสามารถเพิ่มเติมและรุ่นล่าสุด</h3>
             <ul class="ticks">
-              <li data-i18n="card_other_t1">ล็อกอินด้วยรหัสผ่าน, private key, SSH agent ของ Windows หรือ
-                keyboard-interactive</li>
-              <li data-i18n="card_other_t2">เชื่อมต่อผ่านเครื่องกลาง (ProxyJump)</li>
-              <li data-i18n-html="card_other_t3">จัด session เป็นโฟลเดอร์ ใส่แท็ก ค้นหา และนำเข้าจาก
-                <code>~/.ssh/config</code></li>
-              <li data-i18n="card_other_t4">สำรองและกู้คืนข้อมูลได้จากหน้าตั้งค่า</li>
-              <li data-i18n="card_other_t5">ธีมมืดและธีมสว่าง</li>
+              <li data-i18n="card_other_t1">รองรับ Telnet, Serial (COM / /dev/ttyUSB*), X11 forwarding และ 2FA multi-prompt</li>
+              <li data-i18n="card_other_t2">ProxyJump, SSH agent forwarding, zlib compression และคีย์ PuTTY (.ppk)</li>
+              <li data-i18n-html="card_other_t3">SFTP ส่งทั้งโฟลเดอร์, แก้ <code>chmod</code>/<code>chown</code>, แถบ SFTP ข้าง terminal และ Macros</li>
+              <li data-i18n-html="card_other_t4">นำเข้า session จาก <code>~/.ssh/config</code>, MobaXterm (<code>.mxtsessions</code>) และ PuTTY</li>
+              <li data-i18n="card_other_t5">Output highlighting, ยืนยันก่อนวางหลายบรรทัด, ธีมมืด/สว่าง และรองรับ Linux x64</li>
             </ul>
           </article>
         </div>
@@ -440,60 +438,85 @@
     <section class="section" id="download">
       <div class="wrap">
         <header class="section-head">
-          <p class="kicker" data-i18n="dl_kicker">รุ่นล่าสุด</p>
-          <h2 data-i18n="dl_heading">ดาวน์โหลด NexaTerm 1.0.0</h2>
-          <p data-i18n="dl_sub">สำหรับ Windows 10 (1809 ขึ้นไป) และ Windows 11 แบบ 64 บิต ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ
+          <p class="kicker" data-i18n="dl_kicker">ดาวน์โหลดและรุ่นล่าสุด</p>
+          <h2 data-i18n="dl_heading">ดาวน์โหลด NexaTerm 1.0.0 &amp; รุ่นพรีวิว</h2>
+          <p data-i18n="dl_sub">สำหรับ Windows 10 (1809 ขึ้นไป) / Windows 11 x64 และ Linux x64 (Preview) ฟรี ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ
           </p>
         </header>
+
+        <!-- Windows v1.0.0 -->
         <div class="downloads">
           <article class="dl featured">
-            <p class="dl-tag" data-i18n="dl_badge_rec">แนะนำ</p>
-            <h3 data-i18n="dl_offline_title">ตัวติดตั้งแบบออฟไลน์</h3>
-            <p class="dl-file">NexaTerm-Setup-x64.exe <span>287 MB</span></p>
-            <p data-i18n="dl_offline_desc">มีตัวติดตั้ง WebView2 Runtime อยู่ในไฟล์ ติดตั้งได้โดยไม่ต้องต่ออินเทอร์เน็ต
-              ระหว่างติดตั้งต้องมีพื้นที่ว่างในไดรฟ์ C: ประมาณ 300 MB</p>
+            <p class="dl-tag" data-i18n="dl_badge_rec">แนะนำ · โหลดทันที</p>
+            <h3 data-i18n="dl_web_title">ตัวติดตั้งแบบออนไลน์ (Web)</h3>
+            <p class="dl-file">NexaTerm-Setup-x64-web.exe <span>3.0 MB</span></p>
+            <p data-i18n="dl_web_desc">ดาวน์โหลดเร็วและติดตั้งแบบรายผู้ใช้ (ไม่ต้องใช้สิทธิ์แอดมิน) ใช้ WebView2 ที่มีอยู่แล้วใน Windows 11 / 10 หรือโหลดเพิ่มเฉพาะเครื่องที่ยังไม่มี</p>
             <a class="btn btn-primary"
-              href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Setup-x64.exe"
-              data-i18n="dl_offline_btn">ดาวน์โหลดตัวติดตั้ง</a>
-          </article>
-          <article class="dl">
-            <p class="dl-tag muted" data-i18n="dl_badge_small">ไฟล์เล็ก</p>
-            <h3 data-i18n="dl_web_title">ตัวติดตั้งแบบออนไลน์</h3>
-            <p class="dl-file">NexaTerm-Setup-x64-web.exe <span>3 MB</span></p>
-            <p data-i18n="dl_web_desc">ตัวติดตั้งเดียวกัน แต่จะดาวน์โหลด WebView2 จาก Microsoft
-              เฉพาะเมื่อเครื่องยังไม่มี Windows 11 และ Windows 10 ที่อัปเดตแล้วมีอยู่แล้ว</p>
-            <a class="btn btn-ghost"
               href="downloads/NexaTerm-Setup-x64-web.exe" download
-              data-i18n="dl_web_btn">ดาวน์โหลด</a>
+              data-i18n="dl_web_btn">ดาวน์โหลดตัวติดตั้ง (3 MB)</a>
           </article>
           <article class="dl">
-            <p class="dl-tag muted" data-i18n="dl_badge_port">ไม่ต้องติดตั้ง</p>
-            <h3 data-i18n="dl_port_title">รุ่นพกพา</h3>
+            <p class="dl-tag muted" data-i18n="dl_badge_port">ไม่ต้องติดตั้ง · โหลดทันที</p>
+            <h3 data-i18n="dl_port_title">รุ่นพกพา (Portable)</h3>
             <p class="dl-file">NexaTerm-Portable-x64.zip <span>3.6 MB</span></p>
-            <p data-i18n="dl_port_desc">แตกไฟล์ไว้ที่ไหนก็ได้ รวมถึงแฟลชไดรฟ์ ข้อมูลทั้งหมดอยู่ในโฟลเดอร์
-              <code>portable-data\</code> ข้างโปรแกรม ต้องมี WebView2 ในเครื่องอยู่แล้ว</p>
+            <p data-i18n-html="dl_port_desc">แตกไฟล์ไว้ที่ไหนก็ได้ รวมถึงแฟลชไดรฟ์ แล้วเปิด <code>NexaTerm.exe</code> ได้เลย ข้อมูลทั้งหมดอยู่ในโฟลเดอร์ <code>portable-data\</code> ข้างโปรแกรม</p>
             <a class="btn btn-ghost"
               href="downloads/NexaTerm-Portable-x64.zip" download
-              data-i18n="dl_port_btn">ดาวน์โหลด</a>
+              data-i18n="dl_port_btn">ดาวน์โหลด ZIP (3.6 MB)</a>
+          </article>
+          <article class="dl">
+            <p class="dl-tag muted" data-i18n="dl_badge_offline">รวม WebView2 · GitHub</p>
+            <h3 data-i18n="dl_offline_title">ตัวติดตั้งแบบออฟไลน์</h3>
+            <p class="dl-file">NexaTerm-Setup-x64.exe <span>287 MB</span></p>
+            <p data-i18n="dl_offline_desc">รวมตัวติดตั้ง WebView2 Runtime ไว้สำหรับเครื่องออฟไลน์ (ใช้พื้นที่ใน %TEMP% ~300 MB) เนื่องจากเกินโควตา 25 MB ของ Cloudflare Pages จึงเผยแพร่ผ่าน GitHub Releases</p>
+            <a class="btn btn-ghost"
+              href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener"
+              data-i18n="dl_offline_btn">ดูบน GitHub Releases</a>
+          </article>
+        </div>
+
+        <!-- Linux & CI Preview (Unreleased features) -->
+        <div class="downloads-extra">
+          <article class="dl">
+            <p class="dl-tag muted" data-i18n="dl_badge_linux">Linux x64 · Preview</p>
+            <h3 data-i18n="dl_linux_title">แพ็กเกจสำหรับ Linux</h3>
+            <p class="dl-file">.deb · .rpm · .AppImage <span>x64</span></p>
+            <p data-i18n-html="dl_linux_desc">สร้างอัตโนมัติใน GitHub Actions รองรับ Debian/Ubuntu (<code>.deb</code>), Fedora/openSUSE (<code>.rpm</code>) และ <code>.AppImage</code> พร้อม Secret Service keyring, <code>SSH_AUTH_SOCK</code>, Serial และ X11 ผ่าน <code>$DISPLAY</code></p>
+            <a class="btn btn-ghost"
+              href="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml" target="_blank" rel="noopener"
+              data-i18n="dl_linux_btn">ดาวน์โหลดจาก GitHub Actions (CI)</a>
+          </article>
+          <article class="dl">
+            <p class="dl-tag muted" data-i18n="dl_badge_dev">พรีวิวล่าสุด · main</p>
+            <h3 data-i18n="dl_dev_title">รุ่นพัฒนาล่าสุด (Unreleased Features)</h3>
+            <p class="dl-file">Windows &amp; Linux CI Artifacts <span>Auto-built</span></p>
+            <p data-i18n="dl_dev_desc">รวมความสามารถใหม่ที่เพิ่งเขียนเพิ่มหลัง v1.0.0: Telnet, Serial (COM), X11 forwarding, SFTP Side Panel + ส่งทั้งโฟลเดอร์ + chmod, 2FA, Agent forwarding, .ppk, นำเข้า MobaXterm/PuTTY, Output Highlighting และ Macros</p>
+            <a class="btn btn-ghost"
+              href="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml" target="_blank" rel="noopener"
+              data-i18n="dl_dev_btn">ดู Artifacts ล่าสุดบน GitHub CI</a>
           </article>
         </div>
 
         <div class="verify">
           <div>
-            <h3 data-i18n="verify_title">ตรวจสอบไฟล์ก่อนติดตั้ง</h3>
-            <p data-i18n-html="verify_desc">ไฟล์ในรุ่นนี้ยังไม่ได้ลงลายเซ็นดิจิทัล Windows SmartScreen
-              อาจขึ้นคำเตือนตอนเปิดครั้งแรก ให้เทียบค่า SHA-256 กับไฟล์ <code>SHA256SUMS.txt</code> ในหน้า Release ก่อน
-              แล้วจึงกด "More info" และ "Run anyway"</p>
+            <h3 data-i18n="verify_title">ตรวจสอบไฟล์และสถานะลายเซ็น (Code Signing)</h3>
+            <p data-i18n-html="verify_desc">ไฟล์ v1.0.0 ชุดแรกยังไม่ได้ลงลายเซ็นดิจิทัล (Windows SmartScreen อาจแจ้งเตือน) ส่วนระบบ CI/Release ได้เตรียมการเซ็นอัตโนมัติผ่าน <strong>SignPath Foundation</strong> และ <code>scripts/sign-file.ps1</code> ไว้แล้ว โปรดตรวจค่า SHA-256 กับ <a href="downloads/SHA256SUMS.txt" target="_blank" rel="noopener">SHA256SUMS.txt</a> ก่อนติดตั้ง</p>
           </div>
           <div class="cmd">
-            <code id="cmd-hash">Get-FileHash .\NexaTerm-Setup-x64.exe -Algorithm SHA256</code>
+            <code id="cmd-hash">Get-FileHash .\NexaTerm-Setup-x64-web.exe -Algorithm SHA256</code>
             <button class="copy" type="button" data-copy="cmd-hash" aria-label="คัดลอกคำสั่ง"
               data-i18n="copy_btn">คัดลอก</button>
           </div>
         </div>
-        <p class="more" data-i18n-html="dl_more">ไฟล์ทุกรุ่นและบันทึกการเปลี่ยนแปลงอยู่ที่ <a
-            href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener">หน้า Releases บน
-            GitHub</a></p>
+
+        <div class="dl-docs" data-i18n-html="dl_docs_links">
+          <a href="downloads/SHA256SUMS.txt" target="_blank" rel="noopener">SHA256SUMS.txt</a>
+          <a href="downloads/RELEASE_NOTES.md" target="_blank" rel="noopener">Release Notes (v1.0.0)</a>
+          <a href="downloads/INSTALLATION_GUIDE.md" target="_blank" rel="noopener">คู่มือการติดตั้ง</a>
+          <a href="downloads/PORTABLE_GUIDE.md" target="_blank" rel="noopener">คู่มือรุ่นพกพา</a>
+          <a href="https://github.com/bom-sudo/NexaTerm/blob/main/docs/CODE_SIGNING.md" target="_blank" rel="noopener">นโยบาย Code Signing (SignPath)</a>
+          <a href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener">GitHub Releases</a>
+        </div>
       </div>
     </section>
 
@@ -533,10 +556,8 @@
               แต่โปรแกรมจะถามรหัสผ่านใหม่บนเครื่องใหม่</p>
           </details>
           <details>
-            <summary data-i18n="faq_q6">รองรับ RDP, VNC, X11, Telnet หรือ Serial ไหม</summary>
-            <p data-i18n-html="faq_a6">ยังไม่รองรับในรุ่น 1.0.0 และโปรแกรมจะไม่แสดงตัวเลือกเหล่านี้จนกว่าจะใช้งานได้จริง
-              แผนงานอยู่ใน <a href="https://github.com/bom-sudo/NexaTerm/blob/main/DEVELOPMENT_STATUS.md"
-                target="_blank" rel="noopener">DEVELOPMENT_STATUS.md</a></p>
+            <summary data-i18n="faq_q6">รองรับ Telnet, Serial, X11, RDP หรือ VNC ไหม</summary>
+            <p data-i18n-html="faq_a6">ในโค้ดล่าสุด (<code>main</code> / CI builds) รองรับ <strong>Telnet, Serial (COM / /dev/ttyUSB*), X11 forwarding</strong> (ไปยัง VcXsrv/Xming/X410 หรือ <code>$DISPLAY</code> บน Linux), 2FA, SSH agent forwarding, คีย์ <code>.ppk</code>, SFTP ส่งทั้งโฟลเดอร์ + side panel, นำเข้า MobaXterm/PuTTY และ Macros แล้ว ส่วนที่ยังไม่รองรับคือ RDP, VNC, embedded X server ในตัว, Master Password และ Remote Monitoring ดูรายละเอียดใน <a href="https://github.com/bom-sudo/NexaTerm/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG.md</a></p>
           </details>
           <details>
             <summary data-i18n="faq_q7">เกี่ยวข้องกับโปรแกรมเชิงพาณิชย์ตัวอื่นไหม</summary>
@@ -575,15 +596,18 @@
             <p data-i18n="tech_t4_desc">ข้อมูลทั้งหมดอยู่ในไฟล์ SQLite ไฟล์เดียว มีระบบ migration สำหรับอัปเกรดรุ่น</p>
           </div>
         </div>
-        <div class="cmd cmd-wide">
-          <code
-            id="cmd-build">git clone https://github.com/bom-sudo/NexaTerm.git &amp;&amp; cd NexaTerm &amp;&amp; npm ci &amp;&amp; npm run tauri dev</code>
-          <button class="copy" type="button" data-copy="cmd-build" aria-label="คัดลอกคำสั่ง"
-            data-i18n="copy_btn">คัดลอก</button>
+        <div class="sponsor-box">
+          <div>
+            <h3 data-i18n="sponsor_title">สนับสนุนการพัฒนา NexaTerm</h3>
+            <p data-i18n="sponsor_desc">NexaTerm เป็นโปรแกรมฟรีและโอเพนซอร์ส 100% หากโปรแกรมนี้ช่วยงานประจำวันของคุณได้ สามารถร่วมสนับสนุนค่ายาหอมและค่าพัฒนาต่อได้ผ่าน GitHub Sponsors</p>
+          </div>
+          <a class="btn btn-primary" href="https://github.com/sponsors/bom-sudo" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <span data-i18n="sponsor_btn">สนับสนุนผ่าน GitHub Sponsors</span>
+          </a>
         </div>
-        <p class="more" data-i18n-html="tech_more">ต้องใช้ Node.js 22 ขึ้นไป, Rust และ C compiler รายละเอียดอยู่ใน <a
-            href="https://github.com/bom-sudo/NexaTerm/blob/main/docs/DEVELOPER.md" target="_blank"
-            rel="noopener">docs/DEVELOPER.md</a></p>
       </div>
     </section>
   </main>
@@ -604,6 +628,8 @@
             data-i18n="footer_issues">แจ้งปัญหา</a></li>
         <li><a href="https://github.com/bom-sudo/NexaTerm/blob/main/LICENSE" target="_blank" rel="noopener"
             data-i18n="footer_license">สัญญาอนุญาต MIT</a></li>
+        <li><a href="https://github.com/sponsors/bom-sudo" target="_blank" rel="noopener"
+            data-i18n="footer_sponsor">สนับสนุนผู้พัฒนา (Donate)</a></li>
       </ul>
     </div>
     <div class="wrap footer-bottom">

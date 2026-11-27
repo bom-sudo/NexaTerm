@@ -197,6 +197,7 @@ td code { white-space: nowrap; }
 
 /* Downloads */
 .downloads { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
+.downloads-extra { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; align-items: stretch; margin-top: 20px; }
 .dl {
   display: flex; flex-direction: column; gap: 10px;
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px;
@@ -209,6 +210,7 @@ td code { white-space: nowrap; }
 .dl-file span { color: var(--text-faint); margin-left: 8px; }
 .dl p:not(.dl-tag):not(.dl-file) { font-size: 14.5px; color: var(--text-dim); flex: 1; }
 .dl .btn { margin-top: 6px; }
+.dl-docs { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 22px; margin-top: 22px; font-size: 14.5px; color: var(--text-dim); }
 
 .verify {
   display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; margin-top: 28px;
@@ -241,11 +243,19 @@ td code { white-space: nowrap; }
 .faq details[open] summary::after { transform: rotate(-135deg); margin-top: -2px; }
 .faq details p { padding: 0 0 20px; color: var(--text-dim); font-size: 15px; }
 
-/* Tech */
+/* Tech & Sponsor */
 .tech { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .tech > div { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
 .tech h3 { font-size: 17px; margin-bottom: 6px; }
 .tech p { font-size: 14.5px; color: var(--text-dim); line-height: 1.7; }
+.sponsor-box {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px;
+  margin-top: 32px; padding: 26px 28px; border-radius: var(--radius);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(71, 123, 255, 0.06) 60%, var(--panel));
+}
+.sponsor-box h3 { font-size: 19px; margin-bottom: 4px; }
+.sponsor-box p { font-size: 14.5px; color: var(--text-dim); max-width: 660px; }
 
 /* Footer */
 .footer { border-top: 1px solid var(--line); padding: 48px 0 28px; background: #080d1a; }
@@ -279,7 +289,7 @@ td code { white-space: nowrap; }
 @media (max-width: 640px) {
   body { font-size: 15.5px; }
   .hero { padding-top: 56px; }
-  .facts-grid, .tech, .cards, .steps, .downloads { grid-template-columns: 1fr; }
+  .facts-grid, .tech, .cards, .steps, .downloads, .downloads-extra { grid-template-columns: 1fr; }
   .nav-actions .btn-ghost { display: none; }
   .section { padding: 64px 0; }
   td:first-child { white-space: normal; }
