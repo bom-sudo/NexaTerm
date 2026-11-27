@@ -1,5 +1,15 @@
 // Typed wrappers around Tauri IPC. The UI never talks to the network or disk directly.
 import { Channel, invoke } from "@tauri-apps/api/core";
+
+export interface UpdateInfo {
+  current: string;
+  latest: string;
+  newer: boolean;
+  publishedAt: string | null;
+  pageUrl: string;
+  canInstall: boolean;
+  installerSize: number | null;
+}
 import type {
   AppErrorPayload,
   AppInfo,
@@ -103,6 +113,17 @@ export const api = {
   openSession: (req: { sessionId: string; cols: number; rows: number }, h: TermChannels) =>
     call<string>("terminal_open_session", { ...req, ...termChannels(h) }),
   serialPorts: () => call<PortInfo[]>("serial_ports"),
+  /** Asks GitHub for the latest release (only when the user clicks). */
+  updateCheck: () => call<UpdateInfo>("update_check"),
+  /** Downloads and SHA-256-verifies the installer; returns its path. */
+  updateDownload: (onProgress: (done: number, total: number) => void) => {
+    const ch = new Channel<[number, number]>();
+    ch.onmessage = ([d, t]) => onProgress(d, t);
+    return call<string>("update_download", { onProgress: ch });
+  },
+  /** Starts the verified installer and quits NexaTerm (it restarts after the update). */
+  updateInstall: (path: string) => call<void>("update_install", { path }),
+  openReleasePage: (url: string) => call<void>("open_release_page", { url }),
   /** CPU / memory / disk / network counters of the server behind an SSH terminal. */
   sshMonitorSample: (terminalId: string) => call<import("../features/monitor/serverStats").RemoteStats>("ssh_monitor_sample", { terminalId }),
   sshPromptAnswer: (id: string, answers: string[] | null) => call<boolean>("ssh_prompt_answer", { id, answers }),

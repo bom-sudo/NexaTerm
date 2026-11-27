@@ -202,3 +202,48 @@ pub fn snippet_save(state: S, id: Option<String>, input: SnippetInput) -> AppRes
 pub fn snippet_delete(state: S, id: String) -> AppResult<()> {
     repo::delete_snippet(&state.db.lock().unwrap(), &id)
 }
+
+// ---------------------------------------------------------------- updates (only when the user asks)
+
+#[tauri::command]
+pub async fn update_check(state: S<'_>) -> AppResult<crate::updater::UpdateInfo> {
+    let portable = state.portable;
+    tokio::task::spawn_blocking(move || crate::updater::check(portable)).await.map_err(|e| AppError::Other(e.to_string()))?
+}
+
+/// Downloads and verifies the installer; progress is streamed as (done, total) bytes.
+/// Returns the path of the verified installer.
+#[tauri::command]
+pub async fn update_download(state: S<'_>, on_progress: Channel<(u64, u64)>) -> AppResult<String> {
+    let portable = state.portable;
+    tokio::task::spawn_blocking(move || {
+        let mut last = 0u64;
+        crate::updater::download_installer(portable, |done, total| {
+            // ~1% steps are plenty for a progress bar.
+            if done == total || done.saturating_sub(last) >= (total / 100).max(64 * 1024) {
+                last = done;
+                let _ = on_progress.send((done, total));
+            }
+        })
+        .map(|p| p.display().to_string())
+    })
+    .await
+    .map_err(|e| AppError::Other(e.to_string()))?
+}
+
+/// Starts the verified installer (progress window only; NexaTerm restarts afterwards) and quits.
+#[tauri::command]
+pub fn update_install(app: tauri::AppHandle, path: String) -> AppResult<()> {
+    crate::updater::run_installer(std::path::Path::new(&path))?;
+    log::info!("starting update installer {path}; exiting");
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_millis(400));
+        app.exit(0);
+    });
+    Ok(())
+}
+
+#[tauri::command]
+pub fn open_release_page(url: String) -> AppResult<()> {
+    crate::updater::open_page(&url)
+}

@@ -12,6 +12,9 @@ NexaTerm only opens network connections that you ask for:
   network tools (ping, traceroute, DNS, TCP port test);
 * `api.ipify.org`, only when you click **Public IP** in the network tools, to show your public
   IP address;
+* `api.github.com` and `github.com`, only when you click **Check for updates** (in Settings or on
+  the version number in the status bar), to read the latest release and, if you choose to
+  install it, download the installer and its SHA-256 checksum;
 * the small Windows installer (`NexaTerm-Setup-x64-web.exe`) downloads the Microsoft WebView2
   Runtime from Microsoft if it is not already installed.
 

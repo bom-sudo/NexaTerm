@@ -7,6 +7,7 @@ import { useSessions } from "../../store/sessions";
 import { useWorkspace } from "../../store/workspace";
 import { toast } from "../../store/ui";
 import { Button, confirmDialog } from "../../components/ui";
+import { openUpdateDialog } from "../update/UpdateDialog";
 import type { AppInfo } from "../../types";
 import { secretStoreShort } from "../../utils/platform";
 
@@ -114,7 +115,10 @@ export function SettingsView() {
         {filtered.length === 0 && <div className="text-dim">No settings match “{q}”.</div>}
         {info && (
           <div className="mt-2 max-w-3xl rounded-lg border border-line p-4 text-[12px] text-dim select-text">
-            <div className="mb-1 font-semibold text-fg">About NexaTerm {info.version}</div>
+            <div className="mb-1 flex items-center gap-3">
+              <span className="font-semibold text-fg">About NexaTerm {info.version}</span>
+              <Button onClick={() => void openUpdateDialog()}>Check for updates</Button>
+            </div>
             Free and open-source (MIT). No telemetry, no accounts, no paid tiers.
             <div className="mt-2 font-mono text-[11px]">Data: {info.dataDir}{info.portable ? " (portable mode)" : ""} · schema v{info.schemaVersion} · {info.os}</div>
           </div>

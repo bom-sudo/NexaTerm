@@ -25,7 +25,7 @@ Include the version, steps to reproduce and impact.
 | Tunnels | Tunnels start only on user action. Remote-forwarded channels are accepted only for ports the user requested; all others are rejected. Port conflicts are reported. | `tunnels`, `local_and_dynamic_tunnels_lifecycle` |
 | Multi-execution | Broadcasting requires a confirmation listing every target; destructive patterns (`rm -rf`, `mkfs`, `dd of=/dev`, `shutdown`, `DROP TABLE`, …) trigger a stronger warning. Clear visual indicator while active. | `utils/commands.test.ts` |
 | Tauri surface | Minimal capability set: core + dialog + clipboard. No shell, fs, or http plugin is exposed to the webview. Strict CSP (`default-src 'self'`). | `src-tauri/capabilities/default.json`, `tauri.conf.json` |
-| Network | No telemetry, analytics, update checks or background requests. The only outbound request not initiated by a user connection is "Public IP", which runs only when clicked. | code review: grep for network calls in `network/` |
+| Network | No telemetry, analytics, automatic update checks or background requests. Requests not tied to a user connection run only when clicked: "Public IP" (api.ipify.org) and "Check for updates" (api.github.com; a downloaded installer is run only if its SHA-256 matches the release's SHA256SUMS.txt). | code review: grep for network calls in `network/` |
 | Privileges | Runs as the current user; installer is per-user (`currentUser`), portable needs no admin. Nothing is elevated. | `tauri.conf.json` |
 | Cleanup | On window close all PTYs are killed, SSH connections dropped, tunnels stopped. | `lib.rs` `on_window_event` |
 

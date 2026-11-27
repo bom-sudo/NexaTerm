@@ -5,6 +5,7 @@ import type { AppInfo } from "../types";
 import { useSettings } from "../store/settings";
 import { useServerMonitor } from "../features/monitor/useServerMonitor";
 import { ServerMonitorBar } from "../features/monitor/ServerMonitorBar";
+import { openUpdateDialog } from "../features/update/UpdateDialog";
 
 export function StatusBar() {
   const ws = useWorkspace();
@@ -52,7 +53,12 @@ export function StatusBar() {
       <div className="flex-1" />
       {item("Sessions", `${connected.length} active · ${sshCount} SSH`)}
       {!compact && item("Encoding", "UTF-8")}
-      {info && item("", `NexaTerm ${info.version}${info.portable ? " (portable)" : ""}`)}
+      {info && (
+        <button type="button" className="flex items-center border-l border-line px-2.5 text-dim hover:bg-hover hover:text-fg" title="Check for updates" onClick={() => void openUpdateDialog()}>
+          NexaTerm {info.version}
+          {info.portable ? " (portable)" : ""}
+        </button>
+      )}
     </div>
   );
 }

@@ -106,6 +106,12 @@ export async function runShowcase(scene: string) {
       useUi.getState().setSidebarView("macros");
       ws.openTerminal(ssh("web-01"));
       return;
+    case "update": {
+      const { openUpdateDialog } = await import("../features/update/UpdateDialog");
+      void openUpdateDialog();
+      await wait(4000);
+      return;
+    }
     case "monitor": {
       ws.openTerminal(ssh("web-01"));
       ws.splitActive(localShell());

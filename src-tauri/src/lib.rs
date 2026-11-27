@@ -15,6 +15,7 @@ pub mod ssh;
 pub mod state;
 pub mod terminal;
 pub mod tunnels;
+pub mod updater;
 pub mod x11;
 
 use std::sync::Arc;
@@ -161,6 +162,10 @@ pub fn run() {
             tools::key_change_passphrase,
             tools::key_forget,
             tools::x11_status,
+            tools::update_check,
+            tools::update_download,
+            tools::update_install,
+            tools::open_release_page,
             tools::x11_start,
             tools::macros_list,
             tools::macro_save,
