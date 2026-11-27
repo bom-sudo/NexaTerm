@@ -2,11 +2,13 @@
 .SYNOPSIS
   Verifies a NexaTerm release directory: files present and non-empty, PE executables, version
   metadata, ZIP integrity and layout, SHA-256 checksums. -RunSelfTest also extracts the portable
-  ZIP to a temp folder and runs `NexaTerm.exe --self-test`.
+  ZIP to a temp folder and runs `NexaTerm.exe --self-test`. -RequireSignature fails unless every
+  installer and the portable NexaTerm.exe carry a valid, timestamped Authenticode signature.
 #>
 param(
   [string]$ReleaseDir,
-  [switch]$RunSelfTest
+  [switch]$RunSelfTest,
+  [switch]$RequireSignature
 )
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -17,6 +19,16 @@ $failures = New-Object System.Collections.Generic.List[string]
 function Check([string]$name, [bool]$ok, [string]$detail = "") {
   if ($ok) { Write-Host "PASS  $name $detail" -ForegroundColor Green }
   else { Write-Host "FAIL  $name $detail" -ForegroundColor Red; $failures.Add($name) }
+}
+function CheckSignature([string]$label, [string]$path) {
+  $sig = Get-AuthenticodeSignature $path
+  $who = if ($sig.SignerCertificate) { $sig.SignerCertificate.Subject } else { "" }
+  if ($RequireSignature) {
+    Check "signature: $label" ($sig.Status -eq "Valid") "($($sig.Status) $who)"
+    Check "timestamp: $label" ($null -ne $sig.TimeStamperCertificate) "(signature stays valid after the certificate expires)"
+  } else {
+    Write-Host "INFO  signature ${label}: $($sig.Status) $who"
+  }
 }
 function IsPE([string]$path) {
   $b = [IO.File]::ReadAllBytes($path)[0..1]
@@ -33,8 +45,7 @@ foreach ($exe in Get-ChildItem $ReleaseDir -Filter "*.exe") {
   Check "PE executable: $($exe.Name)" (IsPE $exe.FullName)
   $vi = $exe.VersionInfo
   Check "installer version: $($exe.Name)" ($vi.ProductVersion -like "$version*") "(ProductVersion=$($vi.ProductVersion))"
-  $sig = Get-AuthenticodeSignature $exe.FullName
-  Write-Host "INFO  signature $($exe.Name): $($sig.Status) (unsigned release unless a certificate is configured)"
+  CheckSignature $exe.Name $exe.FullName
 }
 
 # Portable ZIP: integrity + layout + exe metadata
@@ -58,6 +69,7 @@ if (Test-Path $zipPath) {
     Check "portable exe version" ($vi.ProductVersion -like "$version*" -or $vi.FileVersion -like "$version*") "(FileVersion=$($vi.FileVersion), Product=$($vi.ProductName))"
     $leaked = $names | Where-Object { $_ -match "node_modules|\.rs$|\.tsx?$|/target/|\.db$|\.pdb$" }
     Check "zip has no source/dev/data files" (-not $leaked) ($leaked -join ", ")
+    CheckSignature "portable NexaTerm.exe" $exe
     if ($RunSelfTest) {
       $p = Start-Process -FilePath $exe -ArgumentList "--self-test" -RedirectStandardOutput "$tmp\selftest.txt" -PassThru -Wait -WindowStyle Hidden
       Get-Content "$tmp\selftest.txt" | ForEach-Object { Write-Host "      $_" }

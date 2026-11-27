@@ -9,6 +9,13 @@
 - Telnet sessions (option negotiation, window size, terminal type) and Serial (COM) sessions with speed, data bits, parity, stop bits and flow control.
 - SSH: keyboard-interactive logins with several prompts (password then one-time code), agent forwarding (ssh -A), zlib compression, X11 forwarding to a locally installed X server (VcXsrv, Xming, X410), PuTTY .ppk private keys.
 - Macros: record keystrokes from a terminal (including pauses) and replay them after a preview, with destructive-command warnings.
+- Linux x64 (preview): login-shell PTYs, desktop keyring (Secret Service) for secrets, ssh-agent via `SSH_AUTH_SOCK`, serial devices (`/dev/ttyUSB*`, `/dev/ttyACM*`, termios), X11 forwarding to `$DISPLAY` (Unix socket), ping/traceroute; deb, rpm and AppImage bundles.
+- GitHub Actions: CI builds and tests on Linux and Windows (with a real GNOME Keyring for the secret-store test); Release workflow drafts a GitHub release with Windows and Linux files.
+- Code signing: Release workflow signs the exe and both installers through SignPath Foundation when configured; `scripts/build-windows.ps1 -Sign` signs local builds with your own certificate (store thumbprint or PFX) via `scripts/sign-file.ps1`; `verify-release.ps1 -RequireSignature` enforces valid, timestamped signatures. See docs/CODE_SIGNING.md.
+
+### Changed
+- X11 forwarding now works like OpenSSH: the server only gets a random fake cookie, which is checked and replaced with the display's real cookie locally.
+- Private key paths may start with `~/`.
 
 ## 1.0.0 — 2026-11-23
 

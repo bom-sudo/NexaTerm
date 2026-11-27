@@ -47,6 +47,20 @@ pub fn installed() -> Vec<XServer> {
 }
 
 pub async fn status() -> XStatus {
+    // Linux desktops already run an X server (or XWayland) on $DISPLAY.
+    #[cfg(unix)]
+    {
+        let running = match crate::ssh::x11fwd::parse_display(None) {
+            Ok((_, crate::ssh::x11fwd::X11Target::Unix(p))) => p.exists(),
+            Ok((_, crate::ssh::x11fwd::X11Target::Tcp(h, port))) => matches!(
+                tokio::time::timeout(Duration::from_millis(400), tokio::net::TcpStream::connect((h.as_str(), port))).await,
+                Ok(Ok(_))
+            ),
+            Err(_) => false,
+        };
+        return XStatus { running, installed: vec![] };
+    }
+    #[cfg(not(unix))]
     let running = matches!(
         tokio::time::timeout(Duration::from_millis(400), tokio::net::TcpStream::connect(("127.0.0.1", 6000))).await,
         Ok(Ok(_))

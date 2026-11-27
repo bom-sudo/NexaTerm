@@ -37,6 +37,13 @@ futures = "0.3"
 dns-lookup = "2"
 if-addrs = "0.13"
 
+[target.'cfg(target_os = "linux")'.dependencies]
+# Linux secret storage (GNOME Keyring / KWallet via the freedesktop Secret Service), pure Rust.
+secret-service = { version = "6", default-features = false, features = ["rt-tokio", "crypto-rust"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.61", features = [
   "Win32_Foundation",

@@ -37,6 +37,92 @@ impl SecretStore for MemoryStore {
 #[cfg(windows)]
 pub use win::WindowsCredentialStore;
 
+#[cfg(target_os = "linux")]
+pub use linux::SecretServiceStore;
+
+/// Linux: freedesktop Secret Service (GNOME Keyring, KWallet, KeePassXC ...). Items carry the
+/// attributes {application: "NexaTerm", target: "<key>"} and are stored in the default collection.
+/// Each call runs on its own thread with a private tokio runtime, so it is safe to call from
+/// synchronous code and from inside the app's async runtime alike.
+#[cfg(target_os = "linux")]
+mod linux {
+    use super::*;
+    use secret_service::{EncryptionType, SecretService};
+    use std::collections::HashMap;
+
+    pub struct SecretServiceStore;
+
+    fn run<T: Send + 'static>(f: impl FnOnce(&tokio::runtime::Runtime) -> AppResult<T> + Send + 'static) -> AppResult<T> {
+        std::thread::spawn(move || {
+            let rt = tokio::runtime::Builder::new_current_thread().enable_all().build().map_err(|e| AppError::Credential(e.to_string()))?;
+            f(&rt)
+        })
+        .join()
+        .map_err(|_| AppError::Credential("secret service thread panicked".into()))?
+    }
+
+    fn err(e: impl std::fmt::Display) -> AppError {
+        AppError::Credential(format!(
+            "Secret Service unavailable ({e}). Install and unlock a keyring such as GNOME Keyring or KWallet to save passwords."
+        ))
+    }
+
+    fn attrs(key: &str) -> HashMap<&str, &str> {
+        HashMap::from([("application", "NexaTerm"), ("target", key)])
+    }
+
+    impl SecretStore for SecretServiceStore {
+        fn set(&self, key: &str, secret: &str) -> AppResult<()> {
+            let (key, secret) = (key.to_string(), secret.to_string());
+            run(move |rt| {
+                rt.block_on(async {
+                    let ss = SecretService::connect(EncryptionType::Dh).await.map_err(err)?;
+                    let col = ss.get_default_collection().await.map_err(err)?;
+                    if col.is_locked().await.map_err(err)? {
+                        col.unlock().await.map_err(err)?;
+                    }
+                    col.create_item(&format!("NexaTerm: {key}"), attrs(&key), secret.as_bytes(), true, "text/plain").await.map_err(err)?;
+                    Ok(())
+                })
+            })
+        }
+
+        fn get(&self, key: &str) -> AppResult<Option<String>> {
+            let key = key.to_string();
+            run(move |rt| {
+                rt.block_on(async {
+                    let ss = SecretService::connect(EncryptionType::Dh).await.map_err(err)?;
+                    let found = ss.search_items(attrs(&key)).await.map_err(err)?;
+                    let item = match (found.unlocked.into_iter().next(), found.locked.into_iter().next()) {
+                        (Some(i), _) => i,
+                        (None, Some(i)) => {
+                            i.unlock().await.map_err(err)?;
+                            i
+                        }
+                        (None, None) => return Ok(None),
+                    };
+                    let bytes = item.get_secret().await.map_err(err)?;
+                    Ok(Some(String::from_utf8_lossy(&bytes).into_owned()))
+                })
+            })
+        }
+
+        fn delete(&self, key: &str) -> AppResult<()> {
+            let key = key.to_string();
+            run(move |rt| {
+                rt.block_on(async {
+                    let ss = SecretService::connect(EncryptionType::Dh).await.map_err(err)?;
+                    let found = ss.search_items(attrs(&key)).await.map_err(err)?;
+                    for item in found.unlocked.iter().chain(found.locked.iter()) {
+                        item.delete().await.map_err(err)?;
+                    }
+                    Ok(())
+                })
+            })
+        }
+    }
+}
+
 #[cfg(windows)]
 mod win {
     use super::*;
@@ -134,6 +220,19 @@ mod tests {
     #[test]
     fn memory_store() {
         exercise(&MemoryStore::default(), "k");
+    }
+
+    /// Runs in CI under dbus-run-session with an unlocked gnome-keyring
+    /// (NEXATERM_TEST_SECRET_SERVICE=1); skipped elsewhere.
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn secret_service_roundtrip() {
+        if std::env::var_os("NEXATERM_TEST_SECRET_SERVICE").is_none() {
+            eprintln!("skipping: NEXATERM_TEST_SECRET_SERVICE not set");
+            return;
+        }
+        let key = format!("NexaTerm-test/{}", uuid::Uuid::new_v4());
+        exercise(&SecretServiceStore, &key);
     }
 
     #[cfg(windows)]

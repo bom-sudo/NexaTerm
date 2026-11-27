@@ -1,6 +1,7 @@
 //! SSH transport (russh). One [`SshConnection`] can carry many channels: shells, SFTP, tunnels.
 
 pub mod shell;
+pub mod x11fwd;
 
 use crate::credentials::{self, SecretStore};
 use crate::database::models::Session;
@@ -24,22 +25,10 @@ pub struct ClientHandler {
     port: u16,
     verdict: Arc<Mutex<Option<AppError>>>,
     remote_forwards: RemoteForwards,
-    /// Local X server (host, port) when X11 forwarding was requested for this session.
-    x11_target: Option<(String, u16)>,
+    /// Local X display + cookies when X11 forwarding was requested for this session.
+    x11: Option<Arc<x11fwd::X11Forward>>,
     /// Accept agent channels only when the user enabled agent forwarding.
     agent_forward: bool,
-}
-
-/// Parse an X display like "localhost:0", ":1" or "127.0.0.1:10.0" into (host, tcp port).
-pub fn x11_target(display: Option<&str>) -> AppResult<(String, u16)> {
-    let d = display.map(str::trim).filter(|d| !d.is_empty()).unwrap_or("localhost:0");
-    let (host, rest) = d.rsplit_once(':').ok_or_else(|| AppError::Validation(format!("Invalid X display '{d}' (expected host:number)")))?;
-    let num: u16 = rest.split('.').next().unwrap_or("").parse().map_err(|_| AppError::Validation(format!("Invalid X display number in '{d}'")))?;
-    if num > 99 {
-        return Err(AppError::Validation("X display number must be 0-99".into()));
-    }
-    let host = if host.is_empty() { "127.0.0.1".to_string() } else { crate::security::validate_host(host)? };
-    Ok((host, 6000 + num))
 }
 
 pub fn fingerprint(key: &PublicKey) -> String {
@@ -142,23 +131,16 @@ impl client::Handler for ClientHandler {
         _session: &mut client::Session,
     ) -> Result<(), Self::Error> {
         // X11 channels are only accepted when the user enabled X11 forwarding for this session.
-        let Some((host, port)) = self.x11_target.clone() else {
+        let Some(fwd) = self.x11.clone() else {
             reply.reject(russh::ChannelOpenFailure::AdministrativelyProhibited).await;
             return Ok(());
         };
-        match tokio::net::TcpStream::connect((host.as_str(), port)).await {
-            Ok(mut sock) => {
-                reply.accept().await;
-                tokio::spawn(async move {
-                    let mut stream = channel.into_stream();
-                    let _ = tokio::io::copy_bidirectional(&mut sock, &mut stream).await;
-                });
+        reply.accept().await;
+        tokio::spawn(async move {
+            if let Err(e) = x11fwd::proxy(&fwd, channel.into_stream()).await {
+                log::warn!("X11 forwarding to {:?}: {e}", fwd.target);
             }
-            Err(e) => {
-                log::warn!("X11 forwarding: no X server at {host}:{port}: {e}");
-                reply.reject(russh::ChannelOpenFailure::ConnectFailed).await;
-            }
-        }
+        });
         Ok(())
     }
 
@@ -189,8 +171,26 @@ impl client::Handler for ClientHandler {
                 }
             }
         }
-        #[cfg(not(windows))]
-        reply.reject(russh::ChannelOpenFailure::AdministrativelyProhibited).await;
+        #[cfg(unix)]
+        {
+            let sock = std::env::var_os("SSH_AUTH_SOCK");
+            match sock {
+                Some(path) => match tokio::net::UnixStream::connect(&path).await {
+                    Ok(mut agent) => {
+                        reply.accept().await;
+                        tokio::spawn(async move {
+                            let mut stream = channel.into_stream();
+                            let _ = tokio::io::copy_bidirectional(&mut agent, &mut stream).await;
+                        });
+                    }
+                    Err(e) => {
+                        log::warn!("agent forwarding: cannot reach SSH_AUTH_SOCK: {e}");
+                        reply.reject(russh::ChannelOpenFailure::ConnectFailed).await;
+                    }
+                },
+                None => reply.reject(russh::ChannelOpenFailure::ConnectFailed).await,
+            }
+        }
         Ok(())
     }
 }
@@ -202,6 +202,8 @@ pub struct SshConnection {
     pub port: u16,
     pub username: String,
     pub remote_forwards: RemoteForwards,
+    /// Set when X11 forwarding is enabled; shells request X11 with its fake cookie.
+    pub x11: Option<Arc<x11fwd::X11Forward>>,
     _jump: Option<Arc<SshConnection>>,
 }
 
@@ -287,6 +289,11 @@ pub fn connect<'a>(
         let username = session.username.clone().unwrap_or_default();
         let timeout = Duration::from_secs(session.options.connect_timeout_secs.unwrap_or(15).clamp(1, 300));
 
+        let x11 = if session.options.x11_forward.unwrap_or(false) {
+            Some(Arc::new(x11fwd::X11Forward::new(session.options.x11_display.as_deref())?))
+        } else {
+            None
+        };
         let verdict = Arc::new(Mutex::new(None));
         let remote_forwards: RemoteForwards = Default::default();
         let handler = ClientHandler {
@@ -295,7 +302,7 @@ pub fn connect<'a>(
             port,
             verdict: verdict.clone(),
             remote_forwards: remote_forwards.clone(),
-            x11_target: if session.options.x11_forward.unwrap_or(false) { Some(x11_target(session.options.x11_display.as_deref())?) } else { None },
+            x11: x11.clone(),
             agent_forward: session.options.agent_forward.unwrap_or(false),
         };
 
@@ -349,6 +356,7 @@ pub fn connect<'a>(
             port,
             username,
             remote_forwards,
+            x11,
             _jump: jump,
         }))
     })
@@ -392,7 +400,15 @@ async fn authenticate(ctx: &SshContext, session: &Session, secrets: &Secrets, ha
             keyboard_interactive(ctx, session, handle, user, pw.as_deref()).await?
         }
         "key" => {
-            let path = session.key_path.clone().unwrap_or_default();
+            let mut path = session.key_path.clone().unwrap_or_default();
+            // "~/.ssh/id_ed25519" style paths (common on Linux) resolve against the home directory.
+            let expanded = match (path.strip_prefix("~/").or_else(|| path.strip_prefix("~\\")), dirs::home_dir()) {
+                (Some(rest), Some(home)) => Some(home.join(rest).display().to_string()),
+                _ => None,
+            };
+            if let Some(p) = expanded {
+                path = p;
+            }
             let pass = match secrets.passphrase.clone() {
                 Some(p) => Some(p),
                 None => stored(ctx, session, "passphrase")?,
@@ -509,9 +525,21 @@ async fn kbd_answers(
 }
 
 async fn agent_auth(handle: &mut Handle<ClientHandler>, user: &str) -> AppResult<AuthResult> {
-    let mut agent = russh::keys::agent::client::AgentClient::connect_named_pipe(r"\\.\pipe\openssh-ssh-agent")
+    #[cfg(windows)]
+    let agent = russh::keys::agent::client::AgentClient::connect_named_pipe(r"\\.\pipe\openssh-ssh-agent")
         .await
         .map_err(|_| AppError::AuthFailed("OpenSSH Authentication Agent is not running (start the 'ssh-agent' Windows service and add keys with ssh-add)".into()))?;
+    #[cfg(unix)]
+    let agent = russh::keys::agent::client::AgentClient::connect_env()
+        .await
+        .map_err(|_| AppError::AuthFailed("No SSH agent found (SSH_AUTH_SOCK is not set or not reachable); start ssh-agent and add keys with ssh-add".into()))?;
+    agent_auth_with(handle, user, agent).await
+}
+
+async fn agent_auth_with<S>(handle: &mut Handle<ClientHandler>, user: &str, mut agent: russh::keys::agent::client::AgentClient<S>) -> AppResult<AuthResult>
+where
+    S: tokio::io::AsyncRead + tokio::io::AsyncWrite + Unpin + Send + 'static,
+{
     let identities = agent.request_identities().await.map_err(|e| AppError::AuthFailed(format!("agent: {e}")))?;
     if identities.is_empty() {
         return Err(AppError::AuthFailed("SSH agent has no keys loaded (use ssh-add)".into()));

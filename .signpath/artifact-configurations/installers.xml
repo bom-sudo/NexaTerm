@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SignPath artifact configuration "installers": the GitHub artifact is a zip holding the offline
+     and web NSIS installers (NexaTerm-Setup-x64.exe, NexaTerm-Setup-x64-web.exe). -->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <zip-file>
+    <pe-file path="NexaTerm-Setup-x64*.exe" max-matches="unbounded">
+      <authenticode-sign />
+    </pe-file>
+  </zip-file>
+</artifact-configuration>

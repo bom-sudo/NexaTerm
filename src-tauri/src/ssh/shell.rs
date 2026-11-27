@@ -56,10 +56,10 @@ impl SshShell {
             channel.agent_forward(false).await?;
         }
         if opts.x11 {
-            // The cookie is only used between sshd and xauth on the server; the local X server
-            // (VcXsrv/Xming/X410) normally runs with access control disabled.
-            let cookie: String = (0..16).map(|_| format!("{:02x}", rand::random::<u8>())).collect();
-            channel.request_x11(false, false, "MIT-MAGIC-COOKIE-1", cookie, 0).await?;
+            if let Some(fwd) = &conn.x11 {
+                // The server only gets a fake cookie; the X11 proxy swaps in the real one locally.
+                channel.request_x11(false, false, super::x11fwd::COOKIE_PROTO, fwd.fake_cookie_hex(), 0).await?;
+            }
         }
         channel.request_shell(true).await?;
         let (mut read, write) = channel.split();

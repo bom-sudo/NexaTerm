@@ -7,6 +7,7 @@ import { openDialog } from "../../store/ui";
 import { Button, Modal, promptDialog } from "../../components/ui";
 import type { HostKeyInfo } from "../../types";
 import { useSessions } from "../../store/sessions";
+import { secretStore } from "../../utils/platform";
 
 export interface SshSecrets {
   password?: string;
@@ -102,7 +103,7 @@ export async function withSshPrompts<T>(sessionId: string, attempt: (s: SshSecre
           title: kind === "password" ? `Password for ${label}` : "Private key passphrase",
           label: kind === "password" ? "Password" : `Passphrase for ${session?.keyPath ?? "key"}`,
           secret: true,
-          checkbox: "Save in Windows Credential Manager",
+          checkbox: `Save in ${secretStore}`,
         });
         if (!r) return null;
         secrets = { ...secrets, [kind]: r.value, saveSecret: r.checked };
@@ -117,7 +118,7 @@ export async function withSshPrompts<T>(sessionId: string, attempt: (s: SshSecre
           title: `Authentication failed — try again`,
           label: kind === "password" ? `Password for ${label}` : "Private key passphrase",
           secret: true,
-          checkbox: "Save in Windows Credential Manager",
+          checkbox: `Save in ${secretStore}`,
         });
         if (!r) return null;
         secrets = { ...secrets, [kind]: r.value, saveSecret: r.checked };

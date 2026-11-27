@@ -169,3 +169,47 @@ mod tests {
         assert!(matches!(erx.recv_timeout(Duration::from_secs(10)), Ok(TermEvent::Exit { .. })));
     }
 }
+
+#[cfg(all(test, unix))]
+mod unix_tests {
+    use super::*;
+    use std::sync::mpsc;
+    use std::time::Duration;
+
+    #[test]
+    fn sh_runs_echoes_resizes_and_exits() {
+        let (dtx, drx) = mpsc::channel::<Vec<u8>>();
+        let (etx, erx) = mpsc::channel::<TermEvent>();
+        let dtx = Mutex::new(dtx);
+        let etx = Mutex::new(etx);
+        let sink = TermSink::new(move |d| { let _ = dtx.lock().unwrap().send(d); }, move |e| { let _ = etx.lock().unwrap().send(e); });
+        let pty = LocalPty::spawn(LocalSpec { program: "/bin/sh".into(), args: vec![], cwd: None, cols: 80, rows: 24 }, sink).unwrap();
+        pty.resize(100, 30).unwrap();
+        pty.write(b"echo NEXA_$((40+2))_OK\n").unwrap();
+        let mut out = Vec::new();
+        let deadline = std::time::Instant::now() + Duration::from_secs(15);
+        while std::time::Instant::now() < deadline && !String::from_utf8_lossy(&out).contains("NEXA_42_OK") {
+            if let Ok(d) = drx.recv_timeout(Duration::from_millis(200)) {
+                out.extend(d);
+            }
+        }
+        assert!(String::from_utf8_lossy(&out).contains("NEXA_42_OK"), "output: {}", String::from_utf8_lossy(&out));
+        pty.write(b"exit 3\n").unwrap();
+        match erx.recv_timeout(Duration::from_secs(15)).unwrap() {
+            TermEvent::Exit { code, .. } => assert_eq!(code, Some(3)),
+            other => panic!("unexpected {other:?}"),
+        }
+        pty.close();
+        assert!(pty.write(b"x").is_err());
+    }
+
+    #[test]
+    fn close_kills_process() {
+        let (etx, erx) = mpsc::channel::<TermEvent>();
+        let etx = Mutex::new(etx);
+        let sink = TermSink::new(|_| {}, move |e| { let _ = etx.lock().unwrap().send(e); });
+        let pty = LocalPty::spawn(LocalSpec { program: "/bin/sh".into(), args: vec![], cwd: None, cols: 80, rows: 24 }, sink).unwrap();
+        pty.close();
+        assert!(matches!(erx.recv_timeout(Duration::from_secs(10)), Ok(TermEvent::Exit { .. })));
+    }
+}

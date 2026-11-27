@@ -25,9 +25,13 @@ fn secret_store() -> Arc<dyn credentials::SecretStore> {
     {
         Arc::new(credentials::WindowsCredentialStore)
     }
-    #[cfg(not(windows))]
+    #[cfg(target_os = "linux")]
     {
-        // Non-Windows builds are for development only: secrets are kept in memory, never on disk.
+        Arc::new(credentials::SecretServiceStore)
+    }
+    #[cfg(not(any(windows, target_os = "linux")))]
+    {
+        // Other platforms are not supported yet: secrets stay in memory only, never on disk.
         Arc::new(credentials::MemoryStore::default())
     }
 }

@@ -3,14 +3,24 @@
   Builds the NexaTerm Windows release: offline NSIS installer, optional web installer,
   portable ZIP, SHA-256 checksums and release documents in dist\release\v<version>\.
 
+  Code signing: set NEXATERM_SIGN_THUMBPRINT (certificate in the Windows store / token) or
+  NEXATERM_SIGN_PFX (+ NEXATERM_SIGN_PFX_PASSWORD) and pass -Sign. The Tauri bundler then signs the
+  app exe, the uninstaller and the installers through scripts\sign-file.ps1, and the release is
+  verified to carry valid signatures. See docs\CODE_SIGNING.md.
+
 .EXAMPLE
   powershell -ExecutionPolicy Bypass -File scripts\build-windows.ps1
   powershell -ExecutionPolicy Bypass -File scripts\build-windows.ps1 -SkipTests -NoWebInstaller
+  $env:NEXATERM_SIGN_THUMBPRINT = "<thumbprint>"; powershell -ExecutionPolicy Bypass -File scripts\build-windows.ps1 -Sign
 #>
 param(
   [switch]$SkipTests,
   [switch]$NoWebInstaller,
   [switch]$SkipNpmInstall,
+  # Sign every executable with the certificate named by NEXATERM_SIGN_THUMBPRINT / NEXATERM_SIGN_PFX.
+  [switch]$Sign,
+  # Package an already-built (e.g. externally signed) target\release\nexaterm.exe with `tauri bundle`.
+  [switch]$BundleOnly,
   # Parallel rustc jobs. 1 keeps peak memory low enough for 8 GB machines with a small page file.
   [int]$Jobs = 1
 )
@@ -21,7 +31,8 @@ $sw = [Diagnostics.Stopwatch]::StartNew()
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $root = $root.Substring(0, 1).ToUpper() + $root.Substring(1)
 Set-Location $root
-if (Test-Path "$PSScriptRoot\devenv.ps1") { . "$PSScriptRoot\devenv.ps1" }
+# CI runners bring their own toolchain; devenv.ps1 is for the portable local toolchain layout.
+if (-not $env:CI -and (Test-Path "$PSScriptRoot\devenv.ps1")) { . "$PSScriptRoot\devenv.ps1" }
 
 function Step([string]$name, [scriptblock]$action) {
   Write-Host ""
@@ -44,6 +55,20 @@ if ($version -ne $tauriVersion -or $version -ne $cargoVersion) {
 $out = "$root\dist\release\v$version"
 $env:CARGO_BUILD_JOBS = "$Jobs"
 
+# Extra Tauri config: signCommand that hands every binary to sign-file.ps1.
+$signArgs = @()
+if ($Sign) {
+  if (-not $env:NEXATERM_SIGN_THUMBPRINT -and -not $env:NEXATERM_SIGN_PFX) {
+    throw "-Sign needs NEXATERM_SIGN_THUMBPRINT or NEXATERM_SIGN_PFX (see docs\CODE_SIGNING.md)"
+  }
+  New-Item -ItemType Directory -Force "$root\build" | Out-Null
+  $signConf = @{ bundle = @{ windows = @{ signCommand = @{ cmd = "powershell"; args = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "$root\scripts\sign-file.ps1", "%1") } } } }
+  $signConf | ConvertTo-Json -Depth 6 | Set-Content -Encoding ascii "$root\build\sign.conf.json"
+  $signArgs = @("--config", "build\sign.conf.json")
+}
+$tauriCmd = if ($BundleOnly) { "bundle" } else { "build" }
+if ($BundleOnly -and -not (Test-Path "$root\src-tauri\target\release\nexaterm.exe")) { throw "-BundleOnly: src-tauri\target\release\nexaterm.exe does not exist" }
+
 Step "Check prerequisites" {
   $node = Need "node" "Install Node.js LTS from https://nodejs.org"
   Need "npm.cmd" "Comes with Node.js" | Out-Null
@@ -53,12 +78,17 @@ Step "Check prerequisites" {
     Need "gcc" "Install MinGW-w64 GCC (WinLibs), see docs/DEVELOPER.md" | Out-Null
     Need "windres" "windres ships with MinGW-w64 binutils" | Out-Null
   } else {
-    Need "cl" "Install Visual Studio Build Tools (Desktop development with C++)" | Out-Null
+    # rustc locates MSVC through vswhere; cl.exe is only on PATH inside a Developer prompt.
+    if (-not (Get-Command cl -ErrorAction SilentlyContinue) -and -not (Test-Path "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe")) {
+      throw "Missing Visual Studio Build Tools (Desktop development with C++)"
+    }
   }
   Write-Host "node $(node -v) | npm $(npm.cmd -v) | $(rustc -V) | host $host_triple"
   $wv = Get-ItemProperty "HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}" -ErrorAction SilentlyContinue
   Write-Host ("WebView2 runtime on build machine: " + $(if ($wv) { $wv.pv } else { "not found (only needed to run the app)" }))
   Write-Host "NSIS: downloaded and verified automatically by the Tauri CLI on first build."
+  if ($Sign) { Write-Host "Code signing: enabled ($(if ($env:NEXATERM_SIGN_THUMBPRINT) { 'certificate store' } else { 'PFX file' }))" }
+  else { Write-Host "Code signing: off (installers will be unsigned; see docs\CODE_SIGNING.md)" }
   $global:LASTEXITCODE = 0
 }
 
@@ -69,7 +99,7 @@ if (-not $SkipTests) {
   Step "Rust tests (unit + SSH/SFTP integration)" { cargo test --manifest-path src-tauri\Cargo.toml }
 }
 
-Step "Build NSIS installer (offline WebView2 runtime embedded)" { npx.cmd tauri build --bundles nsis }
+Step "Build NSIS installer (offline WebView2 runtime embedded)" { npx.cmd tauri $tauriCmd --bundles nsis @signArgs }
 $bundle = "$root\src-tauri\target\release\bundle\nsis\NexaTerm_${version}_x64-setup.exe"
 if (-not (Test-Path $bundle)) { throw "Installer not produced: $bundle" }
 
@@ -79,7 +109,7 @@ Copy-Item $bundle "$out\NexaTerm-Setup-x64.exe"
 
 if (-not $NoWebInstaller) {
   Step "Build small web installer (downloads WebView2 only if missing)" {
-    npx.cmd tauri build --bundles nsis --config src-tauri\tauri.web-installer.conf.json
+    npx.cmd tauri $tauriCmd --bundles nsis --config src-tauri\tauri.web-installer.conf.json @signArgs
   }
   Copy-Item $bundle "$out\NexaTerm-Setup-x64-web.exe"
 }
@@ -90,6 +120,9 @@ Step "Assemble portable package" {
   if (Test-Path "$root\build\portable") { Remove-Item -Recurse -Force "$root\build\portable" }
   New-Item -ItemType Directory -Force "$stage\portable-data" | Out-Null
   Copy-Item "$rel\nexaterm.exe" "$stage\NexaTerm.exe"
+  if ($Sign -and (Get-AuthenticodeSignature "$stage\NexaTerm.exe").Status -ne "Valid") {
+    & powershell -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\sign-file.ps1" "$stage\NexaTerm.exe"
+  }
   # GNU builds load WebView2Loader.dll dynamically; Windows only finds it next to the exe.
   if (Test-Path "$rel\WebView2Loader.dll") { Copy-Item "$rel\WebView2Loader.dll" $stage }
   Copy-Item "$root\packaging\README-PORTABLE.txt", "$root\LICENSE", "$root\THIRD_PARTY_LICENSES.md" $stage
@@ -111,7 +144,9 @@ Step "SHA-256 checksums" {
   [IO.File]::WriteAllLines("$out\SHA256SUMS.txt", $lines)
 }
 
-Step "Verify release" { powershell -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\verify-release.ps1" -ReleaseDir $out }
+$verifyArgs = @("-ReleaseDir", $out)
+if ($Sign) { $verifyArgs += "-RequireSignature" }
+Step "Verify release" { powershell -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\verify-release.ps1" @verifyArgs }
 
 Write-Host ""
 Write-Host "Release v$version built in $([int]$sw.Elapsed.TotalMinutes) min:" -ForegroundColor Green

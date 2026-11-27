@@ -7,6 +7,7 @@ import { api, toApiError } from "../../services/api";
 import { useSessions } from "../../store/sessions";
 import { Button, Field, Modal } from "../../components/ui";
 import type { AuthMethod, Protocol, Session, SessionInput } from "../../types";
+import { defaultSerialPort, isWindows, secretStore, secretStoreShort } from "../../utils/platform";
 
 interface Props {
   session?: Session;
@@ -181,7 +182,7 @@ export function SessionDialog({ session, initial, onClose }: Props) {
                       hint={
                         session?.hasPassword && password === undefined ? (
                           <span>
-                            A password is saved in Windows Credential Manager.{" "}
+                            A password is saved in {secretStore}.{" "}
                             <button type="button" className="text-accent hover:underline" onClick={() => setPassword("")}>
                               Remove it
                             </button>
@@ -189,7 +190,7 @@ export function SessionDialog({ session, initial, onClose }: Props) {
                         ) : password === "" && session?.hasPassword ? (
                           "Saved password will be removed."
                         ) : (
-                          "Optional. Stored only in Windows Credential Manager. Leave empty to be asked on connect."
+                          `Optional. Stored only in ${secretStore}. Leave empty to be asked on connect.`
                         )
                       }
                     >
@@ -202,7 +203,7 @@ export function SessionDialog({ session, initial, onClose }: Props) {
                     <div className="col-span-2">
                       <Field label="Private key file">
                         <div className="flex gap-2">
-                          <input className="field font-mono" value={f.keyPath ?? ""} onChange={(e) => set("keyPath", e.target.value)} placeholder="C:\Users\you\.ssh\id_ed25519" />
+                          <input className="field font-mono" value={f.keyPath ?? ""} onChange={(e) => set("keyPath", e.target.value)} placeholder={isWindows ? "C:\\Users\\you\\.ssh\\id_ed25519" : "~/.ssh/id_ed25519"} />
                           <Button type="button" onClick={browseKey} title="Browse">
                             <FolderOpen size={14} />
                           </Button>
@@ -215,7 +216,7 @@ export function SessionDialog({ session, initial, onClose }: Props) {
                         hint={
                           session?.hasPassphrase && passphrase === undefined ? (
                             <span>
-                              Saved in Credential Manager.{" "}
+                              Saved in {secretStoreShort}.{" "}
                               <button type="button" className="text-accent hover:underline" onClick={() => setPassphrase("")}>
                                 Remove it
                               </button>
@@ -382,7 +383,7 @@ export function SessionDialog({ session, initial, onClose }: Props) {
   );
 }
 
-const DEFAULT_SERIAL: SerialSettings = { port: "COM1", baud: 9600, dataBits: 8, parity: "none", stopBits: "one", flow: "none" };
+const DEFAULT_SERIAL: SerialSettings = { port: defaultSerialPort, baud: 9600, dataBits: 8, parity: "none", stopBits: "one", flow: "none" };
 
 function Check({ label, hint, checked, onChange }: { label: string; hint?: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -404,7 +405,7 @@ function SerialFields({ value, onChange }: { value: SerialSettings; onChange: (v
   const set = <K extends keyof SerialSettings>(k: K, v: SerialSettings[K]) => onChange({ ...value, [k]: v });
   return (
     <div className="col-span-2 grid grid-cols-3 gap-3">
-      <Field label="Port" hint={ports.length ? `${ports.length} port(s) found` : "No COM ports detected; you can still type one"}>
+      <Field label="Port" hint={ports.length ? `${ports.length} port(s) found` : isWindows ? "No COM ports detected; you can still type one" : "No serial devices detected (check the dialout group); you can still type one"}>
         <input className="field font-mono" list="nx-com-ports" value={value.port} onChange={(e) => set("port", e.target.value.toUpperCase())} />
         <datalist id="nx-com-ports">
           {ports.map((p) => (

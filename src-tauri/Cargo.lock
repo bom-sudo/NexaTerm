@@ -118,6 +118,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-trait"
+version = "0.1.92"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "82f6aeea286b8eb4dd3431a1be1b59d290ace00f5bfd8e2a159bc2a05e2c1667"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 3.0.10",
+]
+
+[[package]]
 name = "atk"
 version = "0.18.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1194,6 +1205,12 @@ name = "embed_plist"
 version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4ef6b89e5b37196644d8796de5268852ff179b44e96276cf4290264843743bb7"
+
+[[package]]
+name = "endi"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "66b7e2430c6dff6a955451e2cfc438f09cea1965a9d6f87f7e3b90decc014099"
 
 [[package]]
 name = "enum_dispatch"
@@ -2768,12 +2785,14 @@ dependencies = [
  "embed-manifest",
  "futures",
  "if-addrs",
+ "libc",
  "log",
  "portable-pty",
  "rand",
  "rusqlite",
  "russh",
  "russh-sftp",
+ "secret-service",
  "serde",
  "serde_json",
  "tauri",
@@ -2821,6 +2840,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "num"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "35bd024e8b2ff75562e5f34e7f4905839deb4b22955ef5e73d2fea1b9813cb23"
+dependencies = [
+ "num-bigint 0.4.8",
+ "num-complex",
+ "num-integer",
+ "num-iter",
+ "num-rational",
+ "num-traits",
+]
+
+[[package]]
+name = "num-bigint"
+version = "0.4.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c89e69e7e0f03bea5ef08013795c25018e101932225a656383bd384495ecc367"
+dependencies = [
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
 name = "num-bigint"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2830,6 +2873,15 @@ dependencies = [
  "num-traits",
  "rand",
  "rand_core",
+]
+
+[[package]]
+name = "num-complex"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73f88a1307638156682bada9d7604135552957b7818057dcef22705b4d509495"
+dependencies = [
+ "num-traits",
 ]
 
 [[package]]
@@ -2844,6 +2896,27 @@ version = "0.1.47"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ce2d95d4b3734dc35aa2f45e1aa22cd416814592a4f9d9205e11affd5b8e10b"
 dependencies = [
+ "num-traits",
+]
+
+[[package]]
+name = "num-iter"
+version = "0.1.46"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c92800bd69a1eac91786bcfe9da64a897eb72911b8dc3095decbd07429e8048b"
+dependencies = [
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
+name = "num-rational"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f83d14da390562dca69fc84082e73e548e1ad308d24accdedd2720017cb37824"
+dependencies = [
+ "num-bigint 0.4.8",
+ "num-integer",
  "num-traits",
 ]
 
@@ -3087,6 +3160,16 @@ name = "option-ext"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04744f49eae99ab78e0d5c0b603ab218f515ea8cfe5a456d7629ad883a3b6e7d"
+
+[[package]]
+name = "ordered-stream"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9aa2b01e1d916879f73a53d01d1d6cee68adbb31d6d9177a8cfce093cced1d50"
+dependencies = [
+ "futures-core",
+ "pin-project-lite",
+]
 
 [[package]]
 name = "os_pipe"
@@ -3921,7 +4004,7 @@ dependencies = [
  "md5",
  "ml-kem",
  "module-lattice",
- "num-bigint",
+ "num-bigint 0.5.1",
  "p256",
  "p384",
  "p521",
@@ -4133,6 +4216,25 @@ dependencies = [
  "hybrid-array",
  "subtle",
  "zeroize",
+]
+
+[[package]]
+name = "secret-service"
+version = "6.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "02ce5a46d499a2841b922de2d0f11f190efe0013dbd3b9d0fd0fc2bf5a0c24d8"
+dependencies = [
+ "aes",
+ "cbc",
+ "futures-util",
+ "getrandom 0.4.3",
+ "hkdf",
+ "hybrid-array",
+ "num",
+ "serde",
+ "sha2 0.11.1",
+ "zbus",
+ "zruntime",
 ]
 
 [[package]]
@@ -5513,6 +5615,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20"
 
 [[package]]
+name = "uds_windows"
+version = "1.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
+dependencies = [
+ "memoffset",
+ "tempfile",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
 name = "unicode-ident"
 version = "1.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6600,6 +6713,68 @@ dependencies = [
 ]
 
 [[package]]
+name = "zbus"
+version = "6.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9a7f9f5dd97fa527c1202ba1cb35d48e07f77d4de8542317c854f7aef22b0668"
+dependencies = [
+ "async-trait",
+ "bitflags 2.13.2",
+ "endi",
+ "futures-core",
+ "hex",
+ "libc",
+ "ordered-stream",
+ "rustix",
+ "serde",
+ "serde_repr",
+ "socket2",
+ "tokio",
+ "uds_windows",
+ "uuid",
+ "windows-sys 0.61.2",
+ "winnow 1.0.5",
+ "zbus_macros",
+ "zbus_utils",
+ "zcheapstr",
+ "zruntime",
+]
+
+[[package]]
+name = "zbus_macros"
+version = "6.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f5aa7f2c4ea81b7ccfb26bafefdb4d1a44dd9d4f82c8426173a3727311743e4"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 3.0.10",
+ "zbus_utils",
+]
+
+[[package]]
+name = "zbus_utils"
+version = "6.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "af55e52da295311b368c45bcae221f020e28e97a2420360170ce389218e76ec7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "serde",
+ "syn 3.0.10",
+ "winnow 1.0.5",
+]
+
+[[package]]
+name = "zcheapstr"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2da34e7164b75d803c3197b86e6cf61b874106fbd472c5082575a8bc5fbd0907"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "zerocopy"
 version = "0.8.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6690,6 +6865,19 @@ name = "zmij"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "29666d0abbfad1e3dc4dcf6144730dd3a3ab225bbbdac83319345b1b44ccfc1b"
+
+[[package]]
+name = "zruntime"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac67096b97c00742108c4674db6bb6178adb78c4b66a506b0e4a7a9593aa5d9e"
+dependencies = [
+ "futures-core",
+ "futures-io",
+ "rustix",
+ "tracing",
+ "windows-sys 0.61.2",
+]
 
 [[package]]
 name = "zune-core"

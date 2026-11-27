@@ -1,0 +1,192 @@
+name: Release
+
+# Builds the Windows and Linux release from source on GitHub-hosted runners and drafts a GitHub
+# release for v* tags. When SignPath is configured (see docs/CODE_SIGNING.md) the Windows app exe
+# and both installers are Authenticode-signed by SignPath Foundation; otherwise they stay unsigned
+# and the run says so.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      signing-policy:
+        description: "SignPath signing policy slug (test-signing or release-signing)"
+        default: release-signing
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  CARGO_TERM_COLOR: never
+  CARGO_INCREMENTAL: 0
+
+jobs:
+  windows:
+    name: Windows release
+    runs-on: windows-2022
+    env:
+      SIGNPATH_ENABLED: ${{ secrets.SIGNPATH_API_TOKEN != '' && vars.SIGNPATH_ORGANIZATION_ID != '' }}
+      SIGNPATH_POLICY: ${{ github.event.inputs.signing-policy || 'release-signing' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Tests
+        shell: bash
+        run: |
+          set -o pipefail
+          npx tsc --noEmit && npx vitest run
+          cargo test --manifest-path src-tauri/Cargo.toml --no-fail-fast 2>&1 | tee cargo-test.log
+      - name: Report test failures as annotations
+        if: failure()
+        shell: bash
+        run: bash scripts/ci-annotate.sh cargo-test.log
+
+      - name: Build app executable
+        run: npx tauri build --no-bundle
+
+      # ---- Stage 1: sign nexaterm.exe (it goes into both installers and the portable zip) ----
+      - name: Upload unsigned exe for signing
+        if: env.SIGNPATH_ENABLED == 'true'
+        id: unsigned-exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-exe
+          path: src-tauri/target/release/nexaterm.exe
+          if-no-files-found: error
+      - name: Sign exe (SignPath)
+        if: env.SIGNPATH_ENABLED == 'true'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG || 'NexaTerm' }}
+          signing-policy-slug: ${{ env.SIGNPATH_POLICY }}
+          artifact-configuration-slug: exe
+          github-artifact-id: ${{ steps.unsigned-exe.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: build/signed-exe
+      - name: Use signed exe
+        if: env.SIGNPATH_ENABLED == 'true'
+        shell: pwsh
+        run: |
+          Copy-Item build/signed-exe/nexaterm.exe src-tauri/target/release/nexaterm.exe -Force
+          $s = Get-AuthenticodeSignature src-tauri/target/release/nexaterm.exe
+          if ($s.Status -ne "Valid") { throw "signed exe check failed: $($s.Status)" }
+          "exe signed by: $($s.SignerCertificate.Subject)"
+
+      - name: Package installers + portable zip
+        shell: pwsh
+        run: ./scripts/build-windows.ps1 -BundleOnly -SkipTests -SkipNpmInstall
+
+      # ---- Stage 2: sign the two installers ----
+      - name: Upload unsigned installers for signing
+        if: env.SIGNPATH_ENABLED == 'true'
+        id: unsigned-installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-installers
+          path: dist/release/*/NexaTerm-Setup-x64*.exe
+          if-no-files-found: error
+      - name: Sign installers (SignPath)
+        if: env.SIGNPATH_ENABLED == 'true'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG || 'NexaTerm' }}
+          signing-policy-slug: ${{ env.SIGNPATH_POLICY }}
+          artifact-configuration-slug: installers
+          github-artifact-id: ${{ steps.unsigned-installers.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: build/signed-installers
+      - name: Use signed installers and verify
+        shell: pwsh
+        run: |
+          $dir = (Get-ChildItem dist/release -Directory | Select-Object -First 1).FullName
+          if ($env:SIGNPATH_ENABLED -eq "true") {
+            Get-ChildItem build/signed-installers -Recurse -Filter *.exe | ForEach-Object { Copy-Item $_.FullName (Join-Path $dir $_.Name) -Force }
+            $lines = Get-ChildItem $dir -File | Where-Object { $_.Name -ne "SHA256SUMS.txt" } | Sort-Object Name | ForEach-Object {
+              "{0} *{1}" -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower(), $_.Name
+            }
+            [IO.File]::WriteAllLines("$dir\SHA256SUMS.txt", $lines)
+            ./scripts/verify-release.ps1 -ReleaseDir $dir -RequireSignature
+          } else {
+            Write-Output "::warning::SignPath is not configured (SIGNPATH_API_TOKEN secret / SIGNPATH_ORGANIZATION_ID variable). This release is UNSIGNED and Windows SmartScreen will warn. See docs/CODE_SIGNING.md."
+            ./scripts/verify-release.ps1 -ReleaseDir $dir
+          }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-windows
+          path: dist/release/*/*
+          if-no-files-found: error
+
+  linux:
+    name: Linux release
+    runs-on: ubuntu-22.04 # oldest supported glibc for the AppImage / deb
+    steps:
+      - uses: actions/checkout@v4
+      - name: System packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev libayatana-appindicator3-dev patchelf rpm file xdg-utils
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Build deb / rpm / AppImage
+        shell: bash
+        run: |
+          set -o pipefail
+          npx tauri build 2>&1 | tee tauri-build.log
+      - name: Report build failures as annotations
+        if: failure()
+        shell: bash
+        run: bash scripts/ci-annotate.sh tauri-build.log
+      - name: Collect
+        shell: bash
+        run: |
+          mkdir -p out
+          cp src-tauri/target/release/bundle/deb/*.deb src-tauri/target/release/bundle/rpm/*.rpm src-tauri/target/release/bundle/appimage/*.AppImage out/
+          ls -l out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-linux
+          path: out/*
+          if-no-files-found: error
+
+  publish:
+    name: Draft GitHub release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, linux]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: release-*
+      - name: Combine and checksum
+        shell: bash
+        run: |
+          mkdir -p release
+          find artifacts -type f -exec cp {} release/ \;
+          rm -f release/SHA256SUMS.txt
+          (cd release && sha256sum --binary -- * > SHA256SUMS.txt && cat SHA256SUMS.txt)
+      - uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: release/*

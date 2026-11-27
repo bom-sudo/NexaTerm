@@ -14,7 +14,8 @@
 </p>
 
 <p align="center">
-  <img alt="Platform: Windows 10/11 x64" src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011%20x64-0b1930">
+  <a href="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml/badge.svg"></a>
+  <img alt="Platform: Windows 10/11 x64, Linux x64" src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011%20%7C%20Linux%20x64-0b1930">
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-35bdf2">
   <img alt="Version 1.0.0" src="https://img.shields.io/badge/version-1.0.0-477bff">
   <img alt="Built with Tauri 2 and Rust" src="https://img.shields.io/badge/built%20with-Tauri%202%20%2B%20Rust-142a49">
@@ -79,13 +80,26 @@ an embedded X server, master password and remote monitoring. See [DEVELOPMENT_ST
 | `NexaTerm-Setup-x64-web.exe` (≈3 MB) | Same installer; downloads WebView2 from Microsoft only if missing. |
 | `NexaTerm-Portable-x64.zip` (≈3.6 MB) | Extract anywhere, run `NexaTerm.exe`; data stays in `portable-data\`. |
 
-Releases are **not code-signed**; verify downloads with `SHA256SUMS.txt`.
+The 1.0.0 files are **not code-signed** (Windows shows "Unknown publisher"); verify downloads
+with `SHA256SUMS.txt`. Signed releases come from the Release workflow once SignPath signing is
+active, see [Code signing policy](#code-signing-policy).
 See [docs/INSTALL.md](docs/INSTALL.md) and the guides shipped with each release.
+
+### Linux (preview, built by CI)
+
+`.deb` (Debian/Ubuntu), `.rpm` (Fedora/openSUSE) and `.AppImage` builds for x64 are produced by
+GitHub Actions on every push (artifacts of the [CI workflow](https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml))
+and attached to tagged releases. On Linux, NexaTerm uses your login shell (bash/zsh/fish) through
+a PTY, stores passwords in the desktop keyring (GNOME Keyring / KWallet through the Secret
+Service), uses `ssh-agent` via `SSH_AUTH_SOCK`, opens serial devices such as `/dev/ttyUSB0`
+(your user must be in the `dialout` group) and forwards X11 to your current `$DISPLAY`.
 
 ## Build from source
 
 Prerequisites: Node.js 22+, Rust stable, and a C toolchain (MSVC Build Tools, or the no-admin MinGW
-setup in [docs/DEVELOPER.md](docs/DEVELOPER.md)).
+setup in [docs/DEVELOPER.md](docs/DEVELOPER.md)). On Linux (Ubuntu 22.04+):
+`sudo apt install build-essential libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev patchelf rpm`,
+then `npx tauri build` produces deb/rpm/AppImage in `src-tauri/target/release/bundle/`.
 
 ```powershell
 git clone <your-repo-url> NexaTerm
@@ -108,17 +122,36 @@ src/                 React + TypeScript UI (features/, layouts/, store/, service
 src-tauri/           Rust core (ssh/, sftp/, terminal/, tunnels/, database/, credentials/ …), migrations, tests
 packaging/           installer hooks and release documents (templated with the version)
 public/              logo, icon and wordmarks
-scripts/             build-windows.ps1, verify-release.ps1, test-installer.ps1, test-portable.ps1, devenv.*
+scripts/             build-windows.ps1, sign-file.ps1, verify-release.ps1, test-installer.ps1, test-portable.ps1, devenv.*
+.github/workflows/   ci.yml (Linux + Windows build/test), release.yml (signed release via SignPath)
+.signpath/           SignPath artifact configurations
 docs/                architecture, developer, install and user guides
 ```
 
 Generated folders (`node_modules/`, `build/`, `dist/`, `src-tauri/target/`) are git-ignored.
 Release binaries belong on a GitHub Release, not in the repository.
 
+## Code signing policy
+
+Windows releases are signed through the Release workflow on GitHub Actions. Free code signing is
+provided by [SignPath.io](https://about.signpath.io/), certificate by
+[SignPath Foundation](https://signpath.org/) (once the project's application is approved; until
+then releases are unsigned).
+
+* Only binaries built by [.github/workflows/release.yml](.github/workflows/release.yml) from the
+  source in this repository are signed. Nothing built elsewhere is ever submitted for signing.
+* Committers and reviewers: the maintainers of this repository. Approvers: the repository owner,
+  who approves each release signing request in SignPath.
+* Privacy: NexaTerm does not transfer any information to other networked systems unless
+  specifically requested by the user (connecting to a server, the "public IP" button, or the
+  optional WebView2 download of the web installer). See [SECURITY.md](SECURITY.md).
+
+Details and the local signing option: [docs/CODE_SIGNING.md](docs/CODE_SIGNING.md).
+
 ## Documentation
 
 * [User guide](docs/USER_GUIDE.md) · [Installation](docs/INSTALL.md) · [Developer guide](docs/DEVELOPER.md)
-* [Architecture](docs/ARCHITECTURE.md) · [Security](SECURITY.md) · [Third-party licenses](THIRD_PARTY_LICENSES.md)
+* [Architecture](docs/ARCHITECTURE.md) · [Security](SECURITY.md) · [Code signing](docs/CODE_SIGNING.md) · [Third-party licenses](THIRD_PARTY_LICENSES.md)
 * [Development status](DEVELOPMENT_STATUS.md) · [Changelog](CHANGELOG.md)
 
 NexaTerm is an independent clean-room project. It is not affiliated with, and contains no code or

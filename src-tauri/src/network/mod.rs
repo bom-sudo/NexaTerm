@@ -11,15 +11,7 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 /// Run `ping.exe` or `tracert.exe`, streaming output lines; killed on cancel or timeout.
 pub async fn run_tool(tool: &str, host: &str, count: u32, cancel: &CancelFlag, mut line: impl FnMut(String)) -> AppResult<i32> {
     let host = validate_host(host)?;
-    let sysroot = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".into());
-    let (exe, args, limit): (String, Vec<String>, u64) = match tool {
-        "ping" => {
-            let n = count.clamp(1, 1000);
-            (format!(r"{sysroot}\System32\PING.EXE"), vec!["-n".into(), n.to_string(), host], 10 + n as u64 * 6)
-        }
-        "traceroute" => (format!(r"{sysroot}\System32\TRACERT.EXE"), vec!["-d".into(), "-w".into(), "1500".into(), "-h".into(), "30".into(), host], 300),
-        other => return Err(AppError::Validation(format!("Unknown tool {other}"))),
-    };
+    let (exe, args, limit) = tool_command(tool, &host, count)?;
     let mut cmd = tokio::process::Command::new(exe);
     cmd.args(&args).stdout(std::process::Stdio::piped()).stderr(std::process::Stdio::piped()).kill_on_drop(true);
     #[cfg(windows)]
@@ -44,6 +36,49 @@ pub async fn run_tool(tool: &str, host: &str, count: u32, cancel: &CancelFlag, m
     }
     let status = child.wait().await?;
     Ok(status.code().unwrap_or(-1))
+}
+
+/// Executable, structured arguments and overall time limit (seconds) for a diagnostic tool.
+#[cfg(windows)]
+fn tool_command(tool: &str, host: &str, count: u32) -> AppResult<(String, Vec<String>, u64)> {
+    let sysroot = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".into());
+    let host = host.to_string();
+    Ok(match tool {
+        "ping" => {
+            let n = count.clamp(1, 1000);
+            (format!(r"{sysroot}\System32\PING.EXE"), vec!["-n".into(), n.to_string(), host], 10 + n as u64 * 6)
+        }
+        "traceroute" => (format!(r"{sysroot}\System32\TRACERT.EXE"), vec!["-d".into(), "-w".into(), "1500".into(), "-h".into(), "30".into(), host], 300),
+        other => return Err(AppError::Validation(format!("Unknown tool {other}"))),
+    })
+}
+
+#[cfg(unix)]
+fn tool_command(tool: &str, host: &str, count: u32) -> AppResult<(String, Vec<String>, u64)> {
+    let which = |exe: &str| -> Option<String> {
+        let path = std::env::var_os("PATH")?;
+        std::env::split_paths(&path)
+            .chain(["/usr/sbin", "/sbin", "/usr/bin", "/bin"].iter().map(std::path::PathBuf::from))
+            .map(|d| d.join(exe))
+            .find(|p| p.is_file())
+            .map(|p| p.display().to_string())
+    };
+    let host = host.to_string();
+    Ok(match tool {
+        "ping" => {
+            let n = count.clamp(1, 1000);
+            let exe = which("ping").ok_or_else(|| AppError::Io("ping is not installed (package iputils-ping)".into()))?;
+            (exe, vec!["-n".into(), "-c".into(), n.to_string(), host], 10 + n as u64 * 6)
+        }
+        "traceroute" => match which("traceroute") {
+            Some(exe) => (exe, vec!["-n".into(), "-w".into(), "2".into(), "-m".into(), "30".into(), host], 300),
+            None => {
+                let exe = which("tracepath").ok_or_else(|| AppError::Io("Neither traceroute nor tracepath is installed".into()))?;
+                (exe, vec!["-n".into(), host], 300)
+            }
+        },
+        other => return Err(AppError::Validation(format!("Unknown tool {other}"))),
+    })
 }
 
 #[derive(Debug, Serialize)]

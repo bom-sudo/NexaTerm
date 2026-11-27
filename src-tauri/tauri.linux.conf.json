@@ -1,0 +1,17 @@
+{
+  "bundle": {
+    "targets": ["deb", "rpm", "appimage"],
+    "linux": {
+      "deb": {
+        "section": "net",
+        "recommends": ["gnome-keyring", "openssh-client", "xauth", "iputils-ping", "traceroute"]
+      },
+      "rpm": {
+        "recommends": ["gnome-keyring", "openssh-clients", "xorg-x11-xauth", "iputils", "traceroute"]
+      },
+      "appimage": {
+        "bundleMediaFramework": false
+      }
+    }
+  }
+}

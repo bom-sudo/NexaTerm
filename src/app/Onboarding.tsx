@@ -5,6 +5,7 @@ import { newLocalTerminal, newSessionDialog } from "./actions";
 import { api } from "../services/api";
 import { toast } from "../store/ui";
 import { useSessions } from "../store/sessions";
+import { isWindows, secretStore } from "../utils/platform";
 
 export function Onboarding() {
   const done = () => useSettings.getState().set("onboarded", true);
@@ -22,7 +23,7 @@ export function Onboarding() {
       <div className="space-y-4 text-[13px]">
         <p className="text-dim">A free, open-source workspace for terminals, SSH, SFTP, tunnels and network diagnostics. A few things worth knowing:</p>
         {point(<WifiOff size={18} />, "Offline & private", "No account, no telemetry, no background network traffic. Everything is stored locally.")}
-        {point(<Lock size={18} />, "Secrets stay in Windows", "Passwords and passphrases go to Windows Credential Manager — never into the database, exports or logs.")}
+        {point(<Lock size={18} />, isWindows ? "Secrets stay in Windows" : "Secrets stay in your keyring", `Passwords and passphrases go to ${secretStore} — never into the database, exports or logs.`)}
         {point(<ShieldCheck size={18} />, "Host keys are verified", "You confirm each server's fingerprint on first connect; changed keys are blocked until you decide.")}
         <div className="grid grid-cols-3 gap-2 pt-2">
           <Button

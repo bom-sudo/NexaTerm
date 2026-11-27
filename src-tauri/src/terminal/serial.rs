@@ -12,6 +12,7 @@
 //! Settings validation and DCB field computation are pure functions ([`validate_port_name`],
 //! [`dcb_fields`]) so they can be unit-tested on machines without serial hardware.
 
+#[allow(unused_imports)]
 use super::{TermSink, TerminalBackend};
 use crate::error::{AppError, AppResult};
 use serde::{Deserialize, Serialize};
@@ -225,15 +226,21 @@ pub fn sort_ports(mut ports: Vec<PortInfo>) -> Vec<PortInfo> {
 #[cfg(windows)]
 pub use win::{list_ports, SerialSession};
 
-#[cfg(not(windows))]
+#[cfg(unix)]
+#[path = "serial_unix.rs"]
+mod unix;
+#[cfg(unix)]
+pub use unix::{list_ports, validate_unix_port, SerialSession};
+
+#[cfg(not(any(windows, unix)))]
 pub fn list_ports() -> Vec<PortInfo> {
     Vec::new()
 }
 
-#[cfg(not(windows))]
+#[cfg(not(any(windows, unix)))]
 pub struct SerialSession;
 
-#[cfg(not(windows))]
+#[cfg(not(any(windows, unix)))]
 impl SerialSession {
     pub fn open(spec: SerialSpec, _sink: TermSink) -> AppResult<Arc<SerialSession>> {
         validate_port_name(&spec.port)?;
@@ -242,7 +249,7 @@ impl SerialSession {
     }
 }
 
-#[cfg(not(windows))]
+#[cfg(not(any(windows, unix)))]
 impl TerminalBackend for SerialSession {
     fn write(&self, _: &[u8]) -> AppResult<()> {
         Err(AppError::Terminal("Serial port is closed".into()))

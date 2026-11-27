@@ -12,6 +12,7 @@ import { useWorkspace } from "../../store/workspace";
 import { Button, IconButton, Modal, confirmDialog, promptDialog, useContextMenu, type MenuItem } from "../../components/ui";
 import { connectSession, editSessionDialog, newSessionDialog } from "../../app/actions";
 import type { ImportReport, Session } from "../../types";
+import { secretStoreShort } from "../../utils/platform";
 
 type Sort = "name" | "recent" | "host";
 
@@ -75,7 +76,7 @@ export function SessionsPanel() {
       icon: <Trash2 size={13} />,
       danger: true,
       onClick: async () => {
-        if (await confirmDialog({ title: "Delete session", message: <>Delete <b>{s.name}</b>? Its saved password/passphrase is removed from Credential Manager too.</>, confirmText: "Delete", danger: true }))
+        if (await confirmDialog({ title: "Delete session", message: <>Delete <b>{s.name}</b>? Its saved password/passphrase is removed from {secretStoreShort} too.</>, confirmText: "Delete", danger: true }))
           act(() => api.sessionDelete(s.id), "Session deleted");
       },
     },

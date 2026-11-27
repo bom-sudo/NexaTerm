@@ -77,7 +77,7 @@ pub fn run() -> i32 {
         "shell detection",
         if shells.is_empty() { Err("no shells found".into()) } else { Ok(shells.iter().map(|s| s.name.as_str()).collect::<Vec<_>>().join(", ")) },
     );
-    check("ConPTY local terminal", conpty_check());
+    check(if cfg!(windows) { "ConPTY local terminal" } else { "PTY local terminal" }, conpty_check());
 
     let log_path = loc.dir.join("logs").join("nexaterm.log");
     log::info!("self-test executed");
@@ -86,6 +86,7 @@ pub fn run() -> i32 {
         "application log",
         std::fs::metadata(&log_path).map(|m| format!("{} ({} bytes)", log_path.display(), m.len())).map_err(|e| format!("{}: {e}", log_path.display())),
     );
+    #[cfg(windows)]
     check("WebView2 runtime", webview2_version());
 
     let summary = if failures == 0 { "SELFTEST PASS".to_string() } else { format!("SELFTEST FAIL ({failures} failed)") };
@@ -99,12 +100,21 @@ fn conpty_check() -> Result<String, String> {
     use crate::terminal::local::{LocalPty, LocalSpec};
     use crate::terminal::{TermSink, TerminalBackend};
     use std::sync::{mpsc, Arc, Mutex};
-    let comspec = std::env::var("ComSpec").unwrap_or_else(|_| r"C:\Windows\System32\cmd.exe".into());
+    #[cfg(windows)]
+    let (program, args, cmd, expect, name) = (
+        std::env::var("ComSpec").unwrap_or_else(|_| r"C:\Windows\System32\cmd.exe".into()),
+        vec!["/Q".to_string(), "/K".to_string()],
+        &b"echo NEXATERM_%OS%_OK\r\n"[..],
+        "NEXATERM_Windows_NT_OK",
+        "cmd.exe",
+    );
+    #[cfg(not(windows))]
+    let (program, args, cmd, expect, name) = ("/bin/sh".to_string(), Vec::<String>::new(), &b"echo NEXATERM_$((6*7))_OK\n"[..], "NEXATERM_42_OK", "/bin/sh");
     let (tx, rx) = mpsc::channel::<Vec<u8>>();
     let tx = Mutex::new(tx);
     let sink = TermSink::new(move |d| { let _ = tx.lock().unwrap().send(d); }, |_| {});
-    let pty: Arc<LocalPty> = LocalPty::spawn(LocalSpec { program: comspec, args: vec!["/Q".into(), "/K".into()], cwd: None, cols: 80, rows: 24 }, sink).map_err(|e| e.to_string())?;
-    pty.write(b"echo NEXATERM_%OS%_OK\r\n").map_err(|e| e.to_string())?;
+    let pty: Arc<LocalPty> = LocalPty::spawn(LocalSpec { program, args, cwd: None, cols: 80, rows: 24 }, sink).map_err(|e| e.to_string())?;
+    pty.write(cmd).map_err(|e| e.to_string())?;
     let mut out = String::new();
     let deadline = std::time::Instant::now() + Duration::from_secs(15);
     let mut answered = false;
@@ -115,14 +125,14 @@ fn conpty_check() -> Result<String, String> {
                 let _ = pty.write(b"\x1b[1;1R"); // answer ConPTY's cursor query like xterm.js does
                 answered = true;
             }
-            if out.contains("NEXATERM_Windows_NT_OK") {
+            if out.contains(expect) {
                 pty.close();
-                return Ok("cmd.exe spawned, command executed, output received".into());
+                return Ok(format!("{name} spawned, command executed, output received"));
             }
         }
     }
     pty.close();
-    Err("no output from cmd.exe within 15 s".into())
+    Err(format!("no output from {name} within 15 s"))
 }
 
 #[cfg(windows)]
@@ -148,7 +158,3 @@ fn webview2_version() -> Result<String, String> {
     Err("WebView2 Runtime not found — install it from https://developer.microsoft.com/microsoft-edge/webview2/".into())
 }
 
-#[cfg(not(windows))]
-fn webview2_version() -> Result<String, String> {
-    Ok("not applicable".into())
-}

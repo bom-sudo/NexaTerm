@@ -8,6 +8,7 @@ import { useWorkspace } from "../../store/workspace";
 import { toast } from "../../store/ui";
 import { Button, confirmDialog } from "../../components/ui";
 import type { AppInfo } from "../../types";
+import { secretStoreShort } from "../../utils/platform";
 
 interface Row {
   section: string;
@@ -54,7 +55,7 @@ export function SettingsView() {
     {
       section: "Data",
       label: "Back up database",
-      hint: "Copies sessions, folders, snippets, tunnels and known hosts. Passwords stay in Credential Manager and are not in the backup.",
+      hint: `Copies sessions, folders, snippets, tunnels and known hosts. Passwords stay in ${secretStoreShort} and are not in the backup.`,
       control: <Button onClick={async () => { const p = await save({ title: "Back up NexaTerm database", defaultPath: `nexaterm-backup-${new Date().toISOString().slice(0, 10)}.db`, filters: [{ name: "Database", extensions: ["db"] }] }); if (p) api.dbBackup(p).then(() => toast("success", `Backup written to ${p}`)).catch((e) => toast("error", toApiError(e).message)); }}>Back up…</Button>,
     },
     {

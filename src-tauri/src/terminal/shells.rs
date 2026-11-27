@@ -13,6 +13,7 @@ pub struct ShellProfile {
     pub kind: String,
 }
 
+#[cfg(windows)]
 fn env_path(var: &str, rel: &str) -> Option<PathBuf> {
     std::env::var_os(var).map(|v| Path::new(&v).join(rel)).filter(|p| p.exists())
 }
@@ -22,7 +23,62 @@ fn which(exe: &str) -> Option<PathBuf> {
     std::env::split_paths(&path).map(|d| d.join(exe)).find(|p| p.is_file())
 }
 
+/// Shells available on this machine; the first entry is the platform default.
 pub fn detect() -> Vec<ShellProfile> {
+    #[cfg(windows)]
+    return detect_windows();
+    #[cfg(unix)]
+    return detect_unix();
+}
+
+/// Unix: the login shell from $SHELL first, then common shells listed in /etc/shells or on PATH.
+#[cfg(unix)]
+fn detect_unix() -> Vec<ShellProfile> {
+    let mut v: Vec<ShellProfile> = Vec::new();
+    let listed: Vec<PathBuf> = std::fs::read_to_string("/etc/shells")
+        .unwrap_or_default()
+        .lines()
+        .map(str::trim)
+        .filter(|l| l.starts_with('/'))
+        .map(PathBuf::from)
+        .filter(|p| p.is_file())
+        .collect();
+    let find = |name: &str| listed.iter().find(|p| p.file_name().map(|f| f == name).unwrap_or(false)).cloned().or_else(|| which(name));
+    let mut add = |path: PathBuf, label: Option<&str>| {
+        let file = path.file_name().map(|f| f.to_string_lossy().to_string()).unwrap_or_default();
+        if file.is_empty() || v.iter().any(|s| s.id == file) {
+            return;
+        }
+        let name = match file.as_str() {
+            "bash" => "Bash",
+            "zsh" => "Zsh",
+            "fish" => "Fish",
+            "sh" => "sh",
+            "dash" => "Dash",
+            other => other,
+        }
+        .to_string();
+        v.push(ShellProfile {
+            id: file.clone(),
+            name: label.map(|l| format!("{name} ({l})")).unwrap_or(name),
+            path: path.display().to_string(),
+            args: if matches!(file.as_str(), "bash" | "zsh" | "fish") { vec!["-l".into()] } else { vec![] },
+            kind: file,
+        });
+    };
+    if let Some(sh) = std::env::var_os("SHELL").map(PathBuf::from).filter(|p| p.is_file()) {
+        add(sh, Some("login shell"));
+    }
+    for name in ["bash", "zsh", "fish", "sh"] {
+        if let Some(p) = find(name) {
+            add(p, None);
+        }
+    }
+    v
+}
+
+#[cfg(windows)]
+fn detect_windows() -> Vec<ShellProfile> {
     let mut v = Vec::new();
     let mut push = |id: &str, name: &str, path: PathBuf, args: &[&str], kind: &str| {
         v.push(ShellProfile {
@@ -66,6 +122,7 @@ pub fn detect() -> Vec<ShellProfile> {
 }
 
 /// `wsl.exe -l -q` prints UTF-16LE. Runs with a timeout so a broken WSL install cannot hang startup.
+#[cfg(windows)]
 fn wsl_distros(wsl: &Path) -> Vec<String> {
     use std::os::windows::process::CommandExt;
     const CREATE_NO_WINDOW: u32 = 0x0800_0000;
@@ -104,6 +161,16 @@ pub fn parse_wsl_list(bytes: &[u8]) -> Vec<String> {
 mod tests {
     use super::*;
 
+    #[cfg(unix)]
+    #[test]
+    fn detects_a_posix_shell() {
+        let shells = detect();
+        assert!(!shells.is_empty(), "no shell found");
+        assert!(shells.iter().all(|s| std::path::Path::new(&s.path).is_file()));
+        assert!(shells.iter().any(|s| s.id == "sh" || s.id == "bash"));
+    }
+
+    #[cfg(windows)]
     #[test]
     fn detects_cmd_and_powershell() {
         let shells = detect();

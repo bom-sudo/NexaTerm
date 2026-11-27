@@ -28,3 +28,6 @@ portable-data/
 .DS_Store
 Thumbs.db
 railway-design-md.md
+# Code signing material - never commit
+*.pfx
+*.p12
