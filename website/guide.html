@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คู่มือการใช้งาน NexaTerm ฉบับเต็ม</title>
+  <meta name="description"
+    content="คู่มือ NexaTerm แบบละเอียดทีละขั้นตอน ตั้งแต่ติดตั้งบน Windows และ Linux, เชื่อมต่อ SSH, SFTP, SSH tunnel, Telnet, Serial, X11, คีย์ SSH, Macros จนถึงการแก้ปัญหา">
+  <meta name="theme-color" content="#0a1020">
+  <meta name="color-scheme" content="dark">
+  <link rel="canonical" href="https://nexaterm.pages.dev/guide.html">
+  <link rel="icon" type="image/x-icon" href="nexaterm.ico">
+  <link rel="icon" type="image/svg+xml" href="images/nexaterm-icon.svg">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="คู่มือการใช้งาน NexaTerm ฉบับเต็ม">
+  <meta property="og:image" content="https://nexaterm.pages.dev/images/workspace.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .skip { position: absolute; left: -9999px; top: 8px; z-index: 100; padding: 8px 14px; border-radius: 8px; background: var(--accent); color: #04121f; }
+    .skip:focus { left: 12px; }
+    /* ---- Guide layout ---- */
+    .g-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 48px; padding: 40px 0 96px; }
+    .g-toc { position: sticky; top: 84px; align-self: start; max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px; }
+    .g-toc p { font-size: 13px; font-weight: 600; color: var(--text-faint); text-transform: uppercase; letter-spacing: .6px; margin: 18px 0 6px; }
+    .g-toc p:first-child { margin-top: 0; }
+    .g-toc ol { list-style: none; margin: 0; padding: 0; }
+    .g-toc a { display: block; padding: 5px 10px; border-left: 2px solid var(--line); color: var(--text-dim); font-size: 14px; }
+    .g-toc a:hover { color: var(--text); border-left-color: var(--line-strong); }
+    .g-toc a.active { color: var(--accent); border-left-color: var(--accent); }
+    .g-toc-toggle { display: none; }
+
+    .g-main { max-width: 820px; min-width: 0; }
+    .g-main pre { max-width: 100%; }
+    .g-main li, .g-main td { overflow-wrap: anywhere; }
+    .g-hero h1 { font-size: clamp(30px, 4vw, 42px); line-height: 1.3; }
+    .g-hero p { color: var(--text-dim); margin-top: 10px; font-size: 16.5px; }
+    .g-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 14px; font-size: 14px; color: var(--text-faint); }
+
+    .g-main section { padding-top: 56px; scroll-margin-top: 72px; }
+    .g-main h2 { font-size: 26px; line-height: 1.4; padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+    .g-main h2 .num { color: var(--accent); font-family: var(--mono); font-size: 18px; margin-right: 10px; }
+    .g-main h3 { font-size: 19px; margin: 30px 0 10px; scroll-margin-top: 72px; }
+    .g-main h4 { font-size: 16px; margin: 20px 0 8px; color: var(--text); }
+    .g-main p, .g-main li { color: var(--text-dim); font-size: 15.5px; line-height: 1.85; }
+    .g-main p + p { margin-top: 10px; }
+    .g-main ul, .g-main ol { padding-left: 22px; margin: 8px 0; }
+    .g-main li + li { margin-top: 4px; }
+    .g-main strong { color: var(--text); font-weight: 600; }
+    .g-main code { background: var(--bg-elev); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; color: #bae6fd; }
+    .g-main kbd { display: inline-block; min-width: 22px; text-align: center; padding: 1px 7px; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 6px; background: var(--panel-2); color: var(--text); font-size: .84em; }
+    .ui { color: var(--text); font-weight: 600; background: rgba(56, 189, 248, .10); border-radius: 5px; padding: 0 5px; }
+
+    .steps-list { counter-reset: step; list-style: none; padding: 0 !important; margin: 14px 0 !important; }
+    .steps-list > li { counter-increment: step; position: relative; padding: 2px 0 12px 44px; }
+    .steps-list > li::before {
+      content: counter(step); position: absolute; left: 0; top: 2px; width: 28px; height: 28px; border-radius: 50%;
+      background: var(--accent-soft); border: 1px solid rgba(56, 189, 248, .35); color: var(--accent);
+      font: 600 14px/26px var(--mono); text-align: center;
+    }
+
+    .callout { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; margin: 18px 0; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg-elev); }
+    .callout svg { margin-top: 3px; }
+    .callout p, .callout li { font-size: 14.5px; }
+    .callout.tip { border-color: rgba(56, 189, 248, .35); }
+    .callout.tip svg { color: var(--accent); }
+    .callout.warn { border-color: rgba(251, 191, 36, .4); background: rgba(251, 191, 36, .05); }
+    .callout.warn svg { color: #fbbf24; }
+    .callout.danger { border-color: rgba(248, 113, 113, .45); background: rgba(248, 113, 113, .05); }
+    .callout.danger svg { color: #f87171; }
+    .callout strong:first-child { display: block; margin-bottom: 2px; }
+
+    .g-main figure { margin: 18px 0 8px; }
+    .g-main figure img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--bg-elev); }
+    .g-main figcaption { font-size: 13.5px; color: var(--text-faint); margin-top: 8px; }
+
+    .g-main .table-wrap { margin: 14px 0; }
+    .g-main table th, .g-main table td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+    .g-main table th { color: var(--text); font-weight: 600; background: var(--panel-2); }
+    .g-main table td { color: var(--text-dim); }
+    .g-main table tr:last-child td { border-bottom: 0; }
+    .g-main table td:first-child { color: var(--text); white-space: nowrap; }
+
+    .g-main pre { margin: 12px 0; padding: 14px 16px; background: #060b17; border: 1px solid var(--line-strong); border-radius: 10px; overflow-x: auto; }
+    .g-main pre code { background: none; border: 0; padding: 0; font-size: 13.5px; line-height: 1.7; }
+
+    .os-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+    .os-box { padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    .os-box h4 { margin-top: 0; }
+
+    .trouble { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); margin: 10px 0; }
+    .trouble summary { cursor: pointer; padding: 14px 16px; color: var(--text); font-weight: 600; font-size: 15px; }
+    .trouble > div { padding: 0 16px 14px; }
+
+    .g-top { position: fixed; right: 18px; bottom: 18px; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: var(--panel-2); border: 1px solid var(--line-strong); color: var(--text); opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .g-top.show { opacity: 1; pointer-events: auto; }
+
+    @media (max-width: 980px) {
+      .g-layout { grid-template-columns: minmax(0, 1fr); gap: 0; padding-top: 20px; }
+      .g-main code { overflow-wrap: anywhere; }
+      .g-main .table-wrap { overflow-x: auto; }
+      .g-toc { position: static; max-height: none; display: none; border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: var(--panel); margin-top: 10px; }
+      .g-toc.open { display: block; }
+      .g-toc-toggle { display: flex; width: 100%; justify-content: center; }
+      .os-pair { grid-template-columns: 1fr; }
+      .g-main table td:first-child { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip" href="#content">ข้ามไปที่เนื้อหา</a>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+      <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+      <symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></symbol>
+    </defs>
+  </svg>
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html">
+        <img src="images/nexaterm-icon.svg" alt="" width="28" height="28">
+        <span>NexaTerm</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">หน้าแรก</a></li>
+        <li><a href="guide.html" aria-current="page">คู่มือ</a></li>
+        <li><a href="index.html#faq">คำถามที่พบบ่อย</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a class="btn btn-primary btn-sm" href="index.html#download">ดาวน์โหลด</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap g-layout">
+    <div>
+      <button class="btn btn-ghost g-toc-toggle" type="button" aria-expanded="false" aria-controls="toc">สารบัญ</button>
+      <nav class="g-toc" id="toc" aria-label="สารบัญ">
+        <p>เริ่มต้น</p>
+        <ol>
+          <li><a href="#install">1. ติดตั้งโปรแกรม</a></li>
+          <li><a href="#tour">2. รู้จักหน้าจอ</a></li>
+          <li><a href="#local">3. เทอร์มินัลในเครื่อง</a></li>
+        </ol>
+        <p>เชื่อมต่อเซิร์ฟเวอร์</p>
+        <ol>
+          <li><a href="#ssh">4. เชื่อมต่อ SSH ครั้งแรก</a></li>
+          <li><a href="#sessions">5. จัดการ session</a></li>
+          <li><a href="#ssh-advanced">6. SSH ขั้นสูง</a></li>
+          <li><a href="#telnet-serial">7. Telnet และ Serial</a></li>
+        </ol>
+        <p>ทำงานกับไฟล์และเครือข่าย</p>
+        <ol>
+          <li><a href="#sftp">8. SFTP รับส่งไฟล์</a></li>
+          <li><a href="#tunnels">9. SSH tunnel</a></li>
+          <li><a href="#network">10. เครื่องมือเครือข่าย</a></li>
+        </ol>
+        <p>ทำงานให้เร็วขึ้น</p>
+        <ol>
+          <li><a href="#split">11. แบ่งหน้าจอและแท็บ</a></li>
+          <li><a href="#multiexec">12. สั่งหลายเครื่องพร้อมกัน</a></li>
+          <li><a href="#snippets">13. Snippets</a></li>
+          <li><a href="#macros">14. Macros</a></li>
+          <li><a href="#keys">15. จัดการคีย์ SSH</a></li>
+        </ol>
+        <p>ตั้งค่าและดูแล</p>
+        <ol>
+          <li><a href="#settings">16. ตั้งค่าโปรแกรม</a></li>
+          <li><a href="#shortcuts">17. คีย์ลัดทั้งหมด</a></li>
+          <li><a href="#data">18. ข้อมูล สำรอง และรุ่นพกพา</a></li>
+          <li><a href="#trouble">19. แก้ปัญหาที่พบบ่อย</a></li>
+        </ol>
+      </nav>
+    </div>
+
+    <main class="g-main" id="content">
+      <div class="g-hero">
+        <p class="kicker">คู่มือการใช้งาน</p>
+        <h1>คู่มือ NexaTerm ฉบับเต็ม</h1>
+        <p>อธิบายทีละขั้นตอน ตั้งแต่ติดตั้งโปรแกรมจนถึงฟังก์ชันขั้นสูง ทุกชื่อปุ่มและเมนูในคู่มือนี้ตรงกับที่เห็นในโปรแกรม
+          (หน้าจอโปรแกรมเป็นภาษาอังกฤษ คู่มือจะเขียนชื่อปุ่มเป็นภาษาอังกฤษตามจริงและอธิบายเป็นภาษาไทย)</p>
+        <div class="g-meta">
+          <span>สำหรับ NexaTerm 1.1 ขึ้นไป</span>
+          <span>Windows 10 / 11 และ Linux</span>
+          <span>อ่านจบประมาณ 30 นาที</span>
+        </div>
+      </div>
+
+      <!-- 1 -->
+      <section id="install">
+        <h2><span class="num">01</span>ติดตั้งโปรแกรม</h2>
+
+        <h3>บน Windows 10 / 11</h3>
+        <p>มีให้เลือก 3 แบบ ถ้าไม่แน่ใจให้ใช้แบบแรก</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ไฟล์</th><th>เหมาะกับ</th></tr></thead>
+            <tbody>
+              <tr><td><code>NexaTerm-Setup-x64-web.exe</code></td><td>คนส่วนใหญ่ ไฟล์เล็ก (ประมาณ 3 MB) ถ้าเครื่องยังไม่มี Microsoft WebView2 ตัวติดตั้งจะดาวน์โหลดให้เอง (Windows 11 และ Windows 10 ที่อัปเดตแล้วมีอยู่แล้ว)</td></tr>
+              <tr><td><code>NexaTerm-Portable-x64.zip</code></td><td>ไม่อยากติดตั้ง หรืออยากพกใส่แฟลชไดรฟ์ แตกไฟล์แล้วเปิดใช้ได้เลย</td></tr>
+              <tr><td><code>NexaTerm-Setup-x64.exe</code></td><td>เครื่องที่ต่ออินเทอร์เน็ตไม่ได้ รวม WebView2 ไว้ในไฟล์ (ไฟล์ใหญ่ประมาณ 290 MB)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>ขั้นตอนติดตั้ง (ตัวติดตั้ง)</h4>
+        <ol class="steps-list">
+          <li>ดาวน์โหลดไฟล์จาก<a href="index.html#download">หน้าดาวน์โหลด</a></li>
+          <li>ดับเบิลคลิกไฟล์ ถ้า Windows แสดงหน้าจอสีน้ำเงิน <span class="ui">Windows protected your PC</span> ให้กด <span class="ui">More info</span> แล้วกด <span class="ui">Run anyway</span> (ดูคำอธิบายในกรอบด้านล่าง)</li>
+          <li>เลือกภาษาของตัวติดตั้ง (English หรือไทย) แล้วกด <span class="ui">Next</span></li>
+          <li>เลือกโฟลเดอร์ที่จะติดตั้ง ค่าเริ่มต้นอยู่ในโฟลเดอร์ของบัญชีผู้ใช้ จึง<strong>ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ</strong></li>
+          <li>เลือกว่าจะสร้างไอคอนบนเดสก์ท็อปหรือไม่ แล้วกด <span class="ui">Install</span></li>
+          <li>เมื่อเสร็จ ติ๊ก <span class="ui">Run NexaTerm</span> แล้วกด <span class="ui">Finish</span> โปรแกรมจะอยู่ใน Start menu ชื่อ NexaTerm</li>
+        </ol>
+
+        <div class="callout tip">
+          <svg width="20" height="20" aria-hidden="true"><use href="#i-shield"/></svg>
+          <div>
+            <strong>ทำไม Windows ถึงขึ้นคำเตือน</strong>
+            <p>Windows SmartScreen แสดงคำเตือนนี้กับโปรแกรมใหม่ที่ยังมีคนดาวน์โหลดไม่มาก ไม่ได้แปลว่าไฟล์มีไวรัส ไฟล์ทุกตัวของ NexaTerm สร้างจากซอร์สโค้ดบน GitHub โดยอัตโนมัติ
+              และตรวจสอบได้ด้วยค่า SHA-256 ในไฟล์ <code>SHA256SUMS.txt</code> ที่อยู่ในหน้าดาวน์โหลดเดียวกัน
+              ถ้าต้องการตรวจ ให้เปิด PowerShell ในโฟลเดอร์ที่ดาวน์โหลดแล้วพิมพ์:</p>
+            <pre><code>Get-FileHash .\NexaTerm-Setup-x64-web.exe -Algorithm SHA256</code></pre>
+            <p>ตัวเลขที่ได้ต้องตรงกับบรรทัดของไฟล์นั้นใน <code>SHA256SUMS.txt</code></p>
+          </div>
+        </div>
+
+        <h4>ใช้รุ่นพกพา (Portable)</h4>
+        <ol class="steps-list">
+          <li>คลิกขวาไฟล์ <code>NexaTerm-Portable-x64.zip</code> เลือก <span class="ui">Extract All...</span> ไปไว้ที่ไหนก็ได้ เช่นแฟลชไดรฟ์</li>
+          <li>เปิด <code>NexaTerm.exe</code> ในโฟลเดอร์ที่แตกออกมา</li>
+          <li>ข้อมูลทั้งหมด (session, การตั้งค่า, log) จะเก็บในโฟลเดอร์ <code>portable-data\</code> ข้างโปรแกรม ย้ายทั้งโฟลเดอร์ไปเครื่องอื่นได้</li>
+        </ol>
+        <div class="callout warn">
+          <svg width="20" height="20" aria-hidden="true"><use href="#i-warn"/></svg>
+          <div>
+            <strong>รหัสผ่านไม่ย้ายตามไปด้วย</strong>
+            <p>รหัสผ่านที่บันทึกไว้เก็บใน Windows Credential Manager ของเครื่องนั้น ไม่ได้อยู่ใน <code>portable-data\</code> เมื่อเปิดบนเครื่องใหม่ โปรแกรมจะถามรหัสผ่านอีกครั้งตอนเชื่อมต่อ</p>
+          </div>
+        </div>
+
+        <h3>บน Linux</h3>
+        <p>รองรับเครื่อง 64 บิตที่มีหน้าจอเดสก์ท็อป (GNOME, KDE, XFCE, Cinnamon ฯลฯ) เลือกไฟล์ตามดิสโทรของคุณ แล้วเปิด Terminal ในโฟลเดอร์ที่ดาวน์โหลด:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ดิสโทร</th><th>คำสั่งติดตั้ง</th></tr></thead>
+            <tbody>
+              <tr><td>Ubuntu, Debian, Linux Mint, Pop!_OS</td><td><code>sudo apt install ./NexaTerm-x64.deb</code></td></tr>
+              <tr><td>Fedora, RHEL, Rocky, openSUSE</td><td><code>sudo dnf install ./NexaTerm-x64.rpm</code> (openSUSE ใช้ <code>sudo zypper install ./NexaTerm-x64.rpm</code>)</td></tr>
+              <tr><td>ดิสโทรอื่น ๆ</td><td><code>chmod +x NexaTerm-x64.AppImage</code> แล้ว <code>./NexaTerm-x64.AppImage</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>หลังติดตั้งแบบ .deb หรือ .rpm จะมี NexaTerm ในเมนูแอปของเดสก์ท็อป ถอนการติดตั้งผ่านโปรแกรมจัดการแอปของดิสโทร หรือดูชื่อแพ็กเกจด้วย <code>apt list --installed | grep -i nexa</code> (หรือ <code>rpm -qa | grep -i nexa</code>) แล้วใช้ <code>sudo apt remove</code> / <code>sudo dnf remove</code> ตามด้วยชื่อนั้น</p>
+        <div class="callout tip">
+          <svg width="20" height="20" aria-hidden="true"><use href="#i-info"/></svg>
+          <div>
+            <strong>สิ่งที่ Linux ใช้จากระบบ</strong>
+            <ul>
+              <li>รหัสผ่านเก็บใน keyring ของเดสก์ท็อป (GNOME Keyring หรือ KWallet) ซึ่งเปิดใช้อยู่แล้วในเดสก์ท็อปทั่วไป</li>
+              <li>ใช้ shell ประจำตัวของคุณ (bash, zsh หรือ fish)</li>
+              <li>ถ้าจะใช้พอร์ต Serial ต้องอยู่ในกลุ่ม <code>dialout</code> (ดู<a href="#telnet-serial">หัวข้อ 7</a>)</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>เปิดโปรแกรมครั้งแรก</h3>
+        <p>ครั้งแรกจะมีหน้าต่าง <span class="ui">Welcome to NexaTerm</span> สรุปสามเรื่องสำคัญ: โปรแกรมทำงานแบบออฟไลน์และไม่ส่งข้อมูลการใช้งาน, รหัสผ่านเก็บในที่เก็บรหัสผ่านของระบบ, และทุกเซิร์ฟเวอร์ต้องยืนยัน host key ก่อน
+          มีปุ่มลัดให้เปิดเทอร์มินัล สร้าง session หรือ Quick Connect ได้ทันที ถ้าต้องการดูหน้านี้อีกครั้ง ไปที่ <span class="ui">Settings</span> → <span class="ui">Show welcome screen again</span></p>
+      </section>
+
+      <!-- 2 -->
+      <section id="tour">
+        <h2><span class="num">02</span>รู้จักหน้าจอ</h2>
+        <figure>
+          <img src="images/workspace.png" width="1376" height="819" loading="lazy"
+            alt="หน้าจอหลักของ NexaTerm มีแถบไอคอนด้านซ้าย รายการ session แถบเครื่องมือ แท็บ และเทอร์มินัลสองช่อง">
+          <figcaption>หน้าจอหลัก: ซ้ายสุดคือแถบไอคอน ถัดมาเป็นรายการ session ด้านบนเป็นแถบเครื่องมือและแท็บ ตรงกลางเป็นเทอร์มินัลที่แบ่งเป็นสองช่อง</figcaption>
+        </figure>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ส่วน</th><th>ใช้ทำอะไร</th></tr></thead>
+            <tbody>
+              <tr><td>แถบไอคอนซ้ายสุด</td><td>สลับมุมมองของแผงด้านข้าง: Quick connect, Sessions, Recent connections, Snippets, Macros และเปิดเครื่องมือเป็นแท็บ: SSH tunnels, SSH keys, Network tools, Known hosts, Settings</td></tr>
+              <tr><td>แผงด้านข้าง</td><td>รายการของมุมมองที่เลือก เช่นรายการ session แบบโฟลเดอร์ ซ่อน/แสดงได้โดยคลิกไอคอนเดิมซ้ำ</td></tr>
+              <tr><td>แถบเครื่องมือ</td><td>สร้าง session, Quick connect, เปิดเทอร์มินัล (ลูกศร ▾ เลือก shell), แบ่งจอ, Multi-execution, SFTP, SFTP side panel, ค้นหา, ล้างจอ, export, บันทึก log, อัดมาโคร, ขนาดตัวอักษร</td></tr>
+              <tr><td>แถบแท็บ</td><td>หนึ่งแท็บต่อหนึ่งกลุ่มเทอร์มินัลหรือเครื่องมือ ดับเบิลคลิกเพื่อเปลี่ยนชื่อ คลิกปุ่มกลางเมาส์เพื่อปิด ตัวเลขด้านขวาเปิดรายการแท็บทั้งหมดพร้อมช่องค้นหา</td></tr>
+              <tr><td>แถบสถานะด้านล่าง</td><td>สถานะการเชื่อมต่อ, host, ผู้ใช้, เวลาที่เชื่อมต่อ, จำนวน session ที่เปิดอยู่, encoding และเวอร์ชันโปรแกรม</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>วางเมาส์ค้างบนปุ่มใดก็ได้เพื่อดูชื่อปุ่มและคีย์ลัด</p>
+      </section>
+
+      <!-- 3 -->
+      <section id="local">
+        <h2><span class="num">03</span>เทอร์มินัลในเครื่อง</h2>
+        <p>กด <kbd>Ctrl</kbd>+<kbd>T</kbd> หรือปุ่ม <span class="ui">New local terminal</span> บนแถบเครื่องมือ จะเปิด shell เริ่มต้นของเครื่องในแท็บใหม่</p>
+        <h3>เลือก shell</h3>
+        <p>คลิกลูกศร ▾ ข้างปุ่ม (<span class="ui">Choose shell</span>) จะเห็นทุก shell ที่โปรแกรมตรวจพบ</p>
+        <div class="os-pair">
+          <div class="os-box">
+            <h4>Windows</h4>
+            <p>Windows PowerShell, PowerShell 7, Command Prompt, Git Bash และ WSL ทุกดิสโทรที่ติดตั้งไว้</p>
+          </div>
+          <div class="os-box">
+            <h4>Linux</h4>
+            <p>shell ประจำตัวของคุณ (จาก <code>$SHELL</code>) แสดงเป็นรายการแรก ตามด้วย bash, zsh, fish, sh ที่มีในเครื่อง</p>
+          </div>
+        </div>
+        <p>เปลี่ยน shell ที่เปิดเป็นค่าเริ่มต้นได้ที่ <span class="ui">Settings</span> → <span class="ui">Default shell</span></p>
+        <h3>บันทึก shell พิเศษเป็น session</h3>
+        <p>ถ้าใช้โปรแกรมเฉพาะบ่อย ๆ (เช่น Python, Node REPL หรือ shell ที่ต้องมีอาร์กิวเมนต์) ให้สร้าง session ประเภท <span class="ui">Local terminal</span> แล้วกรอก <span class="ui">Executable path</span>, <span class="ui">Arguments</span> และ <span class="ui">Starting directory</span> จากนั้นดับเบิลคลิก session เพื่อเปิดได้ทุกครั้ง</p>
+        <h3>คัดลอกและวาง</h3>
+        <ul>
+          <li>ลากเมาส์เลือกข้อความแล้วกด <kbd>Ctrl</kbd>+<kbd>C</kbd> เพื่อคัดลอก (ถ้าไม่ได้เลือกข้อความ <kbd>Ctrl</kbd>+<kbd>C</kbd> จะส่งไปหยุดคำสั่งตามปกติ)</li>
+          <li><kbd>Ctrl</kbd>+<kbd>V</kbd> หรือ <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> เพื่อวาง</li>
+          <li>คลิกขวาในเทอร์มินัล: ถ้ามีข้อความที่เลือกจะคัดลอก ถ้าไม่มีจะวาง (ปิดได้ในหน้าตั้งค่า)</li>
+          <li>ถ้าวางข้อความหลายบรรทัด โปรแกรมจะแสดงข้อความให้ยืนยันก่อน เพราะแต่ละบรรทัดจะถูกรันเป็นคำสั่งทันที</li>
+        </ul>
+      </section>
+
+      <!-- 4 -->
+      <section id="ssh">
+        <h2><span class="num">04</span>เชื่อมต่อ SSH ครั้งแรก</h2>
+        <p>ตัวอย่างนี้เชื่อมต่อไปที่เซิร์ฟเวอร์ <code>192.168.1.10</code> ผู้ใช้ <code>admin</code> ด้วยรหัสผ่าน</p>
+        <ol class="steps-list">
+          <li>กด <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd> หรือปุ่ม <span class="ui">New session</span></li>
+          <li>เลือกประเภท <span class="ui">SSH</span></li>
+          <li>กรอก <span class="ui">Session name</span> เป็นชื่อที่จำง่าย เช่น <code>Web server</code></li>
+          <li>กรอก <span class="ui">Host / IP address</span> เป็น <code>192.168.1.10</code> และ <span class="ui">Port</span> เป็น <code>22</code> (ค่าเริ่มต้น)</li>
+          <li>กรอก <span class="ui">Username</span> เป็น <code>admin</code></li>
+          <li><span class="ui">Authentication</span> เลือก <span class="ui">Password</span> ช่องรหัสผ่านจะกรอกหรือเว้นว่างก็ได้ ถ้าเว้นว่าง โปรแกรมจะถามทุกครั้งที่เชื่อมต่อ</li>
+          <li>กด <span class="ui">Save</span> session จะไปอยู่ในรายการด้านซ้าย</li>
+          <li>ดับเบิลคลิก session เพื่อเชื่อมต่อ</li>
+        </ol>
+
+        <h3>ยืนยัน host key (ครั้งแรกเท่านั้น)</h3>
+        <figure>
+          <img src="images/hostkey.png" loading="lazy" alt="หน้าต่างยืนยัน host key แสดง fingerprint SHA-256 ของเซิร์ฟเวอร์">
+          <figcaption>ครั้งแรกที่เชื่อมต่อ โปรแกรมจะแสดง fingerprint ของเซิร์ฟเวอร์ให้ตรวจก่อน</figcaption>
+        </figure>
+        <p>host key คือ "ลายนิ้วมือ" ของเซิร์ฟเวอร์ ใช้ยืนยันว่าคุณกำลังคุยกับเครื่องจริง ไม่ใช่เครื่องที่ปลอมตัวมาดักรหัสผ่าน</p>
+        <ol class="steps-list">
+          <li>ดูค่า <strong>SHA256:...</strong> ในหน้าต่าง</li>
+          <li>เทียบกับค่าจริงของเซิร์ฟเวอร์ (ถามผู้ดูแลเซิร์ฟเวอร์ หรือถ้าเข้าเครื่องได้ทางอื่น ให้รัน <code>ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub</code>)</li>
+          <li>ถ้าตรงกัน กด <span class="ui">Trust and connect</span> โปรแกรมจะจำ key นี้ไว้ ครั้งต่อไปจะไม่ถามอีก</li>
+        </ol>
+        <div class="callout danger">
+          <svg width="20" height="20" aria-hidden="true"><use href="#i-warn"/></svg>
+          <div>
+            <strong>ถ้าโปรแกรมแจ้งว่า host key เปลี่ยน</strong>
+            <p>โปรแกรมจะไม่เชื่อมต่อ และแสดงทั้งค่าเก่าและค่าใหม่ อาจเกิดจากเซิร์ฟเวอร์ถูกติดตั้งใหม่ (ปกติ) หรือมีคนดักการเชื่อมต่อ (อันตราย)
+              <strong>อย่ากดแทนที่ key จนกว่าจะยืนยันกับผู้ดูแลเซิร์ฟเวอร์แล้ว</strong> ดูและลบ key ที่จำไว้ได้ที่ไอคอน <span class="ui">Known hosts</span></p>
+          </div>
+        </div>
+
+        <h3>รหัสผ่านเก็บที่ไหน</h3>
+        <p>ถ้ากรอกรหัสผ่านใน session หรือติ๊ก <span class="ui">Save in ...</span> ตอนที่โปรแกรมถาม รหัสผ่านจะเก็บใน<strong>ที่เก็บรหัสผ่านของระบบปฏิบัติการ</strong>เท่านั้น
+          (Windows Credential Manager บน Windows, GNOME Keyring หรือ KWallet บน Linux) ไม่อยู่ในฐานข้อมูลของโปรแกรม ไม่อยู่ใน log และไม่ติดไปกับไฟล์ export หรือไฟล์สำรอง
+          ลบรหัสผ่านที่บันทึกไว้ได้โดยแก้ไข session แล้วกด <span class="ui">Remove it</span> ใต้ช่องรหัสผ่าน</p>
+
+        <h3>เชื่อมต่อด้วยคีย์แทนรหัสผ่าน</h3>
+        <p>ใน <span class="ui">Authentication</span> เลือก <span class="ui">Private key</span> แล้วกดปุ่มรูปโฟลเดอร์เพื่อเลือกไฟล์คีย์ (เช่น <code>id_ed25519</code>) รองรับคีย์ OpenSSH, PEM และ PuTTY <code>.ppk</code>
+          ถ้าคีย์มี passphrase กรอกในช่อง <span class="ui">Key passphrase</span> หรือเว้นว่างให้ถามตอนเชื่อมต่อ บน Linux พิมพ์ path แบบ <code>~/.ssh/id_ed25519</code> ได้
+          ยังไม่มีคีย์? สร้างได้ในโปรแกรม ดู<a href="#keys">หัวข้อ 15</a></p>
+
+        <h3>Quick Connect: เชื่อมต่อครั้งเดียวไม่ต้องบันทึก</h3>
+        <p>กดปุ่ม <span class="ui">Quick connect</span> แล้วพิมพ์ <code>ผู้ใช้@โฮสต์:พอร์ต</code> เช่น <code>admin@192.168.1.10:22</code> แล้วกด Enter
+          ถ้าใช้แล้วชอบ บันทึกเป็น session ได้ภายหลัง รายการที่เคยเชื่อมต่อดูได้ที่ไอคอน <span class="ui">Recent connections</span></p>
+
+        <h3>เมื่อการเชื่อมต่อหลุด</h3>
+        <p>ช่องเทอร์มินัลจะแสดงสาเหตุและปุ่ม <span class="ui">Reconnect</span> กดเพื่อเชื่อมต่อใหม่ในช่องเดิม ถ้าเครือข่ายไม่เสถียร ตั้ง <span class="ui">Keepalive interval</span> ใน session (เช่น 30 วินาที) เพื่อลดการหลุดจากการไม่มีกิจกรรม</p>
+      </section>
+
+      <!-- 5 -->
+      <section id="sessions">
+        <h2><span class="num">05</span>จัดการ session</h2>
+        <h3>โฟลเดอร์ รายการโปรด และแท็ก</h3>
+        <ul>
+          <li>สร้างโฟลเดอร์ด้วยปุ่มโฟลเดอร์ในแผง Sessions แล้ว<strong>ลาก session ไปวางบนโฟลเดอร์</strong>เพื่อย้าย</li>
+          <li>คลิกขวาโฟลเดอร์เพื่อเปลี่ยนชื่อหรือลบ (session ข้างในจะย้ายออกมา ไม่ถูกลบ)</li>
+          <li>คลิกขวา session → <span class="ui">Favorite</span> เพื่อปักไว้ด้านบน</li>
+          <li>ใส่ <span class="ui">Tags (comma separated)</span> เช่น <code>prod, db</code> แล้วค้นหาด้วยแท็กได้</li>
+          <li><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> ค้นหา session จากชื่อ host ผู้ใช้ หรือแท็ก</li>
+        </ul>
+        <h3>เมนูคลิกขวาของ session</h3>
+        <div class="table-wrap">
+          <table>
+            <tbody>
+              <tr><td>Connect / Connect in split pane</td><td>เชื่อมต่อในแท็บใหม่ หรือเปิดเป็นช่องใหม่ข้างเทอร์มินัลที่ใช้อยู่</td></tr>
+              <tr><td>Open SFTP browser</td><td>เปิดหน้าจัดการไฟล์ของเซิร์ฟเวอร์นี้</td></tr>
+              <tr><td>Edit</td><td>แก้ไขการตั้งค่า</td></tr>
+              <tr><td>Duplicate</td><td>สร้างสำเนา (รหัสผ่านไม่ถูกคัดลอกไปด้วย เพื่อความปลอดภัย)</td></tr>
+              <tr><td>Move to folder</td><td>ย้ายโฟลเดอร์</td></tr>
+              <tr><td>Delete</td><td>ลบ session พร้อมรหัสผ่านที่บันทึกไว้ (มีหน้าต่างยืนยัน)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>นำเข้าและส่งออก</h3>
+        <p>ปุ่มนำเข้าในแผง Sessions มีตัวเลือกดังนี้</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ตัวเลือก</th><th>รายละเอียด</th></tr></thead>
+            <tbody>
+              <tr><td>OpenSSH config</td><td>อ่าน <code>~/.ssh/config</code> นำ Host, HostName, User, Port, IdentityFile และ ProxyJump เข้ามา</td></tr>
+              <tr><td>Import from MobaXterm</td><td>เลือกไฟล์ <code>.mxtsessions</code> (Export sessions จาก MobaXterm) หรือ <code>MobaXterm.ini</code> session SSH และ Telnet จะนำเข้าพร้อมโครงสร้างโฟลเดอร์</td></tr>
+              <tr><td>Import from PuTTY (this PC)</td><td>อ่าน session ของ PuTTY ในเครื่องนี้โดยตรง (Windows)</td></tr>
+              <tr><td>PuTTY .reg file</td><td>ไฟล์ที่ export จาก Registry ของเครื่องอื่น</td></tr>
+              <tr><td>NexaTerm JSON</td><td>ไฟล์ที่ export จาก NexaTerm เอง ใช้ย้าย session ระหว่างเครื่อง</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>เมื่อนำเข้าเสร็จ โปรแกรมจะสรุปจำนวนที่นำเข้าได้และรายการที่ข้าม (เช่น RDP, VNC ที่ยังไม่รองรับ) <strong>ไม่มีการนำเข้ารหัสผ่าน</strong>จากโปรแกรมอื่น</p>
+      </section>
+
+      <!-- 6 -->
+      <section id="ssh-advanced">
+        <h2><span class="num">06</span>SSH ขั้นสูง</h2>
+        <p>ตัวเลือกเหล่านี้อยู่ในหน้าแก้ไข session ส่วนตัวเลือกขั้นสูง</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ตัวเลือก</th><th>ใช้เมื่อไร</th></tr></thead>
+            <tbody>
+              <tr><td>Jump host (ProxyJump)</td><td>เซิร์ฟเวอร์ปลายทางเข้าได้ผ่านเครื่องกลาง (bastion) เท่านั้น เลือก session ของเครื่องกลางที่บันทึกไว้ (เครื่องกลางต้องบันทึกรหัสผ่านไว้ หรือใช้คีย์/agent)</td></tr>
+              <tr><td>Connection timeout (s)</td><td>รอนานเท่าไรก่อนแจ้งว่าเชื่อมต่อไม่ได้</td></tr>
+              <tr><td>Connection retries</td><td>ลองเชื่อมต่อซ้ำกี่ครั้งเมื่อไม่สำเร็จ</td></tr>
+              <tr><td>Keepalive interval</td><td>ส่งสัญญาณทุกกี่วินาทีเพื่อไม่ให้ firewall ตัดการเชื่อมต่อที่ว่าง (0 = ปิด)</td></tr>
+              <tr><td>Startup directory</td><td>เข้าโฟลเดอร์นี้ทันทีหลังล็อกอิน</td></tr>
+              <tr><td>Startup command</td><td>คำสั่งที่จะรันทันทีหลังล็อกอิน เช่น <code>sudo -i</code> หรือ <code>tmux attach</code></td></tr>
+              <tr><td>Terminal type</td><td>ค่า TERM ที่ส่งให้เซิร์ฟเวอร์ ปกติใช้ <code>xterm-256color</code></td></tr>
+              <tr><td>Compression (zlib)</td><td>บีบอัดข้อมูล ช่วยเมื่อเน็ตช้า</td></tr>
+              <tr><td>Forward SSH agent (ssh -A)</td><td>ให้เซิร์ฟเวอร์ใช้คีย์ใน agent ของเครื่องคุณเพื่อ SSH ต่อไปเครื่องอื่น <strong>เปิดเฉพาะกับเซิร์ฟเวอร์ที่ไว้ใจเท่านั้น</strong></td></tr>
+              <tr><td>X11 forwarding</td><td>แสดงโปรแกรมหน้าต่างกราฟิกของ Linux บนเครื่องคุณ (ดูด้านล่าง)</td></tr>
+              <tr><td>Follow terminal folder in the SFTP side panel</td><td>ให้แผง SFTP ข้างเทอร์มินัลเปลี่ยนโฟลเดอร์ตามคำสั่ง <code>cd</code> (ดู<a href="#sftp">หัวข้อ 8</a>)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>ล็อกอินสองขั้นตอน (รหัสผ่าน + รหัส OTP)</h3>
+        <ol class="steps-list">
+          <li>ตั้ง <span class="ui">Authentication</span> เป็น <span class="ui">Keyboard-interactive</span></li>
+          <li>ถ้าบันทึกรหัสผ่านไว้ รหัสผ่านจะตอบคำถามแรกให้อัตโนมัติ</li>
+          <li>เมื่อเซิร์ฟเวอร์ถามรหัส OTP โปรแกรมจะแสดงหน้าต่างให้กรอก (เช่นรหัส 6 หลักจากแอป Authenticator) กรอกแล้วกด Enter</li>
+        </ol>
+
+        <h3>ใช้ SSH agent</h3>
+        <div class="os-pair">
+          <div class="os-box">
+            <h4>Windows</h4>
+            <ol>
+              <li>เปิด PowerShell แบบ Administrator แล้วรัน<br><code>Set-Service ssh-agent -StartupType Automatic</code><br><code>Start-Service ssh-agent</code></li>
+              <li>เพิ่มคีย์: <code>ssh-add $HOME\.ssh\id_ed25519</code></li>
+              <li>ใน session เลือก <span class="ui">SSH agent</span></li>
+            </ol>
+          </div>
+          <div class="os-box">
+            <h4>Linux</h4>
+            <ol>
+              <li>เดสก์ท็อปส่วนใหญ่เปิด agent ไว้แล้ว ตรวจด้วย <code>echo $SSH_AUTH_SOCK</code></li>
+              <li>เพิ่มคีย์: <code>ssh-add ~/.ssh/id_ed25519</code></li>
+              <li>ใน session เลือก <span class="ui">SSH agent</span></li>
+            </ol>
+          </div>
+        </div>
+
+        <h3>X11 forwarding: เปิดโปรแกรมกราฟิกจากเซิร์ฟเวอร์</h3>
+        <div class="os-pair">
+          <div class="os-box">
+            <h4>Windows</h4>
+            <ol>
+              <li>ติดตั้ง X server ฟรี เช่น VcXsrv หรือ Xming (หรือ X410 จาก Microsoft Store)</li>
+              <li>ติ๊ก <span class="ui">X11 forwarding</span> ใน session โปรแกรมจะแสดงสถานะว่าพบ X server หรือไม่ และมีปุ่มสั่งเปิด X server ที่ติดตั้งไว้ให้</li>
+              <li>เชื่อมต่อแล้วลองรัน <code>xclock</code> หรือ <code>xeyes</code></li>
+            </ol>
+          </div>
+          <div class="os-box">
+            <h4>Linux</h4>
+            <ol>
+              <li>ไม่ต้องติดตั้งอะไรเพิ่ม เดสก์ท็อปมี X server (หรือ XWayland) อยู่แล้ว</li>
+              <li>ติ๊ก <span class="ui">X11 forwarding</span> ใน session</li>
+              <li>เชื่อมต่อแล้วรัน <code>xclock</code> หน้าต่างจะเปิดบนจอของคุณ</li>
+            </ol>
+          </div>
+        </div>
+        <p>เซิร์ฟเวอร์ต้องตั้ง <code>X11Forwarding yes</code> ใน <code>/etc/ssh/sshd_config</code> และติดตั้งแพ็กเกจ <code>xauth</code> ไว้ ความปลอดภัย: เซิร์ฟเวอร์จะได้รับเพียงรหัสชั่วคราวแบบสุ่ม ไม่เห็นรหัสจริงของหน้าจอคุณ</p>
+      </section>
+
+      <!-- 7 -->
+      <section id="telnet-serial">
+        <h2><span class="num">07</span>Telnet และ Serial</h2>
+        <h3>Telnet</h3>
+        <p>สร้าง session ใหม่ เลือกประเภท <span class="ui">Telnet</span> กรอก host และ port (ค่าเริ่มต้น 23) ใช้กับอุปกรณ์เครือข่ายรุ่นเก่า</p>
+        <div class="callout warn">
+          <svg width="20" height="20" aria-hidden="true"><use href="#i-warn"/></svg>
+          <div><p><strong>Telnet ไม่เข้ารหัส</strong> รหัสผ่านและทุกอย่างที่พิมพ์ส่งเป็นข้อความธรรมดา ใช้ในเครือข่ายภายในที่ไว้ใจได้เท่านั้น ถ้าอุปกรณ์รองรับ SSH ให้ใช้ SSH</p></div>
+        </div>
+        <h3>Serial (สาย console, USB-to-Serial)</h3>
+        <ol class="steps-list">
+          <li>เสียบสาย แล้วสร้าง session ใหม่ ประเภท <span class="ui">Serial</span></li>
+          <li>ช่อง <span class="ui">Port</span> จะแสดงพอร์ตที่ตรวจพบ: บน Windows เป็น <code>COM3</code>, <code>COM4</code> ... บน Linux เป็น <code>/dev/ttyUSB0</code>, <code>/dev/ttyACM0</code> หรือพิมพ์เองก็ได้</li>
+          <li>ตั้ง <span class="ui">Speed (baud)</span> ตามอุปกรณ์ อุปกรณ์เครือข่ายส่วนใหญ่ใช้ <code>9600</code> บอร์ดพัฒนามักใช้ <code>115200</code></li>
+          <li><span class="ui">Data bits</span> 8, <span class="ui">Parity</span> none, <span class="ui">Stop bits</span> 1, <span class="ui">Flow control</span> none เป็นค่าที่ใช้กันมากที่สุด (เรียกว่า 8N1)</li>
+          <li>บันทึกแล้วดับเบิลคลิกเพื่อเปิด กด Enter หนึ่งครั้งเพื่อให้อุปกรณ์แสดง prompt</li>
+        </ol>
+        <div class="callout tip">
+          <svg width="20" height="20" aria-hidden="true"><use href="#i-info"/></svg>
+          <div>
+            <strong>Linux: ขึ้นว่า Permission denied</strong>
+            <p>เพิ่มผู้ใช้ของคุณเข้ากลุ่ม dialout แล้วออกจากระบบและเข้าใหม่หนึ่งครั้ง</p>
+            <pre><code>sudo usermod -aG dialout $USER</code></pre>
+            <p>(Arch Linux ใช้กลุ่ม <code>uucp</code>)</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8 -->
+      <section id="sftp">
+        <h2><span class="num">08</span>SFTP รับส่งไฟล์</h2>
+        <figure>
+          <img src="images/sftp.png" loading="lazy" alt="หน้าต่าง SFTP แสดงรายการไฟล์บนเซิร์ฟเวอร์ พร้อมขนาด วันที่ และสิทธิ์">
+          <figcaption>หน้าจัดการไฟล์ SFTP</figcaption>
+        </figure>
+        <h3>เปิด SFTP</h3>
+        <ul>
+          <li>ระหว่างใช้เทอร์มินัล SSH กดปุ่ม <span class="ui">Open SFTP for the active SSH terminal</span> บนแถบเครื่องมือ (ใช้การเชื่อมต่อเดิม ไม่ต้องล็อกอินใหม่)</li>
+          <li>หรือคลิกขวา session → <span class="ui">Open SFTP browser</span></li>
+        </ul>
+        <h3>การใช้งานพื้นฐาน</h3>
+        <div class="table-wrap">
+          <table>
+            <tbody>
+              <tr><td>เข้าโฟลเดอร์</td><td>ดับเบิลคลิกโฟลเดอร์ หรือพิมพ์ path ในแถบด้านบนแล้วกด Enter ใช้ปุ่มย้อนกลับ/ถัดไป/ขึ้นบน/หน้าแรกได้</td></tr>
+              <tr><td>อัปโหลด</td><td><strong>ลากไฟล์หรือโฟลเดอร์จาก File Explorer มาวาง</strong> หรือกดปุ่มอัปโหลดไฟล์/อัปโหลดโฟลเดอร์</td></tr>
+              <tr><td>ดาวน์โหลด</td><td>คลิกขวาไฟล์หรือโฟลเดอร์ → Download แล้วเลือกที่เก็บในเครื่อง</td></tr>
+              <tr><td>แก้ไขไฟล์ข้อความ</td><td>ดับเบิลคลิกไฟล์ จะเปิดในแท็บแก้ไข กด <kbd>Ctrl</kbd>+<kbd>S</kbd> เพื่อบันทึกกลับไปที่เซิร์ฟเวอร์</td></tr>
+              <tr><td>สร้าง / เปลี่ยนชื่อ / ลบ</td><td>ปุ่มบนแถบเครื่องมือหรือคลิกขวา การลบทุกครั้งจะถามยืนยันก่อน การลบโฟลเดอร์จะลบทุกอย่างข้างใน</td></tr>
+              <tr><td>กรอง / เรียง</td><td>พิมพ์ในช่องกรองเพื่อหาไฟล์ในโฟลเดอร์ คลิกหัวคอลัมน์เพื่อเรียง</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>การรับส่งไฟล์ทำทีละรายการตามคิว แสดงความคืบหน้าและกดยกเลิกได้ ถ้ายกเลิก ไฟล์ที่ส่งไม่ครบจะถูกลบทิ้ง และโปรแกรมจะ<strong>ไม่เขียนทับไฟล์ที่มีอยู่โดยไม่ถามก่อน</strong>
+          การบันทึกไฟล์ในตัวแก้ไขจะเขียนเป็นไฟล์ชั่วคราวก่อนแล้วค่อยแทนที่ไฟล์เดิม ถ้าเน็ตหลุดระหว่างบันทึก ไฟล์เดิมจะไม่เสียหาย</p>
+
+        <h3>เปลี่ยนสิทธิ์ไฟล์ (chmod / chown)</h3>
+        <ol class="steps-list">
+          <li>คลิกขวาไฟล์หรือโฟลเดอร์ → <span class="ui">Permissions and owner</span></li>
+          <li>ติ๊กช่อง อ่าน/เขียน/รัน ของเจ้าของ กลุ่ม และคนอื่น หรือพิมพ์เป็นตัวเลข เช่น <code>644</code> หรือ <code>755</code></li>
+          <li>ถ้าเป็นโฟลเดอร์ เลือกได้ว่าจะเปลี่ยนทุกอย่างข้างในด้วย</li>
+          <li>เปลี่ยนเจ้าของด้วยเลข uid/gid ได้ (มักต้องเป็น root)</li>
+        </ol>
+
+        <h3>แผง SFTP ข้างเทอร์มินัล</h3>
+        <p>กดปุ่ม <span class="ui">SFTP side panel</span> บนแถบเครื่องมือ จะเปิดรายการไฟล์ข้างเทอร์มินัล SSH ที่ใช้อยู่ ทำงานกับไฟล์และพิมพ์คำสั่งได้ในหน้าจอเดียว
+          ถ้าเปิดตัวเลือก <span class="ui">Follow terminal folder in the SFTP side panel</span> ใน session แผงจะเปลี่ยนโฟลเดอร์ตามเมื่อคุณพิมพ์ <code>cd</code> (รองรับ bash และ zsh บนเซิร์ฟเวอร์)</p>
+      </section>
+
+      <!-- 9 -->
+      <section id="tunnels">
+        <h2><span class="num">09</span>SSH tunnel (port forwarding)</h2>
+        <figure>
+          <img src="images/tunnels.png" loading="lazy" alt="หน้าจัดการ SSH tunnel แสดงรายการ tunnel และสถานะ">
+          <figcaption>หน้าจัดการ SSH tunnel</figcaption>
+        </figure>
+        <p>tunnel ใช้เข้าถึงบริการที่อยู่หลังเซิร์ฟเวอร์ SSH อย่างปลอดภัย เช่นฐานข้อมูลที่เปิดให้เข้าได้เฉพาะในเครือข่ายภายใน</p>
+        <h3>ตัวอย่าง: เข้าฐานข้อมูล PostgreSQL ภายในบริษัท</h3>
+        <p>สมมุติฐานข้อมูลอยู่ที่ <code>db.internal:5432</code> ซึ่งเข้าได้จากเซิร์ฟเวอร์ <code>Web server</code> เท่านั้น</p>
+        <ol class="steps-list">
+          <li>คลิกไอคอน <span class="ui">SSH tunnels</span> แล้วกด <span class="ui">New tunnel</span></li>
+          <li>เลือกประเภท <span class="ui">Local (-L)</span></li>
+          <li>เลือก session ที่จะใช้เป็นทางผ่าน: <code>Web server</code></li>
+          <li>พอร์ตในเครื่อง: <code>127.0.0.1</code> พอร์ต <code>15432</code></li>
+          <li>ปลายทาง: <code>db.internal</code> พอร์ต <code>5432</code></li>
+          <li>บันทึกแล้วกด Start เมื่อสถานะเป็นสีเขียว ให้โปรแกรมฐานข้อมูลเชื่อมต่อไปที่ <code>127.0.0.1:15432</code></li>
+        </ol>
+        <h3>ประเภทของ tunnel</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ประเภท</th><th>ทำอะไร</th><th>ตัวอย่าง</th></tr></thead>
+            <tbody>
+              <tr><td>Local (-L)</td><td>เปิดพอร์ตในเครื่องคุณ ส่งต่อไปยังปลายทางที่เซิร์ฟเวอร์เข้าถึงได้</td><td>เข้าฐานข้อมูล หน้าเว็บผู้ดูแล</td></tr>
+              <tr><td>Remote (-R)</td><td>เปิดพอร์ตบนเซิร์ฟเวอร์ ส่งกลับมายังเครื่องที่คุณเข้าถึงได้</td><td>ให้เซิร์ฟเวอร์เรียกเว็บที่รันอยู่บนเครื่องคุณ</td></tr>
+              <tr><td>Dynamic (-D)</td><td>สร้าง SOCKS5 proxy ในเครื่องคุณ</td><td>ตั้งเบราว์เซอร์ใช้ proxy <code>127.0.0.1:1080</code> เพื่อเปิดเว็บภายในผ่านเซิร์ฟเวอร์</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>tunnel ทำงานเฉพาะตอนที่กด Start และแต่ละ tunnel ใช้การเชื่อมต่อ SSH ของตัวเอง โปรแกรมแสดงจำนวนการเชื่อมต่อที่ผ่าน tunnel และเตือนถ้าพอร์ตในเครื่องถูกโปรแกรมอื่นใช้อยู่</p>
+      </section>
+
+      <!-- 10 -->
+      <section id="network">
+        <h2><span class="num">10</span>เครื่องมือเครือข่าย</h2>
+        <figure>
+          <img src="images/network-tools-light.png" loading="lazy" alt="หน้าเครื่องมือเครือข่าย แสดงผล ping">
+          <figcaption>เครื่องมือเครือข่าย (ธีมสว่าง)</figcaption>
+        </figure>
+        <p>คลิกไอคอน <span class="ui">Network tools</span> ทุกเครื่องมือทำงานเมื่อกดปุ่มเท่านั้น และกดยกเลิกได้</p>
+        <div class="table-wrap">
+          <table>
+            <tbody>
+              <tr><td>Ping</td><td>ตรวจว่าเครื่องปลายทางตอบสนองหรือไม่และใช้เวลาเท่าไร</td></tr>
+              <tr><td>Traceroute</td><td>ดูเส้นทางที่ข้อมูลวิ่งผ่านไปถึงปลายทาง ใช้หาว่าช้าหรือหลุดที่จุดไหน (Linux ต้องมี <code>traceroute</code> หรือ <code>tracepath</code>)</td></tr>
+              <tr><td>DNS lookup</td><td>แปลงชื่อโดเมนเป็น IP</td></tr>
+              <tr><td>Reverse DNS</td><td>แปลง IP กลับเป็นชื่อ</td></tr>
+              <tr><td>TCP port test</td><td>ตรวจว่าพอร์ตบนเครื่องปลายทางเปิดอยู่หรือไม่ (ทีละพอร์ต ไม่ใช่การสแกน)</td></tr>
+              <tr><td>Local interfaces</td><td>ดู IP ของเครื่องคุณทุกการ์ดเครือข่าย</td></tr>
+              <tr><td>Public IP</td><td>ดู IP สาธารณะของคุณ (เชื่อมต่อไปที่ api.ipify.org เฉพาะตอนกดปุ่ม)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 11 -->
+      <section id="split">
+        <h2><span class="num">11</span>แบ่งหน้าจอและแท็บ</h2>
+        <ul>
+          <li>ปุ่ม <span class="ui">Split</span> เพิ่มช่องเทอร์มินัลในแท็บเดียวกัน ได้สูงสุด 4 ช่อง</li>
+          <li>ปุ่ม <span class="ui">Layout: side by side</span> / <span class="ui">Layout: stacked</span> / <span class="ui">Four-pane grid</span> เปลี่ยนการจัดวาง</li>
+          <li>ลากเส้นแบ่งระหว่างช่องเพื่อปรับขนาด</li>
+          <li>คลิกขวา session → <span class="ui">Connect in split pane</span> เพื่อเปิดเซิร์ฟเวอร์ข้างช่องปัจจุบัน</li>
+          <li>ดับเบิลคลิกชื่อแท็บเพื่อเปลี่ยนชื่อ คลิกปุ่มกลางเมาส์เพื่อปิดแท็บ</li>
+          <li>ถ้าปิดแท็บที่มี SSH เชื่อมต่ออยู่ โปรแกรมจะถามยืนยันก่อน (ปิดการถามได้ในหน้าตั้งค่า)</li>
+        </ul>
+        <h3>ค้นหา บันทึก และ export</h3>
+        <ul>
+          <li><kbd>Ctrl</kbd>+<kbd>F</kbd> ค้นหาข้อความในเทอร์มินัล Enter ไปผลถัดไป Shift+Enter ย้อนกลับ Esc ปิด</li>
+          <li>ปุ่ม <span class="ui">Export terminal output to a file</span> บันทึกข้อความทั้งหมดที่อยู่บนจอเป็นไฟล์</li>
+          <li>ปุ่มบันทึก log เริ่มเขียนทุกอย่างที่แสดงลงไฟล์ต่อเนื่องจนกว่าจะกดหยุด</li>
+          <li>โปรแกรมไฮไลต์คำว่า error, warning, success และ IP address ให้อัตโนมัติ (ปิดได้ในหน้าตั้งค่า)</li>
+        </ul>
+      </section>
+
+      <!-- 12 -->
+      <section id="multiexec">
+        <h2><span class="num">12</span>สั่งหลายเครื่องพร้อมกัน (Multi-execution)</h2>
+        <figure>
+          <img src="images/multiexec.png" loading="lazy" alt="หน้าต่าง Multi-execution เลือกเทอร์มินัลหลายช่องและพิมพ์คำสั่ง">
+          <figcaption>ช่องที่ถูกเลือกจะมีกรอบสีเหลืองอำพันและป้าย MULTI-EXEC</figcaption>
+        </figure>
+        <ol class="steps-list">
+          <li>เปิดเทอร์มินัลของทุกเครื่องที่ต้องการ (ในแท็บเดียวกันหรือต่างแท็บก็ได้)</li>
+          <li>กดปุ่ม <span class="ui">Multi-execution</span> บนแถบเครื่องมือ</li>
+          <li>ติ๊กเลือกเทอร์มินัลเป้าหมาย</li>
+          <li>พิมพ์คำสั่ง แล้วกด <span class="ui">Broadcast</span></li>
+          <li>โปรแกรมแสดงรายชื่อเครื่องทั้งหมดให้ตรวจก่อนส่ง ถ้าคำสั่งอันตราย (เช่น <code>rm -rf</code>, <code>shutdown</code>, <code>reboot</code>) จะมีคำเตือนสีแดง</li>
+        </ol>
+        <p>โหมด <span class="ui">Mirror typing</span> ส่งทุกปุ่มที่พิมพ์ในช่องหนึ่งไปยังช่องอื่นที่เลือกทันที เหมาะกับการแก้ไฟล์เดียวกันในหลายเครื่อง ระวังการใช้กับคำสั่งที่ไม่ควรรันซ้ำ</p>
+      </section>
+
+      <!-- 13 -->
+      <section id="snippets">
+        <h2><span class="num">13</span>Snippets: เก็บคำสั่งที่ใช้บ่อย</h2>
+        <figure>
+          <img src="images/snippets.png" loading="lazy" alt="หน้า Snippets แสดงคำสั่งที่บันทึกไว้แยกตามหมวด">
+          <figcaption>คำสั่งที่บันทึกไว้แยกตามหมวด</figcaption>
+        </figure>
+        <ol class="steps-list">
+          <li>คลิกไอคอน <span class="ui">Command snippets</span> แล้วกด <span class="ui">New</span></li>
+          <li>ตั้งชื่อ เลือกหมวด และพิมพ์คำสั่ง</li>
+          <li>ส่วนที่ต้องเปลี่ยนทุกครั้ง ให้เขียนเป็นตัวแปรในวงเล็บปีกกาคู่ เช่น
+            <pre><code>journalctl -u {{service:nginx}} --since "{{since:1 hour ago}}"</code></pre>
+            <code>{{service:nginx}}</code> หมายถึงตัวแปรชื่อ service ค่าเริ่มต้น nginx</li>
+          <li>เวลาใช้ คลิก snippet โปรแกรมจะถามค่าตัวแปร แสดงคำสั่งที่จะรันจริงและเทอร์มินัลเป้าหมาย แล้วค่อยส่ง</li>
+        </ol>
+      </section>
+
+      <!-- 14 -->
+      <section id="macros">
+        <h2><span class="num">14</span>Macros: อัดแล้วเล่นซ้ำ</h2>
+        <p>macro ต่างจาก snippet ตรงที่เก็บ<strong>ทุกปุ่มที่กดรวมถึงช่วงเวลาที่รอ</strong> เหมาะกับขั้นตอนที่ต้องตอบโต้ เช่นเข้าเมนูของอุปกรณ์เครือข่าย</p>
+        <ol class="steps-list">
+          <li>คลิกในเทอร์มินัลที่จะอัด แล้วกดปุ่มอัดมาโคร (ไอคอนสเลตภาพยนตร์) บนแถบเครื่องมือ</li>
+          <li>พิมพ์ตามปกติ โปรแกรมจะจำทั้งตัวอักษรและการเว้นช่วง</li>
+          <li>กดปุ่มเดิมอีกครั้งเพื่อหยุด แล้วตั้งชื่อ macro</li>
+          <li>เปิดแผง <span class="ui">Macros</span> จากแถบไอคอนซ้าย เลือก macro แล้วกดเล่น โปรแกรมจะแสดงเนื้อหาทั้งหมดให้ตรวจก่อนเสมอ</li>
+        </ol>
+      </section>
+
+      <!-- 15 -->
+      <section id="keys">
+        <h2><span class="num">15</span>จัดการคีย์ SSH</h2>
+        <figure>
+          <img src="images/keys.png" loading="lazy" alt="หน้า SSH keys แสดงคีย์ที่มีและปุ่มสร้างคีย์">
+          <figcaption>หน้าจัดการคีย์ SSH</figcaption>
+        </figure>
+        <h3>สร้างคีย์และใช้ล็อกอินแทนรหัสผ่าน</h3>
+        <ol class="steps-list">
+          <li>คลิกไอคอน <span class="ui">SSH keys</span> แล้วกดสร้างคีย์ใหม่</li>
+          <li>เลือกชนิด <strong>Ed25519</strong> (แนะนำ) หรือ RSA สำหรับเซิร์ฟเวอร์เก่ามาก</li>
+          <li>ตั้ง passphrase เพื่อป้องกันคีย์หากไฟล์หลุดออกไป (แนะนำ)</li>
+          <li>กดคัดลอก public key</li>
+          <li>ล็อกอินเซิร์ฟเวอร์ด้วยรหัสผ่านครั้งสุดท้าย แล้วรัน (วาง public key แทนข้อความในเครื่องหมายคำพูด):
+            <pre><code>mkdir -p ~/.ssh &amp;&amp; chmod 700 ~/.ssh
+echo "ssh-ed25519 AAAA... you@pc" &gt;&gt; ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys</code></pre></li>
+          <li>แก้ไข session ให้ <span class="ui">Authentication</span> เป็น <span class="ui">Private key</span> แล้วเลือกไฟล์คีย์ที่สร้าง</li>
+        </ol>
+        <p>หน้านี้ยังใช้นำเข้าคีย์ที่มีอยู่แล้ว ดูและ export public key เปลี่ยนหรือลบ passphrase และตรวจว่าไฟล์คีย์เสียหายหรือไม่</p>
+        <div class="callout danger">
+          <svg width="20" height="20" aria-hidden="true"><use href="#i-warn"/></svg>
+          <div><p><strong>อย่าส่งไฟล์ private key ให้ใคร</strong> ส่งได้เฉพาะ public key (บรรทัดที่ขึ้นต้นด้วย <code>ssh-ed25519</code> หรือ <code>ssh-rsa</code>)</p></div>
+        </div>
+      </section>
+
+      <!-- 16 -->
+      <section id="settings">
+        <h2><span class="num">16</span>ตั้งค่าโปรแกรม</h2>
+        <p>คลิกไอคอน <span class="ui">Settings</span> ล่างสุดของแถบไอคอน การเปลี่ยนแปลงมีผลทันที</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ตัวเลือก</th><th>คำอธิบาย</th></tr></thead>
+            <tbody>
+              <tr><td>Application theme</td><td>ธีมมืดหรือสว่างของโปรแกรม</td></tr>
+              <tr><td>Terminal color theme</td><td>ชุดสีของเทอร์มินัล (มี 4 แบบ)</td></tr>
+              <tr><td>Font family / Font size / Line height</td><td>แบบอักษร ขนาด และระยะบรรทัดของเทอร์มินัล</td></tr>
+              <tr><td>Cursor style / Blinking cursor</td><td>รูปแบบเคอร์เซอร์ (บล็อก ขีดล่าง เส้นตั้ง) และการกะพริบ</td></tr>
+              <tr><td>Scrollback lines</td><td>จำนวนบรรทัดย้อนหลังที่เลื่อนขึ้นไปดูได้</td></tr>
+              <tr><td>Copy on select</td><td>คัดลอกทันทีเมื่อลากเลือกข้อความ</td></tr>
+              <tr><td>Right-click copies selection / pastes</td><td>คลิกขวาเพื่อคัดลอก/วาง</td></tr>
+              <tr><td>Send Ctrl+W / Ctrl+T to the shell</td><td>เปิดไว้ (ค่าเริ่มต้น) Ctrl+W ใช้ลบคำใน bash ได้ ปิดแล้ว Ctrl+W จะปิดแท็บแทน</td></tr>
+              <tr><td>Confirm before closing connected SSH tabs</td><td>ถามก่อนปิดแท็บที่ยังเชื่อมต่ออยู่</td></tr>
+              <tr><td>Confirm before pasting several lines</td><td>ถามก่อนวางข้อความหลายบรรทัด</td></tr>
+              <tr><td>Highlight errors, warnings and IP addresses in output</td><td>ไฮไลต์คำสำคัญในผลลัพธ์</td></tr>
+              <tr><td>Default shell</td><td>shell ที่เปิดเมื่อกด Ctrl+T</td></tr>
+              <tr><td>Back up / Restore database</td><td>สำรองและกู้คืนข้อมูล (ดู<a href="#data">หัวข้อ 18</a>)</td></tr>
+              <tr><td>Show welcome screen again</td><td>แสดงหน้าต้อนรับอีกครั้ง</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 17 -->
+      <section id="shortcuts">
+        <h2><span class="num">17</span>คีย์ลัดทั้งหมด</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>คีย์</th><th>การทำงาน</th></tr></thead>
+            <tbody>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd></td><td>สร้าง session ใหม่</td></tr>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>T</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></td><td>เปิดเทอร์มินัลใหม่</td></tr>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>W</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>W</kbd></td><td>ปิดแท็บ</td></tr>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>Tab</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>ไปแท็บถัดไป / ก่อนหน้า</td></tr>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>ค้นหาในเทอร์มินัล</td></tr>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></td><td>ค้นหา session</td></tr>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd> (เมื่อเลือกข้อความ)</td><td>คัดลอก</td></tr>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>V</kbd></td><td>วาง</td></tr>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd></td><td>คัดลอก / วาง เสมอ (ไม่ส่งไปที่ shell)</td></tr>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>+</kbd> / <kbd>Ctrl</kbd>+<kbd>-</kbd> / <kbd>Ctrl</kbd>+<kbd>0</kbd></td><td>ขยาย / ย่อ / คืนขนาดตัวอักษร</td></tr>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd> (ในตัวแก้ไขไฟล์)</td><td>บันทึกไฟล์กลับไปที่เซิร์ฟเวอร์</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>ขณะพิมพ์ในเทอร์มินัล <kbd>Ctrl</kbd>+<kbd>W</kbd> และ <kbd>Ctrl</kbd>+<kbd>T</kbd> จะส่งให้ shell ตามค่าเริ่มต้น ใช้แบบมี <kbd>Shift</kbd> เพื่อสั่งโปรแกรมแทน</p>
+      </section>
+
+      <!-- 18 -->
+      <section id="data">
+        <h2><span class="num">18</span>ข้อมูล สำรอง และรุ่นพกพา</h2>
+        <h3>ข้อมูลเก็บที่ไหน</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ข้อมูล</th><th>Windows (ติดตั้ง)</th><th>Linux</th><th>รุ่นพกพา</th></tr></thead>
+            <tbody>
+              <tr><td>session, การตั้งค่า, snippet, tunnel</td><td><code>%APPDATA%\NexaTerm\nexaterm.db</code></td><td><code>~/.config/NexaTerm/nexaterm.db</code></td><td><code>portable-data\</code></td></tr>
+              <tr><td>log ของโปรแกรม</td><td><code>%APPDATA%\NexaTerm\logs</code></td><td><code>~/.config/NexaTerm/logs</code></td><td><code>portable-data\logs</code></td></tr>
+              <tr><td>รหัสผ่าน</td><td>Windows Credential Manager</td><td>GNOME Keyring / KWallet</td><td>Windows Credential Manager ของเครื่องที่ใช้</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>log ของโปรแกรมจะปิดบังรหัสผ่านก่อนเขียนเสมอ</p>
+        <h3>สำรองและกู้คืน</h3>
+        <ol class="steps-list">
+          <li><span class="ui">Settings</span> → <span class="ui">Back up database</span> เลือกที่เก็บไฟล์สำรอง</li>
+          <li>ย้ายไปเครื่องใหม่: ติดตั้ง NexaTerm แล้ว <span class="ui">Restore database</span> เลือกไฟล์สำรอง</li>
+          <li>ก่อนกู้คืน โปรแกรมจะเก็บสำเนาข้อมูลปัจจุบันไว้ให้อัตโนมัติ</li>
+        </ol>
+        <p>ไฟล์สำรองไม่มีรหัสผ่านอยู่ข้างใน หลังกู้คืนโปรแกรมจะถามรหัสผ่านใหม่ตอนเชื่อมต่อครั้งแรก</p>
+        <h3>ถอนการติดตั้ง</h3>
+        <ul>
+          <li>Windows: Settings → Apps → NexaTerm → Uninstall ระหว่างถอน ติ๊ก <strong>ลบข้อมูลของโปรแกรม</strong>ได้ถ้าต้องการลบ session ทั้งหมดด้วย</li>
+          <li>Linux: ลบผ่านโปรแกรมจัดการแอป หรือ <code>sudo apt remove</code> / <code>sudo dnf remove</code> ตามด้วยชื่อแพ็กเกจ (ดูวิธีหาชื่อใน<a href="#install">หัวข้อ 1</a>) ข้อมูลใน <code>~/.config/NexaTerm</code> ยังอยู่ ลบเองได้ถ้าไม่ต้องการ</li>
+          <li>รหัสผ่านที่ค้างใน Windows Credential Manager ค้นหาด้วยคำว่า <code>NexaTerm/</code> ในหัวข้อ Windows Credentials</li>
+        </ul>
+      </section>
+
+      <!-- 19 -->
+      <section id="trouble">
+        <h2><span class="num">19</span>แก้ปัญหาที่พบบ่อย</h2>
+
+        <details class="trouble">
+          <summary>Connection refused</summary>
+          <div><p>เครื่องปลายทางไม่ได้เปิดบริการ SSH ที่พอร์ตนั้น ตรวจว่าพิมพ์พอร์ตถูก (ปกติ 22) และบนเซิร์ฟเวอร์รัน <code>sudo systemctl status ssh</code> (หรือ <code>sshd</code>)</p></div>
+        </details>
+        <details class="trouble">
+          <summary>Timeout / เชื่อมต่อนานแล้วขึ้นหมดเวลา</summary>
+          <div><p>ไปไม่ถึงเครื่องปลายทาง อาจเพราะ IP ผิด เครื่องปิดอยู่ หรือ firewall บล็อก ลองใช้ <a href="#network">Network tools</a> → Ping และ TCP port test กับพอร์ต 22 ถ้าต้องผ่าน VPN ให้เชื่อมต่อ VPN ก่อน</p></div>
+        </details>
+        <details class="trouble">
+          <summary>Authentication failed / รหัสผ่านไม่ถูกต้อง</summary>
+          <div>
+            <ul>
+              <li>ตรวจชื่อผู้ใช้ (ตัวพิมพ์เล็ก-ใหญ่มีผล)</li>
+              <li>ถ้าบันทึกรหัสผ่านเก่าไว้ แก้ไข session → <span class="ui">Remove it</span> แล้วเชื่อมต่อใหม่ให้โปรแกรมถาม</li>
+              <li>เซิร์ฟเวอร์บางเครื่องปิดการล็อกอินด้วยรหัสผ่าน ต้องใช้คีย์ (ดู<a href="#keys">หัวข้อ 15</a>)</li>
+              <li>ถ้าเซิร์ฟเวอร์ถามรหัส OTP ให้ใช้ <span class="ui">Keyboard-interactive</span></li>
+            </ul>
+          </div>
+        </details>
+        <details class="trouble">
+          <summary>Host key changed / เตือนว่า key ของเซิร์ฟเวอร์เปลี่ยน</summary>
+          <div><p>ดูกรอบสีแดงใน<a href="#ssh">หัวข้อ 4</a> ยืนยันกับผู้ดูแลเซิร์ฟเวอร์ก่อนเสมอ ถ้าเซิร์ฟเวอร์ถูกติดตั้งใหม่จริง ลบ key เก่าที่ <span class="ui">Known hosts</span> แล้วเชื่อมต่อใหม่</p></div>
+        </details>
+        <details class="trouble">
+          <summary>No SSH agent found / OpenSSH Authentication Agent is not running</summary>
+          <div><p>agent ยังไม่ได้เปิดหรือยังไม่มีคีย์ ทำตามขั้นตอนในหัวข้อ <a href="#ssh-advanced">ใช้ SSH agent</a></p></div>
+        </details>
+        <details class="trouble">
+          <summary>Serial: Permission denied (Linux) หรือ port is in use</summary>
+          <div><p>Linux: เพิ่มผู้ใช้เข้ากลุ่ม <code>dialout</code> แล้วออกจากระบบและเข้าใหม่ ถ้าขึ้นว่าพอร์ตถูกใช้อยู่ ให้ปิดโปรแกรมอื่นที่เปิดพอร์ตเดียวกัน (เช่น PuTTY, Arduino IDE)</p></div>
+        </details>
+        <details class="trouble">
+          <summary>X11: เปิดโปรแกรมกราฟิกแล้วไม่ขึ้นหน้าต่าง</summary>
+          <div>
+            <ul>
+              <li>Windows: ตรวจว่า X server (VcXsrv/Xming/X410) เปิดอยู่ หน้าแก้ไข session จะแสดงสถานะให้</li>
+              <li>เซิร์ฟเวอร์ต้องมี <code>X11Forwarding yes</code> และติดตั้ง <code>xauth</code></li>
+              <li>หลังเชื่อมต่อ ลอง <code>echo $DISPLAY</code> บนเซิร์ฟเวอร์ ควรได้ค่าเช่น <code>localhost:10.0</code></li>
+            </ul>
+          </div>
+        </details>
+        <details class="trouble">
+          <summary>Linux: บันทึกรหัสผ่านไม่ได้ (Secret Service / keyring)</summary>
+          <div><p>เดสก์ท็อปต้องมี keyring ทำงานอยู่ ติดตั้งด้วย <code>sudo apt install gnome-keyring</code> (หรือใช้ KWallet บน KDE) แล้วออกจากระบบและเข้าใหม่ ถ้า keyring ถูกล็อก ระบบจะถามรหัสผ่านเพื่อปลดล็อก ระหว่างนี้ยังเชื่อมต่อได้โดยพิมพ์รหัสผ่านทุกครั้ง</p></div>
+        </details>
+        <details class="trouble">
+          <summary>Windows: เปิดโปรแกรมแล้วขึ้นว่าไม่พบ WebView2</summary>
+          <div><p>ติดตั้ง Microsoft Edge WebView2 Runtime จาก <a href="https://developer.microsoft.com/microsoft-edge/webview2/" target="_blank" rel="noopener">เว็บไซต์ Microsoft</a> หรือใช้ตัวติดตั้งแบบออฟไลน์ <code>NexaTerm-Setup-x64.exe</code> ที่รวม WebView2 ไว้แล้ว</p></div>
+        </details>
+        <details class="trouble">
+          <summary>ตัวติดตั้งแบบออฟไลน์หยุดกลางคัน</summary>
+          <div><p>ตัวติดตั้งขนาดใหญ่ต้องใช้พื้นที่ว่างชั่วคราวประมาณ 300 MB ในไดรฟ์ C: ลบไฟล์ใน <code>%TEMP%</code> หรือเพิ่มพื้นที่ว่างแล้วลองใหม่ หรือใช้ตัวติดตั้งแบบ web ที่มีขนาดเล็ก</p></div>
+        </details>
+        <details class="trouble">
+          <summary>ตรวจสอบปัญหาด้วยตัวเอง (self-test)</summary>
+          <div>
+            <p>โปรแกรมมีโหมดตรวจสอบตัวเอง ตรวจฐานข้อมูล ที่เก็บรหัสผ่าน การเปิด shell และไฟล์ log</p>
+            <pre><code># Windows (PowerShell ในโฟลเดอร์ที่ติดตั้ง)
+.\NexaTerm.exe --self-test
+
+# Linux
+nexaterm --self-test</code></pre>
+            <p>แนบผลลัพธ์มาด้วยเมื่อ<a href="https://github.com/bom-sudo/NexaTerm/issues" target="_blank" rel="noopener">แจ้งปัญหาบน GitHub</a></p>
+          </div>
+        </details>
+
+        <div class="callout tip">
+          <svg width="20" height="20" aria-hidden="true"><use href="#i-info"/></svg>
+          <div><p><strong>ยังแก้ไม่ได้?</strong> <a href="https://github.com/bom-sudo/NexaTerm/issues" target="_blank" rel="noopener">เปิด issue บน GitHub</a> บอกระบบปฏิบัติการ เวอร์ชัน NexaTerm (ดูได้ที่แถบสถานะด้านล่าง) และข้อความ error ที่เห็น อย่าแนบรหัสผ่านหรือ private key</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <a class="g-top" href="#content" aria-label="กลับขึ้นด้านบน"><svg width="20" height="20" aria-hidden="true"><use href="#i-up"/></svg></a>
+
+  <footer class="footer">
+    <div class="wrap footer-bottom">
+      <p>&copy; 2026 NexaTerm Project · ฟรีและโอเพนซอร์สภายใต้สัญญาอนุญาต MIT ·
+        <a href="https://github.com/bom-sudo/NexaTerm" target="_blank" rel="noopener">ซอร์สโค้ดบน GitHub</a> ·
+        <a href="https://github.com/bom-sudo/NexaTerm/edit/main/website/guide.html" target="_blank" rel="noopener">เสนอแก้ไขคู่มือนี้</a></p>
+    </div>
+  </footer>
+
+  <script>
+    // Highlight the current section in the table of contents.
+    (function () {
+      const links = Array.from(document.querySelectorAll('.g-toc a'));
+      const byId = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          links.forEach((a) => a.classList.remove('active'));
+          const a = byId.get(e.target.id);
+          if (a) a.classList.add('active');
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      document.querySelectorAll('.g-main section[id]').forEach((s) => obs.observe(s));
+
+      // Mobile table of contents toggle.
+      const toggle = document.querySelector('.g-toc-toggle');
+      const toc = document.getElementById('toc');
+      toggle.addEventListener('click', () => {
+        const open = toc.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      toc.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A' && window.matchMedia('(max-width: 980px)').matches) {
+          toc.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // Back-to-top button.
+      const top = document.querySelector('.g-top');
+      window.addEventListener('scroll', () => top.classList.toggle('show', window.scrollY > 800), { passive: true });
+    })();
+  </script>
+</body>
+
+</html>
