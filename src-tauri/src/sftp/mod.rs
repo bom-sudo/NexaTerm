@@ -433,6 +433,8 @@ impl SftpHandle {
         let name = remote.trim_end_matches('/').rsplit('/').next().unwrap_or("");
         validate_file_name(name)?;
         let (entries, skipped) = self.walk_remote(remote, cancel).await?;
+        // ชื่อไฟล์บางแบบใช้บน Windows ไม่ได้ ตรวจก่อนเริ่มดาวน์โหลดเพื่อไม่ให้ได้โฟลเดอร์ครึ่ง ๆ กลาง ๆ
+        #[cfg(windows)]
         for (rel, _, _) in &entries {
             for part in rel.split('/') {
                 if part.contains([':', '*', '?', '"', '<', '>', '|', '\\']) {
@@ -452,7 +454,9 @@ impl SftpHandle {
         std::fs::create_dir_all(&root)?;
         let mut files = 0;
         for (rel, is_dir, size) in &entries {
-            let target = root.join(rel.replace('/', "\\"));
+            // Join component by component so the OS separator is used (a literal "\" is a valid
+            // file name character on Linux).
+            let target = rel.split('/').fold(root.clone(), |p, part| p.join(part));
             if *is_dir {
                 std::fs::create_dir_all(&target)?;
                 continue;

@@ -4,6 +4,7 @@
 //! Writes the report to stdout (when redirected) and to `<data dir>\logs\self-test.txt`.
 //! It creates no lasting data except the `selfTest.lastRun` setting used to prove persistence.
 
+#[cfg(windows)]
 use crate::credentials::SecretStore;
 use crate::database::{self, models::SessionInput, repo};
 use std::io::Write;

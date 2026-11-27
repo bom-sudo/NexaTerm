@@ -218,7 +218,9 @@ pub fn parse_openssh_config(text: &str) -> Vec<SshConfigHost> {
                         "user" => h.user = Some(v.clone()),
                         "port" => h.port = v.parse().ok(),
                         "identityfile" if h.identity_file.is_none() => {
-                            let p = v.replacen('~', &home, 1).replace('/', "\\");
+                            let p = v.replacen('~', &home, 1);
+                            #[cfg(windows)]
+                            let p = p.replace('/', "\\");
                             h.identity_file = Some(p);
                         }
                         "proxyjump" => h.proxy_jump = v.split(',').next().map(|s| s.split('@').last().unwrap_or(s).to_string()),
@@ -246,7 +248,8 @@ mod tests {
         assert_eq!(h[1].hostname.as_deref(), Some("10.0.0.5"));
         assert_eq!(h[2].alias, "web2");
         assert_eq!(h[2].proxy_jump.as_deref(), Some("bastion"));
-        assert!(h[1].identity_file.as_deref().unwrap().ends_with(r".ssh\id_ed25519"));
+        let want = if cfg!(windows) { r".ssh\id_ed25519" } else { ".ssh/id_ed25519" };
+        assert!(h[1].identity_file.as_deref().unwrap().ends_with(want));
     }
 
     #[test]
