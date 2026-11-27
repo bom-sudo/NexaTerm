@@ -31,3 +31,7 @@ railway-design-md.md
 # Code signing material - never commit
 *.pfx
 *.p12
+
+# Scratch files from local tooling
+*.tmp.json
+*.tmp.html
