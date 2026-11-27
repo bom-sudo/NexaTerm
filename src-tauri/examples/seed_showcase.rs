@@ -15,6 +15,16 @@ fn store() -> credentials::WindowsCredentialStore {
     credentials::WindowsCredentialStore
 }
 
+#[cfg(target_os = "linux")]
+fn store() -> credentials::SecretServiceStore {
+    credentials::SecretServiceStore
+}
+
+#[cfg(not(any(windows, target_os = "linux")))]
+fn store() -> credentials::MemoryStore {
+    credentials::MemoryStore::default()
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.first().map(String::as_str) == Some("--cleanup") {

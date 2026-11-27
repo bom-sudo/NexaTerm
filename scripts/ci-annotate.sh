@@ -3,7 +3,7 @@
 # failure is visible on the run summary page (and through the public check-runs API).
 # GitHub shows at most 10 error annotations per step, so related lines are grouped.
 log="${1:?usage: ci-annotate.sh <logfile>}"
-[ -f "$log" ] || { echo "::error::log file $log not found"; exit 0; }
+[ -f "$log" ] || exit 0  # the step that writes it did not run
 
 emit() { # title, body
   local body="${2//'%'/'%25'}"
