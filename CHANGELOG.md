@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.1 — 2026-11-28
+
+### Added
+- Status bar shows the CPU, memory, root disk, network rate and uptime of the SSH server in the active pane (Linux servers, read every 3 s over the same connection; can be turned off in Settings).
+- Check for updates in Settings and on the version number in the status bar. Installed Windows builds download the new installer, verify its SHA-256 against the release checksums and update in place; portable and Linux builds open the release page. Runs only when clicked.
+- Close button on every pane of a split tab.
+
+### Fixed
+- Thai installer: the desktop-shortcut checkbox and other installer messages were blank, and several standard texts were mistranslated. The installer now has its own NexaTerm sidebar image.
+- New session dialog: an empty or invalid host, user name, key file or port is marked on the field itself with a message saying what to enter, instead of a short error at the bottom.
+- Linux: folder downloads over SFTP put files in subfolders under wrong names.
+
 ## 1.1.0 — 2026-11-27
 
 ### Added

@@ -17,7 +17,7 @@
   <a href="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml/badge.svg"></a>
   <img alt="Platform: Windows 10/11 x64, Linux x64" src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011%20%7C%20Linux%20x64-0b1930">
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-35bdf2">
-  <img alt="Version 1.1.0" src="https://img.shields.io/badge/version-1.1.0-477bff">
+  <img alt="Version 1.1.1" src="https://img.shields.io/badge/version-1.1.1-477bff">
   <img alt="Built with Tauri 2 and Rust" src="https://img.shields.io/badge/built%20with-Tauri%202%20%2B%20Rust-142a49">
 </p>
 

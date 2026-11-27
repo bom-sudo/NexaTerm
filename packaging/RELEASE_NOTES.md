@@ -22,6 +22,16 @@ this repository by GitHub Actions after the full test suite passes.
 shows this for new programs that few people have downloaded yet. NexaTerm is applying for a free
 code signing certificate from SignPath Foundation; signed releases will show the publisher name.
 
+## New in 1.1.1
+
+* **Server monitor** in the status bar: CPU, memory, disk, network and uptime of the Linux server
+  you are connected to.
+* **Check for updates** in Settings (or click the version number in the status bar). On Windows the
+  update downloads, is verified against the published SHA-256 checksum and installs itself.
+* **Close button** on each pane of a split tab.
+* Fixes: complete Thai installer text, clearer messages in the new-session dialog, SFTP folder
+  downloads on Linux.
+
 ## New in 1.1.0
 
 * **Linux** (x64): deb, rpm and AppImage. Login shell in a real PTY, passwords in the desktop
