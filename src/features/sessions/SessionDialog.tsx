@@ -7,6 +7,7 @@ import { api, toApiError } from "../../services/api";
 import { useSessions } from "../../store/sessions";
 import { Button, Field, Modal } from "../../components/ui";
 import type { AuthMethod, Protocol, Session, SessionInput } from "../../types";
+import { FIELD_ORDER, fieldForServerError, validateFields, type FieldErrors } from "./validation";
 import { defaultSerialPort, isWindows, secretStore, secretStoreShort } from "../../utils/platform";
 
 interface Props {
@@ -50,11 +51,32 @@ export function SessionDialog({ session, initial, onClose }: Props) {
 
   const browseKey = async () => {
     const p = await open({ title: "Select private key", multiple: false, defaultPath: await api.keysDefaultDir() });
-    if (typeof p === "string") set("keyPath", p);
+    if (typeof p === "string") {
+      set("keyPath", p);
+      clearField("keyPath");
+    }
+  };
+
+  // Problems shown under the field they belong to (and the field outlined in red).
+  const [fieldErr, setFieldErr] = useState<FieldErrors>({});
+  const clearField = (k: keyof FieldErrors) => setFieldErr((x) => (x[k] ? { ...x, [k]: undefined } : x));
+
+  const showFieldErrors = (errors: FieldErrors) => {
+    setFieldErr(errors);
+    setTab("general");
+    setErr("Check the highlighted fields.");
+    const first = FIELD_ORDER.find((k) => errors[k]);
+    if (first) setTimeout(() => document.getElementById(`session-${first}`)?.focus(), 0);
   };
 
   const submit = async () => {
     setErr(null);
+    const local = validateFields(f);
+    if (Object.keys(local).length) {
+      showFieldErrors(local);
+      return;
+    }
+    setFieldErr({});
     setBusy(true);
     try {
       const input: SessionInput = {
@@ -64,7 +86,7 @@ export function SessionDialog({ session, initial, onClose }: Props) {
           (f.protocol === "ssh" ? `${f.username}@${f.host}` : f.protocol === "telnet" ? `telnet ${f.host}` : f.protocol === "serial" ? (f.options.serial?.port ?? "Serial") : "Local terminal"),
         tags: tagText.split(",").map((t) => t.trim()).filter(Boolean),
         port: f.protocol === "ssh" ? Number(f.port) || 22 : f.protocol === "telnet" ? Number(f.port) || 23 : null,
-        host: f.protocol === "ssh" || f.protocol === "telnet" ? f.host : null,
+        host: f.protocol === "ssh" || f.protocol === "telnet" ? (f.host ?? "").trim() : null,
         options: f.protocol === "serial" ? { ...f.options, serial: f.options.serial ?? DEFAULT_SERIAL } : f.options,
         username: f.protocol === "ssh" ? f.username : null,
         authMethod: f.protocol === "ssh" ? f.authMethod : null,
@@ -75,7 +97,10 @@ export function SessionDialog({ session, initial, onClose }: Props) {
       const saved = session ? await api.sessionUpdate(session.id, input) : await api.sessionCreate(input);
       onClose(saved);
     } catch (e) {
-      setErr(toApiError(e).message);
+      const message = toApiError(e).message;
+      const field = fieldForServerError(message);
+      if (field) showFieldErrors({ [field]: message });
+      else setErr(message);
     } finally {
       setBusy(false);
     }
@@ -116,7 +141,11 @@ export function SessionDialog({ session, initial, onClose }: Props) {
             <button
               type="button"
               key={p}
-              onClick={() => set("protocol", p)}
+              onClick={() => {
+                set("protocol", p);
+                setFieldErr({});
+                setErr(null);
+              }}
               className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-[12.5px] ${
                 f.protocol === p ? "border-accent bg-accent-soft text-accent" : "border-line text-dim hover:bg-hover"
               }`}
@@ -143,11 +172,11 @@ export function SessionDialog({ session, initial, onClose }: Props) {
             </div>
             {f.protocol === "telnet" && (
               <div className="col-span-2 grid grid-cols-[1fr_100px] gap-3">
-                <Field label="Host / IP address" hint="Telnet sends everything, including passwords, unencrypted. Use it only for devices that offer nothing else.">
-                  <input className="field" value={f.host ?? ""} onChange={(e) => set("host", e.target.value)} placeholder="switch-01.lan" />
+                <Field label="Host / IP address" error={fieldErr.host} hint="Telnet sends everything, including passwords, unencrypted. Use it only for devices that offer nothing else.">
+                  <input id="session-host" className="field" value={f.host ?? ""} onChange={(e) => { set("host", e.target.value); clearField("host"); }} placeholder="e.g. 192.168.1.1" />
                 </Field>
-                <Field label="Port">
-                  <input className="field" type="number" min={1} max={65535} value={f.port ?? 23} onChange={(e) => set("port", Number(e.target.value))} />
+                <Field label="Port" error={fieldErr.port}>
+                  <input id="session-port" className="field" type="number" min={1} max={65535} value={f.port ?? 23} onChange={(e) => { set("port", Number(e.target.value)); clearField("port"); }} />
                 </Field>
               </div>
             )}
@@ -157,15 +186,15 @@ export function SessionDialog({ session, initial, onClose }: Props) {
             {ssh ? (
               <>
                 <div className="col-span-2 grid grid-cols-[1fr_100px] gap-3">
-                  <Field label="Host / IP address">
-                    <input className="field" value={f.host ?? ""} onChange={(e) => set("host", e.target.value)} placeholder="server.example.com" />
+                  <Field label="Host / IP address" error={fieldErr.host}>
+                    <input id="session-host" className="field" value={f.host ?? ""} onChange={(e) => { set("host", e.target.value); clearField("host"); }} placeholder="e.g. 192.168.1.10 or server.example.com" />
                   </Field>
-                  <Field label="Port">
-                    <input className="field" type="number" min={1} max={65535} value={f.port ?? 22} onChange={(e) => set("port", Number(e.target.value))} />
+                  <Field label="Port" error={fieldErr.port}>
+                    <input id="session-port" className="field" type="number" min={1} max={65535} value={f.port ?? 22} onChange={(e) => { set("port", Number(e.target.value)); clearField("port"); }} />
                   </Field>
                 </div>
-                <Field label="Username">
-                  <input className="field" value={f.username ?? ""} onChange={(e) => set("username", e.target.value)} placeholder="root" />
+                <Field label="Username" error={fieldErr.username}>
+                  <input id="session-username" className="field" value={f.username ?? ""} onChange={(e) => { set("username", e.target.value); clearField("username"); }} placeholder="e.g. root" />
                 </Field>
                 <Field label="Authentication">
                   <select className="field" value={f.authMethod ?? "password"} onChange={(e) => set("authMethod", e.target.value as AuthMethod)}>
@@ -201,9 +230,9 @@ export function SessionDialog({ session, initial, onClose }: Props) {
                 {f.authMethod === "key" && (
                   <>
                     <div className="col-span-2">
-                      <Field label="Private key file">
+                      <Field label="Private key file" error={fieldErr.keyPath}>
                         <div className="flex gap-2">
-                          <input className="field font-mono" value={f.keyPath ?? ""} onChange={(e) => set("keyPath", e.target.value)} placeholder={isWindows ? "C:\\Users\\you\\.ssh\\id_ed25519" : "~/.ssh/id_ed25519"} />
+                          <input id="session-keyPath" className="field font-mono" value={f.keyPath ?? ""} onChange={(e) => { set("keyPath", e.target.value); clearField("keyPath"); }} placeholder={isWindows ? "C:\\Users\\you\\.ssh\\id_ed25519" : "~/.ssh/id_ed25519"} />
                           <Button type="button" onClick={browseKey} title="Browse">
                             <FolderOpen size={14} />
                           </Button>

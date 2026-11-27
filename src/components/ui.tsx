@@ -210,12 +210,18 @@ export function EmptyState({ icon, title, children }: { icon: ReactNode; title: 
   );
 }
 
-export function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: ReactNode }) {
+export function Field({ label, children, hint, error }: { label: string; children: ReactNode; hint?: ReactNode; error?: string | null }) {
   return (
-    <div>
+    <div className={error ? "[&_.field]:!border-err" : undefined}>
       <label className="label">{label}</label>
       {children}
-      {hint && <div className="mt-1 text-[11px] text-faint">{hint}</div>}
+      {error ? (
+        <div className="mt-1 text-[11.5px] text-err" role="alert">
+          {error}
+        </div>
+      ) : (
+        hint && <div className="mt-1 text-[11px] text-faint">{hint}</div>
+      )}
     </div>
   );
 }
