@@ -332,6 +332,210 @@ impl SftpHandle {
         tokio::fs::rename(&part, &dest).await?;
         Ok(dest)
     }
+
+    /// File properties for the properties / permissions dialog.
+    pub async fn stat(&self, path: &str) -> AppResult<RemoteEntry> {
+        validate_remote_path(path)?;
+        let attrs = self.sftp.metadata(path).await?;
+        let name = path.trim_end_matches('/').rsplit('/').next().unwrap_or(path).to_string();
+        Ok(RemoteEntry {
+            name,
+            path: path.to_string(),
+            is_dir: attrs.is_dir(),
+            is_symlink: false,
+            size: attrs.size.unwrap_or(0),
+            modified: attrs.mtime,
+            permissions: perm_string(&attrs),
+            mode: attrs.permissions,
+            owner: attrs.user.clone().or(attrs.uid.map(|u| u.to_string())),
+            group: attrs.group.clone().or(attrs.gid.map(|g| g.to_string())),
+        })
+    }
+
+    /// chmod: only the permission bits (07777) are sent; the file type bits are never changed.
+    pub async fn chmod(&self, path: &str, mode: u32, recursive: bool) -> AppResult<u32> {
+        validate_remote_path(path)?;
+        if mode > 0o7777 {
+            return Err(AppError::Validation("Permission mode must be between 0000 and 7777 (octal)".into()));
+        }
+        let mut changed = 0;
+        let mut stack = vec![path.to_string()];
+        while let Some(p) = stack.pop() {
+            let attrs = FileAttributes { permissions: Some(mode), ..FileAttributes::empty() };
+            self.sftp.set_metadata(p.clone(), attrs).await?;
+            changed += 1;
+            if recursive && self.sftp.symlink_metadata(p.clone()).await?.is_dir() {
+                for e in self.sftp.read_dir(p.clone()).await? {
+                    let n = e.file_name().to_string();
+                    if n != "." && n != ".." && !e.metadata().is_symlink() {
+                        stack.push(join_remote(&p, &n));
+                    }
+                }
+            }
+        }
+        Ok(changed)
+    }
+
+    /// chown by numeric uid/gid (SFTP v3 has no owner names). Usually requires root on the server.
+    pub async fn chown(&self, path: &str, uid: Option<u32>, gid: Option<u32>) -> AppResult<()> {
+        validate_remote_path(path)?;
+        if uid.is_none() && gid.is_none() {
+            return Err(AppError::Validation("Enter a user id and/or group id".into()));
+        }
+        let current = self.sftp.metadata(path).await?;
+        let attrs = FileAttributes { uid: uid.or(current.uid), gid: gid.or(current.gid), ..FileAttributes::empty() };
+        self.sftp
+            .set_metadata(path, attrs)
+            .await
+            .map_err(|e| AppError::Sftp(format!("chown failed (changing owners usually needs root on the server): {e}")))?;
+        Ok(())
+    }
+
+    /// Recursive remote listing for folder downloads: (relative path, is_dir, size).
+    /// Symbolic links are skipped to avoid loops; they are reported in `skipped`.
+    async fn walk_remote(&self, root: &str, cancel: &CancelFlag) -> AppResult<(Vec<(String, bool, u64)>, Vec<String>)> {
+        let mut out = vec![];
+        let mut skipped = vec![];
+        let mut stack = vec![(String::new(), 0usize)];
+        while let Some((rel, depth)) = stack.pop() {
+            if cancel.is_cancelled() {
+                return Err(AppError::Cancelled);
+            }
+            if depth > 64 {
+                return Err(AppError::Validation("Folder is nested too deeply (over 64 levels)".into()));
+            }
+            let dir = if rel.is_empty() { root.to_string() } else { join_remote(root, &rel) };
+            for e in self.sftp.read_dir(dir).await? {
+                let name = e.file_name().to_string();
+                if name == "." || name == ".." {
+                    continue;
+                }
+                let child = if rel.is_empty() { name.clone() } else { format!("{rel}/{name}") };
+                let m = e.metadata();
+                if m.is_symlink() {
+                    skipped.push(child);
+                } else if m.is_dir() {
+                    out.push((child.clone(), true, 0));
+                    stack.push((child, depth + 1));
+                } else {
+                    out.push((child, false, m.size.unwrap_or(0)));
+                }
+            }
+        }
+        Ok((out, skipped))
+    }
+
+    /// Download a whole remote folder into `local_parent\<folder name>`.
+    /// Existing local files are only replaced when `overwrite` is set; otherwise the whole job
+    /// is refused before anything is written.
+    pub async fn download_dir(&self, remote: &str, local_parent: &Path, overwrite: bool, cancel: &CancelFlag, mut progress: impl FnMut(u64, u64)) -> AppResult<FolderTransfer> {
+        validate_remote_path(remote)?;
+        let name = remote.trim_end_matches('/').rsplit('/').next().unwrap_or("");
+        validate_file_name(name)?;
+        let (entries, skipped) = self.walk_remote(remote, cancel).await?;
+        for (rel, _, _) in &entries {
+            for part in rel.split('/') {
+                if part.contains([':', '*', '?', '"', '<', '>', '|', '\\']) {
+                    return Err(AppError::Validation(format!("'{rel}' is not a valid Windows file name; nothing was downloaded")));
+                }
+            }
+        }
+        let root = local_parent.join(name);
+        if !overwrite {
+            let conflicts: Vec<&str> = entries.iter().filter(|(rel, dir, _)| !dir && root.join(rel).exists()).map(|(r, _, _)| r.as_str()).take(5).collect();
+            if !conflicts.is_empty() {
+                return Err(AppError::Validation(format!("These files already exist locally: {}", conflicts.join(", "))));
+            }
+        }
+        let total: u64 = entries.iter().map(|e| e.2).sum();
+        let mut done = 0u64;
+        std::fs::create_dir_all(&root)?;
+        let mut files = 0;
+        for (rel, is_dir, size) in &entries {
+            let target = root.join(rel.replace('/', "\\"));
+            if *is_dir {
+                std::fs::create_dir_all(&target)?;
+                continue;
+            }
+            let parent = target.parent().unwrap_or(&root).to_path_buf();
+            std::fs::create_dir_all(&parent)?;
+            let base = done;
+            self.download(&join_remote(remote, rel), &parent, true, cancel, |d, _| progress(base + d, total)).await?;
+            done += size;
+            files += 1;
+        }
+        progress(total, total);
+        Ok(FolderTransfer { path: root.display().to_string(), files, skipped })
+    }
+
+    /// Upload a whole local folder into `remote_parent/<folder name>`. Missing remote folders are
+    /// created; existing remote files are only replaced when `overwrite` is set.
+    pub async fn upload_dir(&self, local: &Path, remote_parent: &str, overwrite: bool, cancel: &CancelFlag, mut progress: impl FnMut(u64, u64)) -> AppResult<FolderTransfer> {
+        validate_remote_path(remote_parent)?;
+        let name = local.file_name().and_then(|n| n.to_str()).ok_or_else(|| AppError::Validation("Invalid local folder".into()))?.to_string();
+        // Walk locally first so the total is known and nothing is sent if the walk fails.
+        let mut entries = vec![];
+        let mut skipped = vec![];
+        let mut stack = vec![(local.to_path_buf(), String::new())];
+        while let Some((dir, rel)) = stack.pop() {
+            for e in std::fs::read_dir(&dir)? {
+                let e = e?;
+                let ft = e.file_type()?;
+                let n = e.file_name().to_string_lossy().to_string();
+                let child_rel = if rel.is_empty() { n.clone() } else { format!("{rel}/{n}") };
+                if ft.is_symlink() {
+                    skipped.push(child_rel);
+                } else if ft.is_dir() {
+                    entries.push((child_rel.clone(), true, 0u64, e.path()));
+                    stack.push((e.path(), child_rel));
+                } else {
+                    entries.push((child_rel, false, e.metadata()?.len(), e.path()));
+                }
+            }
+        }
+        let root = join_remote(remote_parent, &name);
+        if !overwrite {
+            for (rel, is_dir, _, _) in &entries {
+                if !is_dir && self.sftp.try_exists(join_remote(&root, rel)).await? {
+                    return Err(AppError::Validation(format!("'{rel}' already exists on the server; nothing was uploaded")));
+                }
+            }
+        }
+        if !self.sftp.try_exists(root.clone()).await? {
+            self.sftp.create_dir(root.clone()).await?;
+        }
+        entries.sort_by(|a, b| a.0.cmp(&b.0)); // parents before children
+        let total: u64 = entries.iter().map(|e| e.2).sum();
+        let mut done = 0u64;
+        let mut files = 0;
+        for (rel, is_dir, size, path) in &entries {
+            if cancel.is_cancelled() {
+                return Err(AppError::Cancelled);
+            }
+            let target = join_remote(&root, rel);
+            if *is_dir {
+                if !self.sftp.try_exists(target.clone()).await? {
+                    self.sftp.create_dir(target).await?;
+                }
+                continue;
+            }
+            let base = done;
+            self.upload(path, &parent_remote(&target), true, cancel, |d, _| progress(base + d, total)).await?;
+            done += size;
+            files += 1;
+        }
+        progress(total, total);
+        Ok(FolderTransfer { path: root, files, skipped })
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FolderTransfer {
+    pub path: String,
+    pub files: usize,
+    /// Symbolic links that were not followed.
+    pub skipped: Vec<String>,
 }
 
 #[cfg(test)]

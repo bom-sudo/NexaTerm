@@ -513,6 +513,61 @@ pub fn delete_key_record(conn: &Connection, id: &str) -> AppResult<()> {
     Ok(())
 }
 
+// ---------------------------------------------------------------- macros
+
+pub fn list_macros(conn: &Connection) -> AppResult<Vec<MacroProfile>> {
+    let mut st = conn.prepare("SELECT id,name,steps_json,created_at FROM macro_profiles ORDER BY name COLLATE NOCASE")?;
+    let rows = st.query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?, r.get::<_, String>(2)?, r.get::<_, String>(3)?)))?;
+    let mut out = vec![];
+    for row in rows {
+        let (id, name, json, created_at) = row?;
+        // A corrupt row is shown with no steps rather than breaking the whole list.
+        out.push(MacroProfile { id, name, steps: serde_json::from_str(&json).unwrap_or_default(), created_at });
+    }
+    Ok(out)
+}
+
+pub fn validate_macro(name: &str, steps: &[MacroStep]) -> AppResult<()> {
+    if name.trim().is_empty() {
+        return Err(AppError::Validation("Macro name is required".into()));
+    }
+    if steps.is_empty() || steps.len() > 5000 {
+        return Err(AppError::Validation("A macro needs 1 to 5000 steps".into()));
+    }
+    let text: usize = steps.iter().map(|s| if let MacroStep::Text { text } = s { text.len() } else { 0 }).sum();
+    if text > 256 * 1024 {
+        return Err(AppError::Validation("Macro text is larger than 256 KB".into()));
+    }
+    if steps.iter().any(|s| matches!(s, MacroStep::Wait { ms } if *ms > 60_000)) {
+        return Err(AppError::Validation("A single pause cannot exceed 60 seconds".into()));
+    }
+    Ok(())
+}
+
+pub fn save_macro(conn: &Connection, id: Option<&str>, name: &str, steps: &[MacroStep]) -> AppResult<String> {
+    validate_macro(name, steps)?;
+    let json = serde_json::to_string(steps)?;
+    match id {
+        Some(id) => {
+            let n = conn.execute("UPDATE macro_profiles SET name=?2, steps_json=?3 WHERE id=?1", params![id, name.trim(), json])?;
+            if n == 0 {
+                return Err(AppError::NotFound(format!("macro {id}")));
+            }
+            Ok(id.to_string())
+        }
+        None => {
+            let id = new_id();
+            conn.execute("INSERT INTO macro_profiles(id,name,steps_json,created_at) VALUES (?1,?2,?3,?4)", params![id, name.trim(), json, now()])?;
+            Ok(id)
+        }
+    }
+}
+
+pub fn delete_macro(conn: &Connection, id: &str) -> AppResult<()> {
+    conn.execute("DELETE FROM macro_profiles WHERE id=?1", [id])?;
+    Ok(())
+}
+
 // ---------------------------------------------------------------- import / export
 
 pub fn export_sessions(conn: &Connection) -> AppResult<SessionExport> {
@@ -665,6 +720,24 @@ mod tests {
         let a = all.iter().find(|s| s.name == "a").unwrap();
         assert_eq!(b.jump_session_id.as_deref(), Some(a.id.as_str()));
         assert!(a.group_id.is_some());
+    }
+
+    #[test]
+    fn macros_crud_and_validation() {
+        let c = open_in_memory().unwrap();
+        let steps = vec![MacroStep::Text { text: "uptime\r".into() }, MacroStep::Wait { ms: 500 }, MacroStep::Text { text: "df -h\r".into() }];
+        let id = save_macro(&c, None, "Health check", &steps).unwrap();
+        let all = list_macros(&c).unwrap();
+        assert_eq!(all.len(), 1);
+        assert_eq!(all[0].steps, steps);
+        save_macro(&c, Some(&id), "Renamed", &steps[..1]).unwrap();
+        assert_eq!(list_macros(&c).unwrap()[0].name, "Renamed");
+        assert!(save_macro(&c, None, "", &steps).is_err());
+        assert!(save_macro(&c, None, "x", &[]).is_err());
+        assert!(save_macro(&c, None, "x", &[MacroStep::Wait { ms: 120_000 }]).is_err());
+        assert!(save_macro(&c, Some("missing"), "x", &steps).is_err());
+        delete_macro(&c, &id).unwrap();
+        assert!(list_macros(&c).unwrap().is_empty());
     }
 
     #[test]

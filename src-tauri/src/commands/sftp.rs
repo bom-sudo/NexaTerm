@@ -148,6 +148,52 @@ pub async fn sftp_download(state: S<'_>, sftp_id: String, remote_path: String, l
 }
 
 #[tauri::command]
+pub async fn sftp_upload_dir(state: S<'_>, sftp_id: String, local_path: String, remote_dir: String, overwrite: bool, job_id: String, on_progress: Channel<Progress>) -> AppResult<crate::sftp::FolderTransfer> {
+    let h = state.sftp.get(&sftp_id)?;
+    let local = PathBuf::from(&local_path);
+    if !local.is_dir() {
+        return Err(AppError::Validation("Local folder does not exist".into()));
+    }
+    let cancel = state.new_job(&job_id);
+    let r = h.upload_dir(&local, &remote_dir, overwrite, &cancel, throttled(on_progress)).await;
+    state.finish_job(&job_id);
+    r
+}
+
+#[tauri::command]
+pub async fn sftp_download_dir(state: S<'_>, sftp_id: String, remote_path: String, local_dir: String, overwrite: bool, job_id: String, on_progress: Channel<Progress>) -> AppResult<crate::sftp::FolderTransfer> {
+    let h = state.sftp.get(&sftp_id)?;
+    let dir = PathBuf::from(&local_dir);
+    if !dir.is_dir() {
+        return Err(AppError::Validation("Download folder does not exist".into()));
+    }
+    let cancel = state.new_job(&job_id);
+    let r = h.download_dir(&remote_path, &dir, overwrite, &cancel, throttled(on_progress)).await;
+    state.finish_job(&job_id);
+    r
+}
+
+#[tauri::command]
+pub async fn sftp_stat(state: S<'_>, sftp_id: String, path: String) -> AppResult<RemoteEntry> {
+    state.sftp.get(&sftp_id)?.stat(&path).await
+}
+
+#[tauri::command]
+pub async fn sftp_chmod(state: S<'_>, sftp_id: String, path: String, mode: u32, recursive: bool) -> AppResult<u32> {
+    state.sftp.get(&sftp_id)?.chmod(&path, mode, recursive).await
+}
+
+#[tauri::command]
+pub async fn sftp_chown(state: S<'_>, sftp_id: String, path: String, uid: Option<u32>, gid: Option<u32>) -> AppResult<()> {
+    state.sftp.get(&sftp_id)?.chown(&path, uid, gid).await
+}
+
+#[tauri::command]
+pub fn local_is_dir(path: String) -> bool {
+    std::path::Path::new(&path).is_dir()
+}
+
+#[tauri::command]
 pub fn local_exists(path: String) -> bool {
     std::path::Path::new(&path).exists()
 }

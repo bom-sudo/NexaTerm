@@ -24,6 +24,22 @@ pub struct ClientHandler {
     port: u16,
     verdict: Arc<Mutex<Option<AppError>>>,
     remote_forwards: RemoteForwards,
+    /// Local X server (host, port) when X11 forwarding was requested for this session.
+    x11_target: Option<(String, u16)>,
+    /// Accept agent channels only when the user enabled agent forwarding.
+    agent_forward: bool,
+}
+
+/// Parse an X display like "localhost:0", ":1" or "127.0.0.1:10.0" into (host, tcp port).
+pub fn x11_target(display: Option<&str>) -> AppResult<(String, u16)> {
+    let d = display.map(str::trim).filter(|d| !d.is_empty()).unwrap_or("localhost:0");
+    let (host, rest) = d.rsplit_once(':').ok_or_else(|| AppError::Validation(format!("Invalid X display '{d}' (expected host:number)")))?;
+    let num: u16 = rest.split('.').next().unwrap_or("").parse().map_err(|_| AppError::Validation(format!("Invalid X display number in '{d}'")))?;
+    if num > 99 {
+        return Err(AppError::Validation("X display number must be 0-99".into()));
+    }
+    let host = if host.is_empty() { "127.0.0.1".to_string() } else { crate::security::validate_host(host)? };
+    Ok((host, 6000 + num))
 }
 
 pub fn fingerprint(key: &PublicKey) -> String {
@@ -116,6 +132,67 @@ impl client::Handler for ClientHandler {
         });
         Ok(())
     }
+
+    async fn server_channel_open_x11(
+        &mut self,
+        channel: russh::Channel<client::Msg>,
+        _originator_address: &str,
+        _originator_port: u32,
+        reply: client::ChannelOpenHandle,
+        _session: &mut client::Session,
+    ) -> Result<(), Self::Error> {
+        // X11 channels are only accepted when the user enabled X11 forwarding for this session.
+        let Some((host, port)) = self.x11_target.clone() else {
+            reply.reject(russh::ChannelOpenFailure::AdministrativelyProhibited).await;
+            return Ok(());
+        };
+        match tokio::net::TcpStream::connect((host.as_str(), port)).await {
+            Ok(mut sock) => {
+                reply.accept().await;
+                tokio::spawn(async move {
+                    let mut stream = channel.into_stream();
+                    let _ = tokio::io::copy_bidirectional(&mut sock, &mut stream).await;
+                });
+            }
+            Err(e) => {
+                log::warn!("X11 forwarding: no X server at {host}:{port}: {e}");
+                reply.reject(russh::ChannelOpenFailure::ConnectFailed).await;
+            }
+        }
+        Ok(())
+    }
+
+    async fn server_channel_open_agent_forward(
+        &mut self,
+        channel: russh::Channel<client::Msg>,
+        reply: client::ChannelOpenHandle,
+        _session: &mut client::Session,
+    ) -> Result<(), Self::Error> {
+        if !self.agent_forward {
+            reply.reject(russh::ChannelOpenFailure::AdministrativelyProhibited).await;
+            return Ok(());
+        }
+        #[cfg(windows)]
+        {
+            use tokio::net::windows::named_pipe::ClientOptions;
+            match ClientOptions::new().open(r"\\.\pipe\openssh-ssh-agent") {
+                Ok(mut pipe) => {
+                    reply.accept().await;
+                    tokio::spawn(async move {
+                        let mut stream = channel.into_stream();
+                        let _ = tokio::io::copy_bidirectional(&mut pipe, &mut stream).await;
+                    });
+                }
+                Err(e) => {
+                    log::warn!("agent forwarding: OpenSSH agent not available: {e}");
+                    reply.reject(russh::ChannelOpenFailure::ConnectFailed).await;
+                }
+            }
+        }
+        #[cfg(not(windows))]
+        reply.reject(russh::ChannelOpenFailure::AdministrativelyProhibited).await;
+        Ok(())
+    }
 }
 
 pub struct SshConnection {
@@ -146,7 +223,31 @@ pub struct Secrets {
 pub struct SshContext {
     pub db: Db,
     pub secrets: Arc<dyn SecretStore>,
+    /// Asks the user to answer keyboard-interactive prompts (2FA/OTP). None = non-interactive.
+    pub prompter: Option<Prompter>,
 }
+
+/// One keyboard-interactive round as shown to the user.
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct KbdPrompt {
+    pub id: String,
+    pub host: String,
+    pub username: String,
+    pub name: String,
+    pub instructions: String,
+    pub prompts: Vec<KbdPromptItem>,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct KbdPromptItem {
+    pub text: String,
+    pub echo: bool,
+}
+
+/// Returns the answers, or None when the user cancelled.
+pub type Prompter = Arc<dyn Fn(KbdPrompt) -> futures::future::BoxFuture<'static, Option<Vec<String>>> + Send + Sync>;
 
 fn config(s: &Session) -> Arc<client::Config> {
     let keepalive = s.options.keepalive_secs.unwrap_or(30);
@@ -155,6 +256,14 @@ fn config(s: &Session) -> Arc<client::Config> {
         keepalive_interval: if keepalive > 0 { Some(Duration::from_secs(keepalive)) } else { None },
         keepalive_max: 3,
         nodelay: true,
+        preferred: russh::Preferred {
+            compression: if s.options.compression.unwrap_or(false) {
+                std::borrow::Cow::Borrowed(&[russh::compression::ZLIB_LEGACY, russh::compression::ZLIB, russh::compression::NONE])
+            } else {
+                std::borrow::Cow::Borrowed(&[russh::compression::NONE])
+            },
+            ..Default::default()
+        },
         ..Default::default()
     })
 }
@@ -186,6 +295,8 @@ pub fn connect<'a>(
             port,
             verdict: verdict.clone(),
             remote_forwards: remote_forwards.clone(),
+            x11_target: if session.options.x11_forward.unwrap_or(false) { Some(x11_target(session.options.x11_display.as_deref())?) } else { None },
+            agent_forward: session.options.agent_forward.unwrap_or(false),
         };
 
         // ProxyJump: open the jump connection first, tunnel a direct-tcpip channel through it.
@@ -269,11 +380,16 @@ async fn authenticate(ctx: &SshContext, session: &Session, secrets: &Secrets, ha
             handle.authenticate_password(user, pw).await?
         }
         "keyboardInteractive" => {
+            // A saved/typed password answers the first hidden prompt; anything else (OTP, PIN,
+            // a second factor) is asked interactively through the prompter.
             let pw = match secrets.password.clone() {
-                Some(p) => p,
-                None => stored(ctx, session, "password")?.ok_or_else(|| AppError::SecretRequired("password".into()))?,
+                Some(p) => Some(p),
+                None => stored(ctx, session, "password")?,
             };
-            keyboard_interactive(handle, user, &pw).await?
+            if pw.is_none() && ctx.prompter.is_none() {
+                return Err(AppError::SecretRequired("password".into()));
+            }
+            keyboard_interactive(ctx, session, handle, user, pw.as_deref()).await?
         }
         "key" => {
             let path = session.key_path.clone().unwrap_or_default();
@@ -301,12 +417,18 @@ async fn authenticate(ctx: &SshContext, session: &Session, secrets: &Secrets, ha
     }
 }
 
+/// PuTTY .ppk files declare their encryption in a header line ("Encryption: none" when plain).
+pub fn ppk_encrypted(text: &str) -> bool {
+    text.trim_start().starts_with("PuTTY-User-Key-File-")
+        && text.lines().find_map(|l| l.strip_prefix("Encryption:")).map(|v| v.trim() != "none").unwrap_or(false)
+}
+
 pub fn load_private_key(path: &str, passphrase: Option<&str>) -> AppResult<russh::keys::PrivateKey> {
     if path.trim().is_empty() {
         return Err(AppError::Validation("Private key path is empty".into()));
     }
     let text = std::fs::read_to_string(path).map_err(|e| AppError::Validation(format!("Cannot read private key file: {e}")))?;
-    let encrypted = text.contains("ENCRYPTED") || {
+    let encrypted = text.contains("ENCRYPTED") || ppk_encrypted(&text) || {
         russh::keys::PrivateKey::from_openssh(&text).map(|k| k.is_encrypted()).unwrap_or(false)
     };
     if encrypted && passphrase.map(str::is_empty).unwrap_or(true) {
@@ -322,22 +444,68 @@ pub fn load_private_key(path: &str, passphrase: Option<&str>) -> AppResult<russh
     })
 }
 
-async fn keyboard_interactive(handle: &mut Handle<ClientHandler>, user: &str, password: &str) -> AppResult<AuthResult> {
+async fn keyboard_interactive(ctx: &SshContext, session: &Session, handle: &mut Handle<ClientHandler>, user: &str, password: Option<&str>) -> AppResult<AuthResult> {
     let mut resp = handle.authenticate_keyboard_interactive_start(user, None).await?;
-    for _ in 0..5 {
+    let mut password_used = false;
+    for _ in 0..8 {
         match resp {
             KeyboardInteractiveAuthResponse::Success => return Ok(AuthResult::Success),
             KeyboardInteractiveAuthResponse::Failure { remaining_methods, partial_success } => {
                 return Ok(AuthResult::Failure { remaining_methods, partial_success })
             }
-            KeyboardInteractiveAuthResponse::InfoRequest { ref prompts, .. } => {
-                // Answer hidden prompts (password / PIN style) with the supplied secret.
-                let answers = prompts.iter().map(|p| if p.echo { String::new() } else { password.to_string() }).collect();
+            KeyboardInteractiveAuthResponse::InfoRequest { ref name, ref instructions, ref prompts } => {
+                let answers = match kbd_answers(ctx, session, user, name, instructions, prompts, password, &mut password_used).await? {
+                    Some(a) => a,
+                    None => return Err(AppError::AuthFailed("login cancelled".into())),
+                };
                 resp = handle.authenticate_keyboard_interactive_respond(answers).await?;
             }
         }
     }
     Err(AppError::AuthFailed("keyboard-interactive: too many prompts".into()))
+}
+
+/// Decide the answers for one keyboard-interactive round.
+/// Empty rounds are answered empty; a single hidden prompt in the first round uses the password;
+/// everything else is shown to the user. Without a prompter only the password case can succeed.
+#[allow(clippy::too_many_arguments)]
+async fn kbd_answers(
+    ctx: &SshContext,
+    session: &Session,
+    user: &str,
+    name: &str,
+    instructions: &str,
+    prompts: &[russh::client::Prompt],
+    password: Option<&str>,
+    password_used: &mut bool,
+) -> AppResult<Option<Vec<String>>> {
+    if prompts.is_empty() {
+        return Ok(Some(vec![]));
+    }
+    if let Some(pw) = password {
+        if !*password_used && prompts.len() == 1 && !prompts[0].echo {
+            *password_used = true;
+            return Ok(Some(vec![pw.to_string()]));
+        }
+    }
+    let Some(prompter) = ctx.prompter.clone() else {
+        return Err(AppError::AuthFailed("the server asked for additional information (for example a one-time code) and no prompt is available here; connect from a terminal tab".into()));
+    };
+    let request = KbdPrompt {
+        id: uuid::Uuid::new_v4().to_string(),
+        host: session.host.clone().unwrap_or_default(),
+        username: user.to_string(),
+        name: name.to_string(),
+        instructions: instructions.to_string(),
+        prompts: prompts.iter().map(|p| KbdPromptItem { text: p.prompt.clone(), echo: p.echo }).collect(),
+    };
+    let answers = prompter(request).await;
+    if let Some(a) = &answers {
+        if a.len() != prompts.len() {
+            return Err(AppError::AuthFailed("wrong number of answers".into()));
+        }
+    }
+    Ok(answers)
 }
 
 async fn agent_auth(handle: &mut Handle<ClientHandler>, user: &str) -> AppResult<AuthResult> {

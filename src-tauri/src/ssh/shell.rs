@@ -24,7 +24,22 @@ pub struct ShellOptions {
     pub rows: u16,
     pub startup_dir: Option<String>,
     pub startup_command: Option<String>,
+    /// Request X11 forwarding on this channel (the handler connects X channels to the local X server).
+    pub x11: bool,
+    /// Request agent forwarding (ssh -A).
+    pub agent_forward: bool,
+    /// Install a prompt hook that reports the working directory with OSC 7 (bash and zsh).
+    pub follow_folder: bool,
 }
+
+/// Prompt hook for bash/zsh: prints OSC 7 (file://host/path) before every prompt so the SFTP side
+/// panel can follow `cd`. Leading space keeps it out of bash history when HISTCONTROL=ignorespace.
+pub const OSC7_HOOK: &str = concat!(
+    r#" __nx_osc7(){ printf '\033]7;file://%s%s\033\\' "${HOSTNAME:-$HOST}" "$PWD"; }; "#,
+    r#"if [ -n "$ZSH_VERSION" ]; then precmd_functions+=(__nx_osc7); "#,
+    r#"else PROMPT_COMMAND="__nx_osc7${PROMPT_COMMAND:+;$PROMPT_COMMAND}"; fi"#,
+    "\n"
+);
 
 /// Quote a path for POSIX shells (single quotes, escaping embedded quotes).
 fn sh_quote(s: &str) -> String {
@@ -37,6 +52,15 @@ impl SshShell {
         channel
             .request_pty(false, &opts.term, opts.cols as u32, opts.rows as u32, 0, 0, &[])
             .await?;
+        if opts.agent_forward {
+            channel.agent_forward(false).await?;
+        }
+        if opts.x11 {
+            // The cookie is only used between sshd and xauth on the server; the local X server
+            // (VcXsrv/Xming/X410) normally runs with access control disabled.
+            let cookie: String = (0..16).map(|_| format!("{:02x}", rand::random::<u8>())).collect();
+            channel.request_x11(false, false, "MIT-MAGIC-COOKIE-1", cookie, 0).await?;
+        }
         channel.request_shell(true).await?;
         let (mut read, write) = channel.split();
 
@@ -44,6 +68,9 @@ impl SshShell {
 
         // Startup directory / command are typed into the shell exactly like the user would.
         let mut startup = String::new();
+        if opts.follow_folder {
+            startup.push_str(OSC7_HOOK);
+        }
         if let Some(d) = opts.startup_dir.filter(|d| !d.trim().is_empty()) {
             startup.push_str(&format!("cd {}\n", sh_quote(d.trim())));
         }

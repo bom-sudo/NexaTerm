@@ -14,6 +14,18 @@ pub struct SessionOptions {
     pub shell_args: Option<Vec<String>>,
     pub cwd: Option<String>,
     pub encoding: Option<String>,
+    /// SSH zlib compression (useful on slow links).
+    pub compression: Option<bool>,
+    /// Forward the local Windows OpenSSH agent to the server (ssh -A). Only for trusted servers.
+    pub agent_forward: Option<bool>,
+    /// Forward X11 to a local X server (VcXsrv, Xming, X410 …).
+    pub x11_forward: Option<bool>,
+    /// Local X display, e.g. "localhost:0" (default).
+    pub x11_display: Option<String>,
+    /// Let the SFTP side panel follow the shell's working directory (installs a prompt hook).
+    pub follow_terminal_folder: Option<bool>,
+    /// Serial port settings for protocol "serial".
+    pub serial: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -153,6 +165,23 @@ pub struct SshKeyRecord {
     pub fingerprint: String,
     pub comment: Option<String>,
     pub encrypted: bool,
+    pub created_at: String,
+}
+
+/// One recorded macro step: text sent to the terminal, or a pause.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum MacroStep {
+    Text { text: String },
+    Wait { ms: u64 },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MacroProfile {
+    pub id: String,
+    pub name: String,
+    pub steps: Vec<MacroStep>,
     pub created_at: String,
 }
 

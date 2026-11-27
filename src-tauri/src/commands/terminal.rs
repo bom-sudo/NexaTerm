@@ -122,6 +122,9 @@ pub async fn terminal_open_ssh(state: S<'_>, req: SshOpen, on_data: Channel<Invo
         rows: req.rows.max(1),
         startup_dir: session.options.startup_dir.clone(),
         startup_command: session.options.startup_command.clone(),
+        x11: session.options.x11_forward.unwrap_or(false),
+        agent_forward: session.options.agent_forward.unwrap_or(false),
+        follow_folder: session.options.follow_terminal_folder.unwrap_or(false),
     };
     let shell = SshShell::open(conn.clone(), opts, sink.clone()).await?;
     let id = uuid::Uuid::new_v4().to_string();
@@ -134,6 +137,12 @@ pub async fn terminal_open_ssh(state: S<'_>, req: SshOpen, on_data: Channel<Invo
         let _ = repo::add_history(&db, Some(&session.id), &session.name, "ssh", session.host.as_deref(), "connected");
     }
     Ok(SshOpened { terminal_id: id, host: conn.host.clone(), username: conn.username.clone(), label: session.name })
+}
+
+/// Answer (or cancel with None) a keyboard-interactive prompt raised during an SSH login.
+#[tauri::command]
+pub fn ssh_prompt_answer(state: S, id: String, answers: Option<Vec<String>>) -> bool {
+    state.answer_prompt(&id, answers)
 }
 
 #[tauri::command]

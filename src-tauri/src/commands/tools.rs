@@ -157,6 +157,35 @@ pub fn key_forget(state: S, id: String) -> AppResult<()> {
     repo::delete_key_record(&state.db.lock().unwrap(), &id)
 }
 
+// ---------------------------------------------------------------- X11
+
+#[tauri::command]
+pub async fn x11_status() -> crate::x11::XStatus {
+    crate::x11::status().await
+}
+
+#[tauri::command]
+pub fn x11_start(id: String) -> AppResult<()> {
+    crate::x11::start(&id)
+}
+
+// ---------------------------------------------------------------- macros
+
+#[tauri::command]
+pub fn macros_list(state: S) -> AppResult<Vec<MacroProfile>> {
+    repo::list_macros(&state.db.lock().unwrap())
+}
+
+#[tauri::command]
+pub fn macro_save(state: S, id: Option<String>, name: String, steps: Vec<MacroStep>) -> AppResult<String> {
+    repo::save_macro(&state.db.lock().unwrap(), id.as_deref(), &name, &steps)
+}
+
+#[tauri::command]
+pub fn macro_delete(state: S, id: String) -> AppResult<()> {
+    repo::delete_macro(&state.db.lock().unwrap(), &id)
+}
+
 // ---------------------------------------------------------------- snippets
 
 #[tauri::command]

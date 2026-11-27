@@ -8,6 +8,8 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use tokio_util_like::CancelFlag;
 
+pub type PendingPrompts = Arc<Mutex<HashMap<String, tokio::sync::oneshot::Sender<Option<Vec<String>>>>>>;
+
 pub struct AppState {
     pub db: Db,
     pub secrets: Arc<dyn SecretStore>,
@@ -22,6 +24,10 @@ pub struct AppState {
     pub portable: bool,
     /// Message for the user when the preferred data location was unusable.
     pub data_notice: Option<String>,
+    /// Set in setup; used to emit keyboard-interactive prompts (2FA) to the UI.
+    pub app: Mutex<Option<tauri::AppHandle>>,
+    /// Keyboard-interactive prompts waiting for the user, by prompt id.
+    pub pending_prompts: PendingPrompts,
 }
 
 impl AppState {
@@ -42,11 +48,45 @@ impl AppState {
             ssh_conns: Mutex::new(HashMap::new()),
             portable: false,
             data_notice: None,
+            app: Mutex::new(None),
+            pending_prompts: Default::default(),
         }
     }
 
     pub fn ssh_ctx(&self) -> SshContext {
-        SshContext { db: self.db.clone(), secrets: self.secrets.clone() }
+        SshContext { db: self.db.clone(), secrets: self.secrets.clone(), prompter: self.prompter() }
+    }
+
+    /// Prompter that shows keyboard-interactive questions (password, OTP ...) in the UI via the
+    /// "ssh-prompt" event and waits up to 5 minutes for `ssh_prompt_answer`.
+    fn prompter(&self) -> Option<crate::ssh::Prompter> {
+        use tauri::Emitter;
+        let app = self.app.lock().unwrap().clone()?;
+        let pending = self.pending_prompts.clone();
+        Some(Arc::new(move |req: crate::ssh::KbdPrompt| {
+            let app = app.clone();
+            let pending = pending.clone();
+            Box::pin(async move {
+                let (tx, rx) = tokio::sync::oneshot::channel();
+                pending.lock().unwrap().insert(req.id.clone(), tx);
+                let id = req.id.clone();
+                if app.emit("ssh-prompt", &req).is_err() {
+                    pending.lock().unwrap().remove(&id);
+                    return None;
+                }
+                let answer = tokio::time::timeout(std::time::Duration::from_secs(300), rx).await;
+                pending.lock().unwrap().remove(&id);
+                answer.ok().and_then(|r| r.ok()).flatten()
+            })
+        }))
+    }
+
+    /// Deliver the answers typed by the user (None = cancelled). False for unknown/expired prompts.
+    pub fn answer_prompt(&self, id: &str, answers: Option<Vec<String>>) -> bool {
+        match self.pending_prompts.lock().unwrap().remove(id) {
+            Some(tx) => tx.send(answers).is_ok(),
+            None => false,
+        }
     }
 
     pub fn new_job(&self, id: &str) -> CancelFlag {

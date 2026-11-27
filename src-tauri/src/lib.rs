@@ -5,6 +5,7 @@ pub mod commands;
 pub mod credentials;
 pub mod database;
 pub mod error;
+pub mod importers;
 pub mod keys;
 pub mod network;
 pub mod security;
@@ -14,6 +15,7 @@ pub mod ssh;
 pub mod state;
 pub mod terminal;
 pub mod tunnels;
+pub mod x11;
 
 use std::sync::Arc;
 use tauri::Manager;
@@ -53,6 +55,7 @@ pub fn run() {
                 app.dialog().message(msg.clone()).kind(MessageDialogKind::Error).title("NexaTerm").blocking_show();
                 Box::<dyn std::error::Error>::from(msg)
             })?;
+            *st.app.lock().unwrap() = Some(app.handle().clone());
             st.portable = loc.portable;
             st.data_notice = loc.notice;
             app.manage(st);
@@ -96,6 +99,7 @@ pub fn run() {
             terminal::terminal_open_local,
             terminal::terminal_open_ssh,
             terminal::terminal_write,
+            terminal::ssh_prompt_answer,
             terminal::terminal_broadcast,
             terminal::terminal_resize,
             terminal::terminal_close,
@@ -120,6 +124,12 @@ pub fn run() {
             sftp::sftp_upload,
             sftp::sftp_download,
             sftp::local_exists,
+            sftp::local_is_dir,
+            sftp::sftp_upload_dir,
+            sftp::sftp_download_dir,
+            sftp::sftp_stat,
+            sftp::sftp_chmod,
+            sftp::sftp_chown,
             sftp::downloads_dir,
             tools::tunnels_list,
             tools::tunnel_save,
@@ -141,6 +151,11 @@ pub fn run() {
             tools::key_inspect,
             tools::key_change_passphrase,
             tools::key_forget,
+            tools::x11_status,
+            tools::x11_start,
+            tools::macros_list,
+            tools::macro_save,
+            tools::macro_delete,
             tools::snippets_list,
             tools::snippet_save,
             tools::snippet_delete,
