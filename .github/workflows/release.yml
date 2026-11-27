@@ -208,3 +208,23 @@ jobs:
           draft: false
           make_latest: true
           files: release/*
+
+  winget:
+    name: Submit update to winget
+    # Needs a classic GitHub token with public_repo scope in the WINGET_TOKEN secret, and the
+    # first version (packaging/winget) already accepted into microsoft/winget-pkgs.
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [publish]
+    runs-on: windows-2022
+    env:
+      WINGET_ENABLED: ${{ secrets.WINGET_TOKEN != '' }}
+    steps:
+      - name: Skip when WINGET_TOKEN is not set
+        if: env.WINGET_ENABLED != 'true'
+        run: echo "::notice::WINGET_TOKEN is not set; winget submission skipped."
+      - uses: vedantmgoyal9/winget-releaser@v2
+        if: env.WINGET_ENABLED == 'true'
+        with:
+          identifier: NexaTerm.NexaTerm
+          installers-regex: 'NexaTerm-Setup-x64-web\.exe$'
+          token: ${{ secrets.WINGET_TOKEN }}

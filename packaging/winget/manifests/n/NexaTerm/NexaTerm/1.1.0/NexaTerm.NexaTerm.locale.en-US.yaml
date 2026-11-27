@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.10.0.schema.json
+
+PackageIdentifier: NexaTerm.NexaTerm
+PackageVersion: 1.1.0
+PackageLocale: en-US
+Publisher: NexaTerm Project
+PublisherUrl: https://github.com/bom-sudo/NexaTerm
+PublisherSupportUrl: https://github.com/bom-sudo/NexaTerm/issues
+PrivacyUrl: https://github.com/bom-sudo/NexaTerm/blob/main/PRIVACY.md
+PackageName: NexaTerm
+PackageUrl: https://nexaterm.pages.dev/
+License: MIT
+LicenseUrl: https://github.com/bom-sudo/NexaTerm/blob/main/LICENSE
+Copyright: Copyright (c) 2026 NexaTerm Project
+ShortDescription: Free, open-source terminal, SSH, SFTP and remote administration workstation.
+Description: |-
+  NexaTerm combines a tabbed terminal with split panes, an SSH client with host-key verification, an SFTP file manager, SSH tunnels, serial and Telnet sessions, and network diagnostics in one desktop application.
+  It works offline, has no account or telemetry, and stores passwords only in Windows Credential Manager.
+Moniker: nexaterm
+Tags:
+- ssh
+- sftp
+- terminal
+- telnet
+- serial
+- ssh-tunnel
+- sysadmin
+- remote-administration
+ReleaseNotesUrl: https://github.com/bom-sudo/NexaTerm/releases/tag/v1.1.0
+Documentations:
+- DocumentLabel: User guide
+  DocumentUrl: https://nexaterm.pages.dev/guide.html
+ManifestType: defaultLocale
+ManifestVersion: 1.10.0

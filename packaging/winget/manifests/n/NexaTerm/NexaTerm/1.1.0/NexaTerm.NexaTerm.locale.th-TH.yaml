@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.locale.1.10.0.schema.json
+
+PackageIdentifier: NexaTerm.NexaTerm
+PackageVersion: 1.1.0
+PackageLocale: th-TH
+Publisher: NexaTerm Project
+PackageName: NexaTerm
+License: MIT
+ShortDescription: โปรแกรมเทอร์มินัล SSH และ SFTP สำหรับผู้ดูแลระบบ ฟรีและโอเพนซอร์ส
+Description: |-
+  NexaTerm รวมเทอร์มินัลแบบแท็บและแบ่งจอ, SSH ที่ตรวจ host key, จัดการไฟล์ผ่าน SFTP, SSH tunnel, Telnet, Serial และเครื่องมือเครือข่ายไว้ในโปรแกรมเดียว
+  ใช้งานแบบออฟไลน์ ไม่ต้องสมัครบัญชี ไม่ส่งข้อมูลการใช้งาน และเก็บรหัสผ่านใน Windows Credential Manager เท่านั้น
+ManifestType: locale
+ManifestVersion: 1.10.0
