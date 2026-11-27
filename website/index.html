@@ -41,13 +41,13 @@
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "NexaTerm",
-    "operatingSystem": "Windows 10 (1809+), Windows 11 (x64), Linux (x64 preview)",
+    "operatingSystem": "Windows 10 (1809+), Windows 11 (x64), Linux (x64)",
     "applicationCategory": "DeveloperApplication",
-    "softwareVersion": "1.0.0",
+    "softwareVersion": "1.1.0",
     "inLanguage": ["th", "en"],
     "license": "https://opensource.org/licenses/MIT",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "THB" },
-    "downloadUrl": "https://nexaterm.pages.dev/downloads/NexaTerm-Setup-x64-web.exe",
+    "downloadUrl": "https://github.com/bom-sudo/NexaTerm/releases/latest",
     "description": "โปรแกรมเทอร์มินัล SSH, Telnet, Serial, SFTP, SSH tunnel, X11 forwarding และเครื่องมือเครือข่ายสำหรับ Windows และ Linux ฟรีและโอเพนซอร์ส",
     "screenshot": "https://nexaterm.pages.dev/images/workspace.png"
   }
@@ -95,8 +95,8 @@
     <!-- Hero -->
     <section class="hero">
       <div class="wrap">
-        <p class="eyebrow" data-i18n-html="hero_eyebrow">NexaTerm 1.0.0 <span>·</span> ฟรีและโอเพนซอร์ส (MIT)
-          <span>·</span> Windows 10/11 &amp; Linux x64 (Preview)</p>
+        <p class="eyebrow" data-i18n-html="hero_eyebrow">NexaTerm 1.1.0 <span>·</span> ฟรีและโอเพนซอร์ส (MIT)
+          <span>·</span> Windows 10/11 และ Linux</p>
         <h1 data-i18n-html="hero_title">หนึ่งพื้นที่ทำงาน<br><span class="grad">ครบทุกการเชื่อมต่อระยะไกล</span></h1>
         <p class="lead" data-i18n="hero_lead">
           เทอร์มินัล, SSH, SFTP, SSH tunnel และเครื่องมือตรวจสอบเครือข่ายสำหรับผู้ดูแลระบบ รวมอยู่ในโปรแกรมเดียวบน
@@ -104,7 +104,7 @@
           ไม่ต้องสมัครบัญชี ไม่มีรุ่นเสียเงิน และไม่ส่งข้อมูลการใช้งานออกจากเครื่อง
         </p>
         <div class="cta">
-          <a class="btn btn-primary btn-lg" href="#download">
+          <a class="btn btn-primary btn-lg" href="#download" id="hero-download">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -438,84 +438,132 @@
     <section class="section" id="download">
       <div class="wrap">
         <header class="section-head">
-          <p class="kicker" data-i18n="dl_kicker">ดาวน์โหลดและรุ่นล่าสุด</p>
-          <h2 data-i18n="dl_heading">ดาวน์โหลด NexaTerm 1.0.0 &amp; รุ่นพรีวิว</h2>
-          <p data-i18n="dl_sub">สำหรับ Windows 10 (1809 ขึ้นไป) / Windows 11 x64 และ Linux x64 (Preview) ฟรี ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ
+          <p class="kicker" data-i18n="dl_kicker">ดาวน์โหลด</p>
+          <h2 data-i18n="dl_heading">ดาวน์โหลด NexaTerm</h2>
+          <p data-i18n="dl_sub">ฟรีทุกฟังก์ชัน ไม่ต้องสมัครบัญชี ไม่ต้องใช้สิทธิ์ผู้ดูแลระบบ</p>
+          <p class="dl-release" id="dl-release">
+            <span data-i18n="dl_version_label">รุ่นล่าสุด</span>
+            <strong class="js-version">1.1.0</strong>
+            <span class="js-date"></span>
+            <a href="https://github.com/bom-sudo/NexaTerm/releases/latest" target="_blank" rel="noopener"
+              data-i18n="dl_whatsnew">มีอะไรใหม่</a>
           </p>
         </header>
 
-        <!-- Windows v1.0.0 -->
-        <div class="downloads">
-          <article class="dl featured">
-            <p class="dl-tag" data-i18n="dl_badge_rec">แนะนำ · โหลดทันที</p>
-            <h3 data-i18n="dl_web_title">ตัวติดตั้งแบบออนไลน์ (Web)</h3>
-            <p class="dl-file">NexaTerm-Setup-x64-web.exe <span>3.0 MB</span></p>
-            <p data-i18n="dl_web_desc">ดาวน์โหลดเร็วและติดตั้งแบบรายผู้ใช้ (ไม่ต้องใช้สิทธิ์แอดมิน) ใช้ WebView2 ที่มีอยู่แล้วใน Windows 11 / 10 หรือโหลดเพิ่มเฉพาะเครื่องที่ยังไม่มี</p>
-            <a class="btn btn-primary"
-              href="downloads/NexaTerm-Setup-x64-web.exe" download
-              data-i18n="dl_web_btn">ดาวน์โหลดตัวติดตั้ง (3 MB)</a>
-          </article>
-          <article class="dl">
-            <p class="dl-tag muted" data-i18n="dl_badge_port">ไม่ต้องติดตั้ง · โหลดทันที</p>
-            <h3 data-i18n="dl_port_title">รุ่นพกพา (Portable)</h3>
-            <p class="dl-file">NexaTerm-Portable-x64.zip <span>3.6 MB</span></p>
-            <p data-i18n-html="dl_port_desc">แตกไฟล์ไว้ที่ไหนก็ได้ รวมถึงแฟลชไดรฟ์ แล้วเปิด <code>NexaTerm.exe</code> ได้เลย ข้อมูลทั้งหมดอยู่ในโฟลเดอร์ <code>portable-data\</code> ข้างโปรแกรม</p>
-            <a class="btn btn-ghost"
-              href="downloads/NexaTerm-Portable-x64.zip" download
-              data-i18n="dl_port_btn">ดาวน์โหลด ZIP (3.6 MB)</a>
-          </article>
-          <article class="dl">
-            <p class="dl-tag muted" data-i18n="dl_badge_offline">รวม WebView2 · GitHub</p>
-            <h3 data-i18n="dl_offline_title">ตัวติดตั้งแบบออฟไลน์</h3>
-            <p class="dl-file">NexaTerm-Setup-x64.exe <span>287 MB</span></p>
-            <p data-i18n="dl_offline_desc">รวมตัวติดตั้ง WebView2 Runtime ไว้สำหรับเครื่องออฟไลน์ (ใช้พื้นที่ใน %TEMP% ~300 MB) เนื่องจากเกินโควตา 25 MB ของ Cloudflare Pages จึงเผยแพร่ผ่าน GitHub Releases</p>
-            <a class="btn btn-ghost"
-              href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener"
-              data-i18n="dl_offline_btn">ดูบน GitHub Releases</a>
-          </article>
+        <div class="os-tabs" role="tablist" aria-label="ระบบปฏิบัติการ">
+          <button class="os-tab" role="tab" type="button" id="tab-windows" aria-controls="panel-windows" aria-selected="true">Windows</button>
+          <button class="os-tab" role="tab" type="button" id="tab-linux" aria-controls="panel-linux" aria-selected="false">Linux</button>
         </div>
 
-        <!-- Linux & CI Preview (Unreleased features) -->
-        <div class="downloads-extra">
-          <article class="dl">
-            <p class="dl-tag muted" data-i18n="dl_badge_linux">Linux x64 · Preview</p>
-            <h3 data-i18n="dl_linux_title">แพ็กเกจสำหรับ Linux</h3>
-            <p class="dl-file">.deb · .rpm · .AppImage <span>x64</span></p>
-            <p data-i18n-html="dl_linux_desc">สร้างอัตโนมัติใน GitHub Actions รองรับ Debian/Ubuntu (<code>.deb</code>), Fedora/openSUSE (<code>.rpm</code>) และ <code>.AppImage</code> พร้อม Secret Service keyring, <code>SSH_AUTH_SOCK</code>, Serial และ X11 ผ่าน <code>$DISPLAY</code></p>
-            <a class="btn btn-ghost"
-              href="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml" target="_blank" rel="noopener"
-              data-i18n="dl_linux_btn">ดาวน์โหลดจาก GitHub Actions (CI)</a>
+        <!-- Windows -->
+        <div class="os-panel" id="panel-windows" role="tabpanel" aria-labelledby="tab-windows">
+          <article class="dl-main">
+            <div class="dl-main-text">
+              <p class="dl-tag" data-i18n="dl_win_tag">แนะนำสำหรับคนส่วนใหญ่</p>
+              <h3 data-i18n="dl_win_title">ตัวติดตั้งสำหรับ Windows 10 / 11</h3>
+              <p data-i18n="dl_win_desc">ดาวน์โหลดแล้วดับเบิลคลิก กด Next ไม่กี่ครั้งก็ใช้งานได้ ติดตั้งเฉพาะบัญชีผู้ใช้ของคุณ ถอนการติดตั้งได้จาก Settings ของ Windows ตามปกติ</p>
+            </div>
+            <div class="dl-main-action">
+              <a class="btn btn-primary btn-lg" data-asset="NexaTerm-Setup-x64-web.exe"
+                href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Setup-x64-web.exe">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span data-i18n="dl_win_btn">ดาวน์โหลดตัวติดตั้ง</span>
+              </a>
+              <p class="dl-meta"><span>NexaTerm-Setup-x64-web.exe</span> <span class="js-size" data-for="NexaTerm-Setup-x64-web.exe">3 MB</span></p>
+            </div>
           </article>
-          <article class="dl">
-            <p class="dl-tag muted" data-i18n="dl_badge_dev">พรีวิวล่าสุด · main</p>
-            <h3 data-i18n="dl_dev_title">รุ่นพัฒนาล่าสุด (Unreleased Features)</h3>
-            <p class="dl-file">Windows &amp; Linux CI Artifacts <span>Auto-built</span></p>
-            <p data-i18n="dl_dev_desc">รวมความสามารถใหม่ที่เพิ่งเขียนเพิ่มหลัง v1.0.0: Telnet, Serial (COM), X11 forwarding, SFTP Side Panel + ส่งทั้งโฟลเดอร์ + chmod, 2FA, Agent forwarding, .ppk, นำเข้า MobaXterm/PuTTY, Output Highlighting และ Macros</p>
-            <a class="btn btn-ghost"
-              href="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml" target="_blank" rel="noopener"
-              data-i18n="dl_dev_btn">ดู Artifacts ล่าสุดบน GitHub CI</a>
-          </article>
+
+          <div class="dl-alt">
+            <a class="dl-row" data-asset="NexaTerm-Portable-x64.zip"
+              href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Portable-x64.zip">
+              <span class="dl-row-text">
+                <strong data-i18n="dl_port_title">รุ่นพกพา (ไม่ต้องติดตั้ง)</strong>
+                <span data-i18n="dl_port_desc">แตก ZIP แล้วเปิด NexaTerm.exe ใช้จากแฟลชไดรฟ์ได้ ข้อมูลอยู่ในโฟลเดอร์ข้างโปรแกรม</span>
+              </span>
+              <span class="dl-row-meta">.zip <span class="js-size" data-for="NexaTerm-Portable-x64.zip">3.6 MB</span></span>
+            </a>
+            <a class="dl-row" data-asset="NexaTerm-Setup-x64.exe"
+              href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Setup-x64.exe">
+              <span class="dl-row-text">
+                <strong data-i18n="dl_offline_title">ตัวติดตั้งสำหรับเครื่องที่ไม่มีอินเทอร์เน็ต</strong>
+                <span data-i18n="dl_offline_desc">รวม Microsoft WebView2 ไว้ในไฟล์เดียว ไฟล์ใหญ่ ใช้เมื่อเครื่องปลายทางออนไลน์ไม่ได้เท่านั้น</span>
+              </span>
+              <span class="dl-row-meta">.exe <span class="js-size" data-for="NexaTerm-Setup-x64.exe">287 MB</span></span>
+            </a>
+          </div>
+
+          <details class="smartscreen">
+            <summary data-i18n="dl_ss_q">Windows แสดงหน้าจอสีน้ำเงิน "Windows protected your PC" ต้องทำอย่างไร</summary>
+            <div data-i18n-html="dl_ss_a">
+              <p>กด <strong>More info</strong> (ข้อมูลเพิ่มเติม) แล้วกด <strong>Run anyway</strong> (เรียกใช้ต่อไป)</p>
+              <p>หน้าจอนี้ขึ้นกับโปรแกรมใหม่ที่ยังมีคนดาวน์โหลดไม่มาก ไม่ได้แปลว่าไฟล์มีไวรัส NexaTerm อยู่ระหว่างขอใบรับรองลงนามโค้ดจาก SignPath Foundation (โครงการที่ให้ใบรับรองฟรีแก่ซอฟต์แวร์โอเพนซอร์ส) เมื่อได้แล้ว ไฟล์จะแสดงชื่อผู้เผยแพร่ และคำเตือนจะค่อย ๆ หายไป</p>
+            </div>
+          </details>
         </div>
 
-        <div class="verify">
-          <div>
-            <h3 data-i18n="verify_title">ตรวจสอบไฟล์และสถานะลายเซ็น (Code Signing)</h3>
-            <p data-i18n-html="verify_desc">ไฟล์ v1.0.0 ชุดแรกยังไม่ได้ลงลายเซ็นดิจิทัล (Windows SmartScreen อาจแจ้งเตือน) ส่วนระบบ CI/Release ได้เตรียมการเซ็นอัตโนมัติผ่าน <strong>SignPath Foundation</strong> และ <code>scripts/sign-file.ps1</code> ไว้แล้ว โปรดตรวจค่า SHA-256 กับ <a href="downloads/SHA256SUMS.txt" target="_blank" rel="noopener">SHA256SUMS.txt</a> ก่อนติดตั้ง</p>
+        <!-- Linux -->
+        <div class="os-panel" id="panel-linux" role="tabpanel" aria-labelledby="tab-linux" hidden>
+          <div class="dl-linux">
+            <article class="dl-card">
+              <h3>Ubuntu / Debian / Mint</h3>
+              <a class="btn btn-primary" data-asset="NexaTerm-x64.deb"
+                href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-x64.deb">
+                <span data-i18n="dl_get_deb">ดาวน์โหลด .deb</span>
+              </a>
+              <p class="dl-meta"><span class="js-size" data-for="NexaTerm-x64.deb"></span></p>
+              <div class="cmd small"><code id="cmd-deb">sudo apt install ./NexaTerm-x64.deb</code>
+                <button class="copy" type="button" data-copy="cmd-deb" data-i18n="copy_btn">คัดลอก</button></div>
+            </article>
+            <article class="dl-card">
+              <h3>Fedora / openSUSE / RHEL</h3>
+              <a class="btn btn-primary" data-asset="NexaTerm-x64.rpm"
+                href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-x64.rpm">
+                <span data-i18n="dl_get_rpm">ดาวน์โหลด .rpm</span>
+              </a>
+              <p class="dl-meta"><span class="js-size" data-for="NexaTerm-x64.rpm"></span></p>
+              <div class="cmd small"><code id="cmd-rpm">sudo dnf install ./NexaTerm-x64.rpm</code>
+                <button class="copy" type="button" data-copy="cmd-rpm" data-i18n="copy_btn">คัดลอก</button></div>
+            </article>
+            <article class="dl-card">
+              <h3 data-i18n="dl_appimage_title">ลินุกซ์อื่น ๆ (AppImage)</h3>
+              <a class="btn btn-ghost" data-asset="NexaTerm-x64.AppImage"
+                href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-x64.AppImage">
+                <span data-i18n="dl_get_appimage">ดาวน์โหลด AppImage</span>
+              </a>
+              <p class="dl-meta"><span class="js-size" data-for="NexaTerm-x64.AppImage"></span></p>
+              <div class="cmd small"><code id="cmd-appimage">chmod +x NexaTerm-x64.AppImage && ./NexaTerm-x64.AppImage</code>
+                <button class="copy" type="button" data-copy="cmd-appimage" data-i18n="copy_btn">คัดลอก</button></div>
+            </article>
           </div>
-          <div class="cmd">
-            <code id="cmd-hash">Get-FileHash .\NexaTerm-Setup-x64-web.exe -Algorithm SHA256</code>
-            <button class="copy" type="button" data-copy="cmd-hash" aria-label="คัดลอกคำสั่ง"
-              data-i18n="copy_btn">คัดลอก</button>
-          </div>
+          <p class="dl-linux-note" data-i18n-html="dl_linux_note">ใช้ได้กับเครื่อง 64 บิตที่มีหน้าจอเดสก์ท็อป (GNOME, KDE, XFCE ฯลฯ) รหัสผ่านเก็บใน keyring ของเดสก์ท็อป ถ้าจะใช้พอร์ต Serial ให้เพิ่มผู้ใช้เข้ากลุ่ม <code>dialout</code></p>
         </div>
+
+        <!-- Trust -->
+        <ul class="trust">
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span data-i18n-html="dl_trust_source">ซอร์สโค้ดเปิดทั้งหมดบน <a href="https://github.com/bom-sudo/NexaTerm" target="_blank" rel="noopener">GitHub</a> สัญญาอนุญาต MIT</span>
+          </li>
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span data-i18n="dl_trust_build">ไฟล์ทุกตัวสร้างจากซอร์สโค้ดโดย GitHub Actions และผ่านชุดทดสอบก่อนเผยแพร่</span>
+          </li>
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            <span data-i18n-html="dl_trust_hash">ตรวจไฟล์ได้ด้วยค่า SHA-256 ใน <a href="https://github.com/bom-sudo/NexaTerm/releases/latest/download/SHA256SUMS.txt" target="_blank" rel="noopener">SHA256SUMS.txt</a></span>
+          </li>
+        </ul>
 
         <div class="dl-docs" data-i18n-html="dl_docs_links">
-          <a href="downloads/SHA256SUMS.txt" target="_blank" rel="noopener">SHA256SUMS.txt</a>
-          <a href="downloads/RELEASE_NOTES.md" target="_blank" rel="noopener">Release Notes (v1.0.0)</a>
-          <a href="downloads/INSTALLATION_GUIDE.md" target="_blank" rel="noopener">คู่มือการติดตั้ง</a>
-          <a href="downloads/PORTABLE_GUIDE.md" target="_blank" rel="noopener">คู่มือรุ่นพกพา</a>
-          <a href="https://github.com/bom-sudo/NexaTerm/blob/main/docs/CODE_SIGNING.md" target="_blank" rel="noopener">นโยบาย Code Signing (SignPath)</a>
-          <a href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener">GitHub Releases</a>
+          <a href="https://github.com/bom-sudo/NexaTerm/releases" target="_blank" rel="noopener">รุ่นก่อนหน้าทั้งหมด</a>
+          <a href="https://github.com/bom-sudo/NexaTerm/blob/main/docs/INSTALL.md" target="_blank" rel="noopener">คู่มือการติดตั้ง</a>
+          <a href="https://github.com/bom-sudo/NexaTerm/blob/main/CHANGELOG.md" target="_blank" rel="noopener">บันทึกการเปลี่ยนแปลง</a>
+          <a href="https://github.com/bom-sudo/NexaTerm/blob/main/docs/CODE_SIGNING.md" target="_blank" rel="noopener">นโยบายลงนามโค้ด</a>
         </div>
       </div>
     </section>
@@ -666,6 +714,54 @@
     function closeLb() { lb.hidden = true; document.body.style.overflow = ''; }
     lb.addEventListener('click', (e) => { if (e.target === lb || e.target.classList.contains('lightbox-close')) closeLb(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !lb.hidden) closeLb(); });
+
+    // Download section: pick the visitor's OS, and show the real version / file sizes of the
+    // latest GitHub release. Links work without this script (they point at releases/latest/download).
+    (function () {
+      const tabs = { windows: document.getElementById('tab-windows'), linux: document.getElementById('tab-linux') };
+      const panels = { windows: document.getElementById('panel-windows'), linux: document.getElementById('panel-linux') };
+      function showOs(os) {
+        Object.keys(tabs).forEach((k) => {
+          tabs[k].setAttribute('aria-selected', k === os ? 'true' : 'false');
+          panels[k].hidden = k !== os;
+        });
+      }
+      Object.keys(tabs).forEach((k) => tabs[k].addEventListener('click', () => showOs(k)));
+      const ua = navigator.userAgent || '';
+      const isLinux = /Linux|X11/.test(ua) && !/Android|CrOS/.test(ua);
+      if (isLinux) {
+        showOs('linux');
+        const heroLabel = document.querySelector('#hero-download [data-i18n]');
+        // i18n.js applies the text on DOMContentLoaded, which runs after this script.
+        if (heroLabel) heroLabel.setAttribute('data-i18n', 'hero_cta_download_linux');
+      }
+
+      function fmtSize(bytes) {
+        return bytes >= 1048576 ? (bytes / 1048576).toFixed(bytes >= 104857600 ? 0 : 1) + ' MB' : Math.round(bytes / 1024) + ' KB';
+      }
+      fetch('https://api.github.com/repos/bom-sudo/NexaTerm/releases/latest', { headers: { Accept: 'application/vnd.github+json' } })
+        .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+        .then((rel) => {
+          const assets = {};
+          (rel.assets || []).forEach((a) => (assets[a.name] = a));
+          const v = (rel.tag_name || '').replace(/^v/, '');
+          if (v) document.querySelectorAll('.js-version').forEach((el) => (el.textContent = v));
+          if (rel.published_at) {
+            const lang = document.documentElement.lang === 'en' ? 'en-GB' : 'th-TH';
+            const d = new Date(rel.published_at).toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric' });
+            document.querySelectorAll('.js-date').forEach((el) => (el.textContent = '· ' + d));
+          }
+          document.querySelectorAll('.js-size').forEach((el) => {
+            const a = assets[el.dataset.for];
+            if (a) el.textContent = fmtSize(a.size);
+          });
+          // A file missing from the latest release: send people to the release page instead of a 404.
+          document.querySelectorAll('[data-asset]').forEach((link) => {
+            if (!assets[link.dataset.asset]) link.href = rel.html_url || 'https://github.com/bom-sudo/NexaTerm/releases';
+          });
+        })
+        .catch(() => { /* offline or rate-limited: the static links still work */ });
+    })();
 
     // Copy buttons
     document.querySelectorAll('.copy').forEach((b) => {

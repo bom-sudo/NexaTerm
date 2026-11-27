@@ -159,7 +159,10 @@ jobs:
         shell: bash
         run: |
           mkdir -p out
-          cp src-tauri/target/release/bundle/deb/*.deb src-tauri/target/release/bundle/rpm/*.rpm src-tauri/target/release/bundle/appimage/*.AppImage out/
+          # Stable names so .../releases/latest/download/<name> links never change.
+          cp src-tauri/target/release/bundle/deb/*.deb out/NexaTerm-x64.deb
+          cp src-tauri/target/release/bundle/rpm/*.rpm out/NexaTerm-x64.rpm
+          cp src-tauri/target/release/bundle/appimage/*.AppImage out/NexaTerm-x64.AppImage
           ls -l out
       - uses: actions/upload-artifact@v4
         with:
@@ -168,13 +171,21 @@ jobs:
           if-no-files-found: error
 
   publish:
-    name: Draft GitHub release
+    name: Publish GitHub release
     if: startsWith(github.ref, 'refs/tags/v')
     needs: [windows, linux]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+      - name: Tag must match the app version
+        shell: bash
+        run: |
+          v=$(node -p "require('./package.json').version")
+          [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "::error::tag $GITHUB_REF_NAME does not match package.json version $v"; exit 1; }
+          echo "VERSION=$v" >> "$GITHUB_ENV"
+          sed "s/{{VERSION}}/$v/g" packaging/RELEASE_NOTES.md > release-body.md
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
@@ -184,9 +195,13 @@ jobs:
         run: |
           mkdir -p release
           find artifacts -type f -exec cp {} release/ \;
-          rm -f release/SHA256SUMS.txt
+          # Only the programs; the guides live in the repository and in the release text.
+          rm -f release/SHA256SUMS.txt release/*.md
           (cd release && sha256sum --binary -- * > SHA256SUMS.txt && cat SHA256SUMS.txt)
       - uses: softprops/action-gh-release@v2
         with:
-          draft: true
+          name: NexaTerm ${{ env.VERSION }}
+          body_path: release-body.md
+          draft: false
+          make_latest: true
           files: release/*

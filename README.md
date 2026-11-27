@@ -17,7 +17,7 @@
   <a href="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml/badge.svg"></a>
   <img alt="Platform: Windows 10/11 x64, Linux x64" src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011%20%7C%20Linux%20x64-0b1930">
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-35bdf2">
-  <img alt="Version 1.0.0" src="https://img.shields.io/badge/version-1.0.0-477bff">
+  <img alt="Version 1.1.0" src="https://img.shields.io/badge/version-1.1.0-477bff">
   <img alt="Built with Tauri 2 and Rust" src="https://img.shields.io/badge/built%20with-Tauri%202%20%2B%20Rust-142a49">
 </p>
 
@@ -51,7 +51,7 @@ server that ships with the source (`cargo run --example mock_sshd`), which is wh
   </tr>
 </table>
 
-## Features (v1.0.0)
+## Features
 
 | Area | What works today |
 |---|---|
@@ -72,27 +72,28 @@ forwarding, SFTP folder transfer and permissions, an SFTP side panel, MobaXterm/
 output highlighting and macros (see CHANGELOG, Unreleased). Not yet implemented: RDP, VNC,
 an embedded X server, master password and remote monitoring. See [DEVELOPMENT_STATUS.md](DEVELOPMENT_STATUS.md).
 
-## Install (v1.0.0)
+## Install
 
-| Download | Notes |
-|---|---|
-| `NexaTerm-Setup-x64.exe` (≈287 MB) | Wizard, per-user, no admin. Bundles the WebView2 Runtime → works offline. Needs ~300 MB free in `%TEMP%` while installing. |
-| `NexaTerm-Setup-x64-web.exe` (≈3 MB) | Same installer; downloads WebView2 from Microsoft only if missing. |
-| `NexaTerm-Portable-x64.zip` (≈3.6 MB) | Extract anywhere, run `NexaTerm.exe`; data stays in `portable-data\`. |
+Download from the [latest release](https://github.com/bom-sudo/NexaTerm/releases/latest):
 
-The 1.0.0 files are **not code-signed** (Windows shows "Unknown publisher"); verify downloads
-with `SHA256SUMS.txt`. Signed releases come from the Release workflow once SignPath signing is
-active, see [Code signing policy](#code-signing-policy).
-See [docs/INSTALL.md](docs/INSTALL.md) and the guides shipped with each release.
+| You use | Download | How |
+|---|---|---|
+| Windows 10 / 11 (most people) | [NexaTerm-Setup-x64-web.exe](https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Setup-x64-web.exe) | Double-click, follow the wizard. Per-user, no admin rights. |
+| Windows, no installation | [NexaTerm-Portable-x64.zip](https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Portable-x64.zip) | Extract anywhere, run `NexaTerm.exe`; data stays in `portable-data\`. |
+| Windows PC without internet | [NexaTerm-Setup-x64.exe](https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-Setup-x64.exe) | Includes the WebView2 Runtime (large); needs ~300 MB free in `%TEMP%`. |
+| Ubuntu / Debian / Mint | [NexaTerm-x64.deb](https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-x64.deb) | `sudo apt install ./NexaTerm-x64.deb` |
+| Fedora / openSUSE / RHEL | [NexaTerm-x64.rpm](https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-x64.rpm) | `sudo dnf install ./NexaTerm-x64.rpm` |
+| Any other Linux desktop | [NexaTerm-x64.AppImage](https://github.com/bom-sudo/NexaTerm/releases/latest/download/NexaTerm-x64.AppImage) | `chmod +x NexaTerm-x64.AppImage && ./NexaTerm-x64.AppImage` |
 
-### Linux (preview, built by CI)
+Every file is built from this repository by GitHub Actions after the test suite passes; checksums
+are in [SHA256SUMS.txt](https://github.com/bom-sudo/NexaTerm/releases/latest/download/SHA256SUMS.txt). The Windows files are not code-signed yet, so Windows
+may show "Windows protected your PC": click *More info*, then *Run anyway*. Signing through
+SignPath Foundation is being set up, see [Code signing policy](#code-signing-policy).
 
-`.deb` (Debian/Ubuntu), `.rpm` (Fedora/openSUSE) and `.AppImage` builds for x64 are produced by
-GitHub Actions on every push (artifacts of the [CI workflow](https://github.com/bom-sudo/NexaTerm/actions/workflows/ci.yml))
-and attached to tagged releases. On Linux, NexaTerm uses your login shell (bash/zsh/fish) through
-a PTY, stores passwords in the desktop keyring (GNOME Keyring / KWallet through the Secret
-Service), uses `ssh-agent` via `SSH_AUTH_SOCK`, opens serial devices such as `/dev/ttyUSB0`
-(your user must be in the `dialout` group) and forwards X11 to your current `$DISPLAY`.
+On Linux, NexaTerm uses your login shell (bash/zsh/fish) in a PTY, keeps passwords in the desktop
+keyring (GNOME Keyring / KWallet), uses `ssh-agent`, opens serial devices such as `/dev/ttyUSB0`
+(add your user to the `dialout` group) and forwards X11 to your current display.
+More in [docs/INSTALL.md](docs/INSTALL.md).
 
 ## Build from source
 

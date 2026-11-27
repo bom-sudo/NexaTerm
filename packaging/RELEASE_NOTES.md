@@ -1,42 +1,49 @@
-# NexaTerm {{VERSION}} — Release Notes
+# NexaTerm {{VERSION}}
 
-**One Workspace. Every Remote Connection.** Free and open-source (MIT) remote administration
-workstation for Windows 10/11 x64. No account, no telemetry, no paid tier, no usage limits.
+**One Workspace. Every Remote Connection.** Free and open-source (MIT) terminal, SSH, SFTP and
+remote administration workstation for Windows 10/11 and Linux (x64). No account, no telemetry,
+no paid tier, no usage limits.
 
-## Downloads
+## Which file do I need?
 
-| File | Description |
-|---|---|
-| `NexaTerm-Setup-x64.exe` | Installer wizard, per-user, includes the WebView2 Runtime offline installer (works without internet) |
-| `NexaTerm-Setup-x64-web.exe` | Small installer; downloads WebView2 from Microsoft only if missing |
-| `NexaTerm-Portable-x64.zip` | Portable edition (extract and run `NexaTerm.exe`) |
-| `SHA256SUMS.txt` | SHA-256 checksums of the files above |
+| You use | Download | How |
+|---|---|---|
+| Windows 10 / 11 (most people) | `NexaTerm-Setup-x64-web.exe` | Double-click and follow the wizard. Per-user install, no admin rights. |
+| Windows, no installation | `NexaTerm-Portable-x64.zip` | Extract anywhere (also a USB drive) and run `NexaTerm.exe`. |
+| Windows PC without internet | `NexaTerm-Setup-x64.exe` | Same installer with Microsoft WebView2 included (large file). |
+| Ubuntu / Debian / Mint | `NexaTerm-x64.deb` | `sudo apt install ./NexaTerm-x64.deb` |
+| Fedora / openSUSE / RHEL | `NexaTerm-x64.rpm` | `sudo dnf install ./NexaTerm-x64.rpm` |
+| Any other Linux desktop | `NexaTerm-x64.AppImage` | `chmod +x NexaTerm-x64.AppImage && ./NexaTerm-x64.AppImage` |
 
-**Signing status: unsigned.** No code-signing certificate is used for this release. Windows SmartScreen
-may warn on first run. Verify the checksums before running.
+`SHA256SUMS.txt` lists the SHA-256 checksum of every file. All files are built from the source in
+this repository by GitHub Actions after the full test suite passes.
 
-## Included in this version
+**If Windows shows "Windows protected your PC":** click *More info*, then *Run anyway*. Windows
+shows this for new programs that few people have downloaded yet. NexaTerm is applying for a free
+code signing certificate from SignPath Foundation; signed releases will show the publisher name.
 
-* Terminal: tabs, split panes (2/4) with resizable dividers, search, clipboard, export, session logging, themes, font/cursor settings.
-* Local shells via ConPTY: PowerShell, PowerShell 7, Command Prompt, Git Bash, WSL (auto-detected).
-* SSH: password, private key (incl. encrypted), Windows OpenSSH agent, keyboard-interactive (password prompts),
-  SHA-256 host-key verification with known-hosts store, ProxyJump, keepalive, retries, reconnect.
-* Session manager: folders, favorites, tags, search, history, Quick Connect, `~/.ssh/config` import, JSON import/export (no secrets).
-* SFTP browser: transfers with progress/cancel, drag-and-drop upload, remote editor with atomic save.
-* SSH tunnels (-L, -R, SOCKS5 -D), multi-execution with safety confirmation, SSH key manager,
-  command snippets with variables, network tools (ping, traceroute, DNS, reverse DNS, TCP test, interfaces, public IP).
-* Secrets in Windows Credential Manager only; SQLite database with migrations and backup/restore.
-* New in {{VERSION}}: portable mode with `portable-data` folder and read-only fallback, application log
-  (`logs\nexaterm.log`, redacted), `--self-test` diagnostics, N logo, English/Thai installer.
+## New in 1.1.0
+
+* **Linux** (x64): deb, rpm and AppImage. Login shell in a real PTY, passwords in the desktop
+  keyring (GNOME Keyring / KWallet), ssh-agent, serial devices, X11 forwarding to your display.
+* **Telnet** and **Serial** sessions (COM ports on Windows, `/dev/ttyUSB*` / `/dev/ttyACM*` on Linux).
+* **SSH:** two-factor logins (password then one-time code), agent forwarding, compression,
+  X11 forwarding, PuTTY `.ppk` keys, `~/` in key paths.
+* **SFTP:** upload / download whole folders, permissions dialog (chmod / chown), a side panel next
+  to the terminal that can follow the shell's current folder.
+* **Import** sessions from MobaXterm and PuTTY.
+* **Terminal:** highlighting of errors, warnings and IP addresses; confirmation before pasting
+  several lines; **macros** (record and replay keystrokes).
+
+## Already in 1.0
+
+Tabs and split panes, local shells (PowerShell, cmd, Git Bash, WSL), SSH with host-key
+verification and ProxyJump, session manager with folders and favorites, SFTP browser and editor,
+SSH tunnels (-L / -R / SOCKS), multi-execution, SSH key manager, snippets, network tools,
+portable mode, backup / restore.
 
 ## Not included yet
 
-RDP, VNC, X11 forwarding, Telnet, serial, macro recording, recursive folder transfers over SFTP.
+RDP, VNC, a built-in X server, master password, remote monitoring.
 
-## Known limitations
-
-* Unsigned executables (SmartScreen warning).
-* Keyboard-interactive logins that ask several different questions (e.g. password then OTP) are not yet supported.
-* SSH has been validated against NexaTerm's bundled test server and its automated test suite; test against
-  your own servers before relying on it in production.
-* The portable edition needs the WebView2 Runtime to be present on the PC (standard on Windows 11 / updated Windows 10).
+Full history: [CHANGELOG.md](https://github.com/bom-sudo/NexaTerm/blob/main/CHANGELOG.md)
